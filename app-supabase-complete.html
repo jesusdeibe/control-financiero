@@ -2400,10 +2400,12 @@
         } else {
           await addTransaction(transaction);
         }
-
+        
         closeModal();
+        await getData(); // AÑADÍ ESTA LÍNEA
         renderMonthlyView();
         renderDashboard();
+        showToast('Transacción guardada correctamente', 'success'); // ← Opcional pero útil
       } catch (error) {
         console.error('Error saving transaction:', error);
         showToast('Error al guardar la transacción: ' + error.message, 'error');
