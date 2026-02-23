@@ -1660,63 +1660,70 @@
     let editingId = null;
 
     // Initialize data structure
-    function initData() {
-      const data = localStorage.getItem('financialData');
-      if (!data) {
-        const initialData = {
-          transactions: [],
-          holdings: [],
-          transfers: [],
-          contributions: [],
-          customCategories: {},
-          accounts: ACCOUNTS.map(name => ({
+    async function initData() {
+      try {
+        const { data: existingAccounts } = await supabaseClient.from('accounts').select('name');
+        
+        if (!existingAccounts || existingAccounts.length === 0) {
+          const defaultAccounts = ACCOUNTS.map(name => ({
             name,
             type: ACCOUNT_TYPES[name] || 'Cuenta',
             color: ACCOUNT_COLORS[name] || '#3B82F6',
-            initialBalance: 0,
-            balance: 0,
-            includeInPatrimony: true
-          }))
-        };
-        localStorage.setItem('financialData', JSON.stringify(initialData));
-        return initialData;
+            initial_balance: 0,
+            include_in_patrimony: true
+          }));
+          
+          await supabaseClient.from('accounts').insert(defaultAccounts);
+          console.log('✅ Default accounts created');
+        }
+        
+        return await getData();
+      } catch (error) {
+        console.error('Error initializing data:', error);
+        showToast('Error al inicializar datos', 'error');
+        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
       }
-      const parsed = JSON.parse(data);
-      
-      // Ensure all arrays exist for backwards compatibility
-      if (!parsed.transfers) parsed.transfers = [];
-      if (!parsed.holdings) parsed.holdings = [];
-      if (!parsed.contributions) parsed.contributions = [];
-      if (!parsed.customCategories) parsed.customCategories = {};
-      
-      // Load custom categories
-      if (parsed.customCategories) {
-        Object.keys(parsed.customCategories).forEach(type => {
-          if (CATEGORIES[type]) {
-            CATEGORIES[type] = parsed.customCategories[type];
-          }
-        });
-      }
-      
-      // Load custom accounts
-      if (parsed.accounts && parsed.accounts.length > 0) {
-        ACCOUNTS = parsed.accounts.map(a => a.name);
-        parsed.accounts.forEach(account => {
-          if (account.color) ACCOUNT_COLORS[account.name] = account.color;
-          if (account.type) ACCOUNT_TYPES[account.name] = account.type;
-        });
-      }
-      
-      return parsed;
     }
 
-    function getData() {
-      const data = localStorage.getItem('financialData');
-      if (!data) {
-        console.warn('No data found, initializing...');
-        return initData();
+    async function getData() {
+      if (dataCache) return dataCache;
+      
+      try {
+        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes] = await Promise.all([
+          supabaseClient.from('accounts').select('*').order('name'),
+          supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
+          supabaseClient.from('holdings').select('*').order('name'),
+          supabaseClient.from('transfers').select('*').order('date', { ascending: false }),
+          supabaseClient.from('contributions').select('*'),
+          supabaseClient.from('fixed_expenses').select('*').order('name'),
+          supabaseClient.from('fixed_expenses_paid').select('*'),
+          supabaseClient.from('monthly_patrimony').select('*')
+        ]);
+
+        const data = {
+          accounts: (accountsRes.data || []).map(a => ({ name: a.name, type: a.type, color: a.color, initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), includeInPatrimony: a.include_in_patrimony })),
+          transactions: (transactionsRes.data || []).map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
+          holdings: (holdingsRes.data || []).map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
+          transfers: (transfersRes.data || []).map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
+          contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
+          fixedExpenses: (fixedExpensesRes.data || []).map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
+          fixedExpensesPaid: {},
+          monthlyPatrimony: {},
+          customCategories: {}
+        };
+
+        (fixedExpensesPaidRes.data || []).forEach(item => { if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); });
+        (monthlyPatrimonyRes.data || []).forEach(item => { data.monthlyPatrimony[item.month_key] = parseFloat(item.value); });
+
+        if (data.accounts.length > 0) { ACCOUNTS.length = 0; data.accounts.forEach(acc => { ACCOUNTS.push(acc.name); ACCOUNT_COLORS[acc.name] = acc.color; ACCOUNT_TYPES[acc.name] = acc.type; }); }
+
+        dataCache = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error al cargar datos', 'error');
+        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
       }
-      return JSON.parse(data);
     }
 
     function saveData(data) {
@@ -1776,8 +1783,8 @@
       }
     }
 
-    function getTransactionsByMonth(month, type = null) {
-      const data = getData();
+    async function getTransactionsByMonth(month, type = null) {
+      const data = await getData();
       return data.transactions.filter(t => {
         const txnMonth = new Date(t.date).getMonth();
         const matchesMonth = txnMonth === month;
@@ -1851,8 +1858,8 @@
       return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
-    function renderDashboard() {
-      const data = getData();
+    async function renderDashboard() {
+      const data = await getData();
       const transactions = data.transactions;
       
       // Calculate totals
@@ -1910,7 +1917,8 @@
       `).join('');
     }
 
-    function renderMonthlyView() {
+    async function renderMonthlyView() {
+      await getData();
       // Render month selector
       const monthSelector = document.getElementById('month-selector');
       monthSelector.innerHTML = MONTHS.map((month, index) => `
@@ -1925,13 +1933,13 @@
         `${MONTHS[currentMonth]} 2025`;
 
       // Calculate monthly totals
-      const ingresos = getTransactionsByMonth(currentMonth, 'ingresos')
+      const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const gastosPersonales = getTransactionsByMonth(currentMonth, 'gastos_personales')
+      const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const gastosCompartidos = getTransactionsByMonth(currentMonth, 'gastos_compartidos')
+      const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const inversiones = getTransactionsByMonth(currentMonth, 'inversiones')
+      const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
       
       const ahorroNeto = ingresos - gastosPersonales - inversiones;
@@ -1964,21 +1972,21 @@
       document.getElementById('inversiones-total').textContent = formatCurrency(inversiones);
 
       // Render tables
-      renderTable('ingresos');
-      renderTable('gastos_personales');
-      renderTable('gastos_compartidos');
-      renderTable('inversiones');
+      await renderTable('ingresos');
+      await renderTable('gastos_personales');
+      await renderTable('gastos_compartidos');
+      await renderTable('inversiones');
       
       // Load contributions after DOM is ready
-      setTimeout(() => {
-        loadContributions();
-        renderFixedExpensesInMonth();
-        updateMonthlyPatrimonyDisplay();
+      setTimeout(async() => {
+        await loadContributions();
+        await renderFixedExpensesInMonth();
+        await updateMonthlyPatrimonyDisplay();
       }, 0);
     }
 
-    function renderTable(type) {
-      const transactions = getTransactionsByMonth(currentMonth, type);
+    async function renderTable(type) {
+      const transactions = await getTransactionsByMonth(currentMonth, type);
       const tableId = type.replace('_', '-') + '-table';
       const tbody = document.getElementById(tableId);
 
@@ -2021,92 +2029,94 @@
     // CONTRIBUTIONS MANAGEMENT
     // ============================================================================
     
-    function saveContributions() {
-      const data = getData();
-      if (!data.contributions) data.contributions = [];
-      
+    async function saveContributions() {
       const myContribution = parseFloat(document.getElementById('my-contribution').value) || 0;
       const partnerContribution = parseFloat(document.getElementById('partner-contribution').value) || 0;
       const externalContributions = parseFloat(document.getElementById('external-contributions').value) || 0;
       
-      console.log('Saving contributions:', JSON.stringify({ my: myContribution, partner: partnerContribution, external: externalContributions }));
+      const monthKey = `${currentMonth}-2025`;
       
-      // Find or create contribution entry for current month
-      const monthKey = `${currentMonth}-2025`; // e.g., "1-2025" for February
-      let contribution = data.contributions.find(c => c.month === monthKey);
-      
-      if (contribution) {
-        contribution.my = myContribution;
-        contribution.partner = partnerContribution;
-        contribution.external = externalContributions;
-        console.log('Updated existing contribution for month', monthKey);
-      } else {
-        data.contributions.push({
-          month: monthKey,
-          my: myContribution,
-          partner: partnerContribution,
-          external: externalContributions
-        });
-        console.log('Created new contribution for month', monthKey);
+      try {
+        // Check if contribution already exists for this month
+        const { data: existing, error: fetchError } = await supabaseClient
+          .from('contributions')
+          .select('*')
+          .eq('month_key', monthKey)
+          .maybeSingle();
+        
+        if (existing) {
+          // Update existing
+          const { error } = await supabaseClient
+            .from('contributions')
+            .update({
+              my: myContribution,
+              partner: partnerContribution,
+              external: externalContributions
+            })
+            .eq('month_key', monthKey);
+          
+          if (error) throw error;
+          console.log('Updated existing contribution for month', monthKey);
+        } else {
+          // Insert new
+          const { error } = await supabaseClient
+            .from('contributions')
+            .insert({
+              month_key: monthKey,
+              my: myContribution,
+              partner: partnerContribution,
+              external: externalContributions
+            });
+          
+          if (error) throw error;
+          console.log('Created new contribution for month', monthKey);
+        }
+        
+        invalidateCache();
+        await getData();
+        
+        // Recargar inputs después de guardar
+          setTimeout(() => loadContributions(),100);
+        
+        // Update total display
+        const total = myContribution + partnerContribution + externalContributions;
+        document.getElementById('total-contributions').textContent = formatCurrency(total);
+      } catch (error) {
+        console.error('Error saving contributions:', error);
+        showToast('Error al guardar aportaciones', 'error');
       }
-      
-      console.log('All contributions after save:', JSON.stringify(data.contributions));
-      saveData(data);
-      
-      // Update total display
-      const total = myContribution + partnerContribution + externalContributions;
-      document.getElementById('total-contributions').textContent = formatCurrency(total);
-      
-      // Recalculate account balances
-      if (typeof renderAccountsView === 'function') {
-        renderAccountsView();
-      }
-      renderDashboard();
     }
     
-    function loadContributions() {
+    async function loadContributions() {
       const myInput = document.getElementById('my-contribution');
       const partnerInput = document.getElementById('partner-contribution');
       const externalInput = document.getElementById('external-contributions');
       const totalDisplay = document.getElementById('total-contributions');
       
-      // Check if elements exist (they might not if not in monthly view)
+      // Check if elements exist
       if (!myInput || !partnerInput || !externalInput || !totalDisplay) {
         console.log('Contribution inputs not found - not in monthly view');
         return;
       }
       
-      const data = getData();
-      if (!data.contributions) data.contributions = [];
-      
+      const data = await getData();
       const monthKey = `${currentMonth}-2025`;
       const contribution = data.contributions.find(c => c.month === monthKey);
       
-      console.log(`Loading contributions for month ${monthKey}:`, JSON.stringify(contribution));
+      console.log(`Loading contributions for month ${monthKey}:`, contribution);
       
       if (contribution) {
-        console.log('Found contribution:', JSON.stringify(contribution));
+        const myValue = contribution.my || 0;
+        const partnerValue = contribution.partner || 0;
+        const externalValue = contribution.external || 0;
         
-        const myValue = contribution.my;
-        const partnerValue = contribution.partner;
-        const externalValue = contribution.external;
+        // Set values - show empty if 0
+        myInput.value = myValue !== 0 ? myValue : '';
+        partnerInput.value = partnerValue !== 0 ? partnerValue : '';
+        externalInput.value = externalValue !== 0 ? externalValue : '';
         
-        console.log('Setting my:', myValue, typeof myValue);
-        console.log('Setting partner:', partnerValue, typeof partnerValue);
-        console.log('Setting external:', externalValue, typeof externalValue);
-        
-        // Set values - use empty string if 0 or undefined
-        myInput.value = (myValue && myValue !== 0) ? myValue : '';
-        partnerInput.value = (partnerValue && partnerValue !== 0) ? partnerValue : '';
-        externalInput.value = (externalValue && externalValue !== 0) ? externalValue : '';
-        
-        // Calculate total with proper number handling
-        const myNum = parseFloat(myValue) || 0;
-        const partnerNum = parseFloat(partnerValue) || 0;
-        const externalNum = parseFloat(externalValue) || 0;
-        const total = myNum + partnerNum + externalNum;
-        
-        console.log('Calculated total:', total, '=', myNum, '+', partnerNum, '+', externalNum);
+        // Calculate total
+        const total = myValue + partnerValue + externalValue;
         totalDisplay.textContent = formatCurrency(total);
       } else {
         console.log('No contributions found for this month, clearing inputs');
@@ -2117,11 +2127,11 @@
       }
     }
     
-    function getMonthlyContributions(accountName) {
+    async function getMonthlyContributions(accountName) {
       // Only count partner and external contributions for Santander Pareja account
       if (accountName !== 'Santander Pareja') return 0;
       
-      const data = getData();
+      const data = await getData();
       if (!data.contributions) {
         console.log('No contributions data found');
         return 0;
@@ -2141,8 +2151,8 @@
       return total;
     }
 
-    function renderInvestmentsView() {
-      const data = getData();
+    async function renderInvestmentsView() {
+      const data = await getData();
       const holdings = data.holdings || [];
       const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
 
@@ -2524,7 +2534,7 @@
     // ============================================================================
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const view = btn.dataset.view;
         
         // Update active nav
@@ -2536,14 +2546,35 @@
         document.getElementById(`${view}-view`).classList.add('active');
 
         // Render view
-        if (view === 'dashboard') renderDashboard();
-        if (view === 'monthly') renderMonthlyView();
-        if (view === 'inversiones') renderInvestmentsView();
-        if (view === 'accounts') renderAccountsView();
-        if (view === 'settings') renderSettingsView();
-        if (view === 'accounts') renderAccountsView();
+        if (view === 'dashboard') await renderDashboard();
+        if (view === 'monthly') await renderMonthlyView();
+        if (view === 'inversiones') await renderInvestmentsView();
+        if (view === 'accounts') await renderAccountsView();
+        if (view === 'settings') await renderSettingsView();
+        if (view === 'accounts') await renderAccountsView();
       });
     });
+
+    function switchView(viewName) {
+      // Update active nav button
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.view === viewName) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Show view
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`${viewName}-view`).classList.add('active');
+
+      // Render view
+      if (viewName === 'dashboard') renderDashboard();
+      if (viewName === 'monthly') renderMonthlyView();
+      if (viewName === 'inversiones') renderInvestmentsView();
+      if (viewName === 'accounts') renderAccountsView();
+      if (viewName === 'settings') renderSettingsView();
+    }
 
     // Close modals on overlay click
     document.getElementById('transaction-modal').addEventListener('click', (e) => {
@@ -2606,8 +2637,8 @@ async function updateAccountBalance(accountName, initialBalance) {
   }
 }
 
-function calculateAccountBalance(accountName) {
-  const data = getData();
+async function calculateAccountBalance(accountName) {
+  const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
   if (!account) return 0;
   
@@ -2632,14 +2663,14 @@ function calculateAccountBalance(accountName) {
     .reduce((sum, t) => sum + parseFloat(t.amount), 0);
   
   // Add partner and external contributions for shared account
-  const contributions = getMonthlyContributions(accountName);
+  const contributions = await getMonthlyContributions(accountName);
   
   return account.initialBalance + ingresos - gastos - inversiones + transfersReceived - transfersSent + contributions;
 }
 
 // Render Accounts View
-function renderAccountsView() {
-  const data = getData();
+async function renderAccountsView() {
+  const data = await getData();
   const filterAccount = document.getElementById('account-filter')?.value || '';
   
   // Calculate total patrimonio
@@ -2680,14 +2711,20 @@ function renderAccountsView() {
   
   // Render Account Cards
   const cardsGrid = document.getElementById('accounts-cards-grid');
-  cardsGrid.innerHTML = ACCOUNTS.map(accountName => {
-    const balance = calculateAccountBalance(accountName);
+
+  // Calculate all balances first
+  const balances = await Promise.all(
+    ACCOUNTS.map(accountName => calculateAccountBalance(accountName))
+  );
+
+  cardsGrid.innerHTML = ACCOUNTS.map((accountName, index) => {
+    const balance = balances[index];
     const account = data.accounts.find(a => a.name === accountName);
     const change = balance - (account?.initialBalance || 0);
     
     return `
       <div class="account-card" style="--account-color: ${ACCOUNT_COLORS[accountName]}" 
-           onclick="openAccountModal('${accountName}')">
+           onclick="handleAccountClick('${accountName}')">
         <div class="account-card-header">
           <div>
             <div class="account-card-name">${accountName}</div>
@@ -2866,7 +2903,7 @@ function saveTransfer(event) {
   renderDashboard();
 }
 
-function saveTransferClick() {
+async function saveTransferClick() {
   const date = document.getElementById('transfer-date').value;
   const from = document.getElementById('transfer-from').value;
   const to = document.getElementById('transfer-to').value;
@@ -2889,15 +2926,17 @@ function saveTransferClick() {
     concept: document.getElementById('transfer-concept').value
   };
   
-  addTransfer(transfer);
+  await addTransfer(transfer);
   closeTransferModal();
-  renderAccountsView();
-  renderDashboard();
+  await getData(); // Recargar datos para actualizar la vista
+  await renderAccountsView();
+  await renderDashboard();
+  showToast('Transferencia guardada correctamente', 'success');
 }
 
-function openAccountModal(accountName) {
+async function openAccountModal(accountName) {
   editingAccountName = accountName;
-  const data = getData();
+  const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
   
   document.getElementById('account-modal-title').textContent = `Editar ${accountName}`;
@@ -2905,6 +2944,10 @@ function openAccountModal(accountName) {
   document.getElementById('account-initial-balance').value = account?.initialBalance || 0;
   
   document.getElementById('account-modal').classList.add('active');
+}
+
+async function handleAccountClick(accountName) {
+  await openAccountModal(accountName);
 }
 
 function closeAccountModal() {
@@ -3040,22 +3083,30 @@ function saveEditedAccount() {
   showToast('Cuenta actualizada correctamente', 'success');
 }
 
-function toggleAccountInPatrimony(accountName) {
-  const data = getData();
-  const account = data.accounts.find(a => a.name === accountName);
-  if (!account) return;
-  
-  account.includeInPatrimony = !account.includeInPatrimony;
-  if (account.includeInPatrimony === undefined) {
-    account.includeInPatrimony = false;
+async function toggleAccountInPatrimony(accountName) {
+  try {
+    const data = await getData();
+    const account = data.accounts.find(a => a.name === accountName);
+    if (!account) return;
+    
+    const newValue = !account.includeInPatrimony;
+    
+    const { error } = await supabaseClient.from('accounts').update({
+      include_in_patrimony: newValue
+    }).eq('name', accountName);
+    
+    if (error) throw error;
+    
+    invalidateCache();
+    await renderSettingsView();
+    showToast(newValue ? 
+      `${accountName} incluida en patrimonio` : 
+      `${accountName} excluida de patrimonio`, 
+      'info');
+  } catch (error) {
+    console.error('Error toggling account:', error);
+    showToast('Error al actualizar cuenta', 'error');
   }
-  
-  saveData(data);
-  renderSettingsView();
-  showToast(account.includeInPatrimony ? 
-    `${accountName} incluida en patrimonio` : 
-    `${accountName} excluida de patrimonio`, 
-    'info');
 }
 
 function saveNewAccount() {
@@ -3222,8 +3273,8 @@ function deleteCategory(type, categoryName) {
 // SETTINGS VIEW RENDERING
 // ============================================================================
 
-function renderSettingsView() {
-  const data = getData();
+async function renderSettingsView() {
+  const data = await getData();
 
   // Render accounts table
   const accountsTable = document.getElementById('settings-accounts-table');
@@ -3254,7 +3305,7 @@ function renderSettingsView() {
   }).join('');
 
   // Render fixed expenses
-  renderFixedExpensesInSettings();
+  await renderFixedExpensesInSettings();
 
   // Render categories
   Object.keys(CATEGORIES).forEach(type => {
@@ -3364,7 +3415,7 @@ function populateFixedExpenseAccounts() {
 // CRUD FUNCTIONS
 // ============================================================================
 
-function saveFixedExpense() {
+async function saveFixedExpense() {
   const name = document.getElementById('fixed-expense-name').value.trim();
   const type = document.getElementById('fixed-expense-type').value;
   const category = document.getElementById('fixed-expense-category').value;
@@ -3385,32 +3436,41 @@ function saveFixedExpense() {
     return;
   }
   
-  const data = getData();
-  if (!data.fixedExpenses) data.fixedExpenses = [];
-  
-  const expense = {
-    id: editingFixedExpenseId || Date.now().toString(),
-    name,
-    type,
-    category,
-    account,
-    amount,
-    months  // Add months array
-  };
-  
-  if (editingFixedExpenseId) {
-    const index = data.fixedExpenses.findIndex(e => e.id === editingFixedExpenseId);
-    if (index !== -1) {
-      data.fixedExpenses[index] = expense;
+  try {
+    if (editingFixedExpenseId) {
+      // Update existing
+      const { error } = await supabaseClient.from('fixed_expenses').update({
+        name,
+        type,
+        category,
+        account,
+        amount,
+        months
+      }).eq('id', editingFixedExpenseId);
+      
+      if (error) throw error;
+    } else {
+      // Insert new
+      const { error } = await supabaseClient.from('fixed_expenses').insert({
+        name,
+        type,
+        category,
+        account,
+        amount,
+        months
+      });
+      
+      if (error) throw error;
     }
-  } else {
-    data.fixedExpenses.push(expense);
+    
+    invalidateCache();
+    closeFixedExpenseModal();
+    await renderSettingsView();
+    showToast('Gasto fijo guardado correctamente', 'success');
+  } catch (error) {
+    console.error('Error saving fixed expense:', error);
+    showToast('Error al guardar: ' + error.message, 'error');
   }
-  
-  saveData(data);
-  closeFixedExpenseModal();
-  renderSettingsView();
-  showToast('Gasto fijo guardado correctamente', 'success');
 }
 
 function deleteFixedExpense(id) {
@@ -3425,63 +3485,76 @@ function deleteFixedExpense(id) {
 // MONTHLY CHECKLIST FUNCTIONS
 // ============================================================================
 
-function toggleFixedExpense(expenseId, month) {
-  const data = getData();
-  if (!data.fixedExpensesPaid) data.fixedExpensesPaid = {};
-  
-  const monthKey = `${month}-2025`;
-  if (!data.fixedExpensesPaid[monthKey]) {
-    data.fixedExpensesPaid[monthKey] = [];
-  }
-  
-  const expense = (data.fixedExpenses || []).find(e => e.id === expenseId);
-  if (!expense) return;
-  
-  const isPaid = data.fixedExpensesPaid[monthKey].includes(expenseId);
-  
-  if (isPaid) {
-    // Uncheck: Remove from paid list and delete transaction
-    data.fixedExpensesPaid[monthKey] = data.fixedExpensesPaid[monthKey].filter(id => id !== expenseId);
+async function toggleFixedExpense(expenseId, month) {
+  try {
+    const data = await getData();
+    const monthKey = `${month}-2025`;
     
-    // Find and delete the associated transaction
-    const transactionIndex = data.transactions.findIndex(t => 
-      t.fixedExpenseId === expenseId && 
-      new Date(t.date).getMonth() === month
-    );
+    const expense = (data.fixedExpenses || []).find(e => e.id === expenseId);
+    if (!expense) return;
     
-    if (transactionIndex !== -1) {
-      data.transactions.splice(transactionIndex, 1);
+    const isPaid = (data.fixedExpensesPaid[monthKey] || []).includes(expenseId);
+    
+    if (isPaid) {
+      // Uncheck: Remove from paid list and delete transaction
+      await supabaseClient
+        .from('fixed_expenses_paid')
+        .delete()
+        .eq('month_key', monthKey)
+        .eq('fixed_expense_id', expenseId);
+      
+      // Find and delete the associated transaction
+      const { data: transactions } = await supabaseClient
+        .from('transactions')
+        .select('id')
+        .eq('fixed_expense_id', expenseId)
+        .eq('date', `ilike`, `2025-${String(month + 1).padStart(2, '0')}%`);
+      
+      if (transactions && transactions.length > 0) {
+        await supabaseClient
+          .from('transactions')
+          .delete()
+          .eq('id', transactions[0].id);
+      }
+      
+      showToast('Gasto desmarcado y transacción eliminada', 'info');
+    } else {
+      // Check: Add to paid list
+      await supabaseClient
+        .from('fixed_expenses_paid')
+        .insert({
+          month_key: monthKey,
+          fixed_expense_id: expenseId
+        });
+      
+      // Create transaction
+      await supabaseClient
+        .from('transactions')
+        .insert({
+          fixed_expense_id: expenseId,
+          type: expense.type,
+          date: new Date(2025, month, new Date().getDate()).toISOString().split('T')[0],
+          description: expense.name,
+          category: expense.category,
+          account: expense.account,
+          amount: expense.amount
+        });
+      
+      showToast(`✓ ${expense.name} pagado - ${expense.amount}€ descontado de ${expense.account}`, 'success');
     }
     
-    showToast('Gasto desmarcado y transacción eliminada', 'info');
-  } else {
-    // Check: Add to paid list and create transaction
-    data.fixedExpensesPaid[monthKey].push(expenseId);
-    
-    // Create transaction
-    const transaction = {
-      id: Date.now().toString(),
-      fixedExpenseId: expenseId, // Link to fixed expense
-      type: expense.type,
-      date: new Date(2025, month, new Date().getDate()).toISOString().split('T')[0],
-      description: expense.name,
-      category: expense.category,
-      account: expense.account,
-      amount: expense.amount
-    };
-    
-    data.transactions.push(transaction);
-    showToast(`✓ ${expense.name} pagado - ${expense.amount}€ descontado de ${expense.account}`, 'success');
+    invalidateCache();
+    await renderMonthlyView();
+    await renderDashboard();
+    await renderAccountsView();
+  } catch (error) {
+    console.error('Error toggling fixed expense:', error);
+    showToast('Error al procesar el gasto', 'error');
   }
-  
-  saveData(data);
-  renderMonthlyView();
-  renderDashboard();
-  renderAccountsView();
 }
 
-function renderFixedExpensesInMonth() {
-  const data = getData();
+async function renderFixedExpensesInMonth() {
+  const data = await getData();
   const allFixedExpenses = data.fixedExpenses || [];
   
   // Filter expenses for current month
@@ -3562,8 +3635,8 @@ function renderFixedExpensesInMonth() {
 // SETTINGS VIEW RENDERING
 // ============================================================================
 
-function renderFixedExpensesInSettings() {
-  const data = getData();
+async function renderFixedExpensesInSettings() {
+  const data = await getData();
   const fixedExpenses = data.fixedExpenses || [];
   const table = document.getElementById('fixed-expenses-table');
   
@@ -3615,8 +3688,8 @@ function renderFixedExpensesInSettings() {
  * Month 0 (January) = sum of initial balances of selected accounts
  * Month N = patrimony end of month N-1
  */
-function getPatrimonyStartOfMonth(month) {
-  const data = getData();
+async function getPatrimonyStartOfMonth(month) {
+  const data = await getData();
   
   // For January (month 0), use initial balances
   if (month === 0) {
@@ -3640,9 +3713,9 @@ function getPatrimonyStartOfMonth(month) {
 /**
  * Calculate patrimony at the end of a given month
  */
-function calculatePatrimonyEndOfMonth(month) {
-  const data = getData();
-  const startPatrimony = getPatrimonyStartOfMonth(month);
+async function calculatePatrimonyEndOfMonth(month) {
+  const data = await getData();
+  const startPatrimony = await getPatrimonyStartOfMonth(month);
   
   // Get accounts included in patrimony
   const includedAccounts = data.accounts
@@ -3722,9 +3795,9 @@ function saveMonthlyPatrimonySnapshot(month) {
 /**
  * Update patrimony display in monthly view
  */
-function updateMonthlyPatrimonyDisplay() {
-  const startPatrimony = getPatrimonyStartOfMonth(currentMonth);
-  const endPatrimony = calculatePatrimonyEndOfMonth(currentMonth);
+async function updateMonthlyPatrimonyDisplay() {
+  const startPatrimony = await getPatrimonyStartOfMonth(currentMonth);
+  const endPatrimony = await calculatePatrimonyEndOfMonth(currentMonth);
   const change = endPatrimony - startPatrimony;
   const changePercent = startPatrimony > 0 ? ((change / startPatrimony) * 100) : 0;
   
@@ -3768,8 +3841,13 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
       location.reload();
     };
 
-    initData();
-    renderDashboard();
+    async function initializeApp() {
+      const data = await initData();
+      dataCache = data; // ← Asegurar que el cache tiene datos
+      await renderDashboard();
+    }
+
+  initializeApp();
   </script>
 </body>
 </html> 
