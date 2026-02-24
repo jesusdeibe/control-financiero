@@ -791,12 +791,84 @@
       <header class="header">
         <div>
           <h1 class="page-title">Control Financiero</h1>
-          <p class="page-subtitle" id="dashboard-subtitle">Patrimonio Total: 0,00 €</p>
+          <p class="page-subtitle">Tu resumen financiero</p>
         </div>
       </header>
 
-      <div class="kpi-grid" id="kpi-grid">
-        <!-- KPIs se generan dinámicamente -->
+      <!-- Patrimonio Total (destacado) -->
+      <div style="background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); padding: 32px; border-radius: 20px; margin-bottom: 32px; color: white; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px; font-weight: 500;">💰 Patrimonio Personal</div>
+        <div style="font-size: 48px; font-weight: 700; margin-bottom: 16px;" id="dashboard-total-patrimony">0,00 €</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Cuentas Normales</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-normal-total">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Inversiones</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-investments-total">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Cuenta Compartida</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-shared-total">0,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución del Mes Actual -->
+      <div class="section" style="margin-bottom: 32px;">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📊</span>
+            Evolución del Mes Actual
+          </h2>
+          <span id="dashboard-current-month" style="font-size: 14px; color: var(--text-tertiary);"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div class="kpi-card">
+            <div class="kpi-label">Ingresos</div>
+            <div class="kpi-value" style="color: var(--green);" id="dashboard-month-income">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Gastos</div>
+            <div class="kpi-value" style="color: var(--red);" id="dashboard-month-expenses">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Inversiones</div>
+            <div class="kpi-value" style="color: var(--purple);" id="dashboard-month-investments">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Ahorro Neto</div>
+            <div class="kpi-value" id="dashboard-month-savings">0,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficos en Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        
+        <!-- Evolución Anual -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span>📈</span>
+              Evolución del Patrimonio 2025
+            </h2>
+          </div>
+          <canvas id="patrimony-chart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- Distribución -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span>🥧</span>
+              Distribución del Patrimonio
+            </h2>
+          </div>
+          <canvas id="distribution-chart" style="max-height: 300px;"></canvas>
+        </div>
+
       </div>
     </div>
 
@@ -868,6 +940,21 @@
           <h2 class="section-title">
             <span>💳</span>
             Gastos Personales
+            <button onclick="showPersonalExpensesBreakdown()" style="
+              margin-left: 12px;
+              background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-size: 12px;
+              font-weight: 500;
+              color: var(--text-secondary);
+              cursor: pointer;
+              transition: all 0.2s;
+            " onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25))'" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))'">
+              📊 Por categoría
+            </button>
           </h2>
           <div style="display: flex; gap: 16px; align-items: center;">
             <span class="section-total" id="gastos-personales-total">0,00 €</span>
@@ -898,6 +985,21 @@
           <h2 class="section-title">
             <span>🏠</span>
             Gastos Compartidos
+            <button onclick="showSharedExpensesBreakdown()" style="
+              margin-left: 12px;
+              background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-size: 12px;
+              font-weight: 500;
+              color: var(--text-secondary);
+              cursor: pointer;
+              transition: all 0.2s;
+            " onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25))'" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))'">
+              📊 Por categoría
+            </button>
           </h2>
           <div style="display: flex; gap: 16px; align-items: center;">
             <span class="section-total" id="gastos-compartidos-total">0,00 €</span>
@@ -977,54 +1079,19 @@
         </div>
       </section>
 
-      <!-- Aportaciones Cuenta Compartida -->
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title">
-            <span>💸</span>
-            Aportaciones a Cuenta Compartida
-          </h2>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div>
-            <label class="form-label" style="margin-bottom: 8px;">Mi Aportación (€)</label>
-            <input type="number" step="0.01" class="form-input" id="my-contribution" 
-                   onchange="saveContributions()" placeholder="0.00"
-                   style="font-weight: 600;">
-            <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 4px; display: block;">
-              Solo informativo (registra como transferencia)
-            </small>
-          </div>
-          <div>
-            <label class="form-label" style="margin-bottom: 8px;">Aportación Pareja (€)</label>
-            <input type="number" step="0.01" class="form-input" id="partner-contribution" 
-                   onchange="saveContributions()" placeholder="0.00"
-                   style="font-weight: 600; color: var(--orange);">
-            <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 4px; display: block;">
-              Se suma al saldo de cuenta compartida
-            </small>
-          </div>
-          <div>
-            <label class="form-label" style="margin-bottom: 8px;">Aportaciones Externas (€)</label>
-            <input type="number" step="0.01" class="form-input" id="external-contributions" 
-                   onchange="saveContributions()" placeholder="0.00"
-                   style="font-weight: 600; color: var(--green);">
-            <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 4px; display: block;">
-              Ej: ayudas al alquiler
-            </small>
-          </div>
-          <div>
-            <div style="background: var(--bg-primary); padding: 16px; border-radius: 8px; height: 100%;">
-              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Total Aportado</div>
-              <div style="font-size: 24px; font-weight: 600; color: var(--text-primary);" id="total-contributions">
-                0,00 €
-              </div>
-            </div>
+          <h2 class="section-title"><span>💸</span> Aportaciones a Cuenta Compartida</h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="contributions-total">0,00 €</span>
+            <button class="add-btn" onclick="openContributionModal()">+ Añadir</button>
           </div>
         </div>
+        <div id="contributions-list" style="display: flex; flex-direction: column; gap: 12px;">
+          </div>
       </section>
     </div>
-
+   
     <!-- Accounts View -->
     <div id="accounts-view" class="view">
       <header class="header">
@@ -1106,7 +1173,7 @@
             Movimientos por Cuenta
           </h2>
           <div class="form-group" style="margin: 0;">
-            <select class="form-select" id="account-filter" onchange="renderAccountsView()" style="width: 250px;">
+              <select class="form-select" id="account-filter" onchange="filterAccountMovements()"></select>
               <option value="">Todas las cuentas</option>
             </select>
           </div>
@@ -1200,7 +1267,6 @@
         </div>
       </section>
     </div>
-  </div>
 
   <!-- Settings View -->
   <div id="settings-view" class="view">
@@ -1516,6 +1582,45 @@
     </div>
   </div>
 
+  <!-- Contribution Modal -->
+  <div id="contribution-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Nueva Aportación a Cuenta Compartida</h2>
+        <button class="close-btn" onclick="closeContributionModal()">&times;</button>
+      </div>
+      <form class="modal-form" onsubmit="event.preventDefault(); saveContribution();">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contribution-type">Tipo de aportación *</label>
+            <select class="form-select" id="contribution-type" required>
+              <option value="my">Mi aportación (solo informativo)</option>
+              <option value="partner">Aportación pareja</option>
+              <option value="external">Aportación externa (ayudas, etc.)</option>
+            </select>
+            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+              "Mi aportación" se registra como transferencia a la cuenta compartida
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="contribution-amount">Importe (€) *</label>
+            <input type="number" step="0.01" class="form-input" id="contribution-amount" placeholder="0.00" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contribution-description">Descripción</label>
+            <input type="text" class="form-input" id="contribution-description" placeholder="Ej: Nómina febrero, Ayuda alquiler...">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeContributionModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Aportación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Add Account Modal -->
   <div class="modal-overlay" id="add-account-modal">
     <div class="modal">
@@ -1556,6 +1661,8 @@
       </form>
     </div>
   </div>
+
+
 
   <!-- Add Category Modal -->
   <div class="modal-overlay" id="add-category-modal">
@@ -1708,6 +1815,9 @@
 
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 
   <script>
     // ============================================================================
@@ -1971,61 +2081,152 @@
 
     async function renderDashboard() {
       const data = await getData();
-      const transactions = data.transactions;
+      const currentMonthIndex = new Date().getMonth();
       
       // Calculate totals
-      const ingresos = transactions
-        .filter(t => t.type === 'ingresos')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const normalAccounts = data.accounts.filter(a => 
+        a.name !== 'Santander Pareja' && 
+        a.type !== 'Broker' && 
+        a.type !== 'Exchange Crypto'
+      );
+      const brokerAccounts = data.accounts.filter(a => 
+        a.type === 'Broker' || 
+        a.type === 'Exchange Crypto'
+      );
       
-      const gastosPersonales = transactions
-        .filter(t => t.type === 'gastos_personales')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const normalTotal = await Promise.all(
+        normalAccounts.map(a => calculateAccountBalance(a.name))
+      ).then(balances => balances.reduce((sum, b) => sum + b, 0));
       
-      const gastosCompartidos = transactions
-        .filter(t => t.type === 'gastos_compartidos')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const brokerTotal = await Promise.all(
+        brokerAccounts.map(a => calculateAccountBalance(a.name))
+      ).then(balances => balances.reduce((sum, b) => sum + b, 0));
       
-      const inversiones = transactions
-        .filter(t => t.type === 'inversiones')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-
-      // Calculate my total contributions to shared account
-      const contributions = data.contributions || [];
-      const myTotalContributions = contributions.reduce((sum, c) => sum + (parseFloat(c.my) || 0), 0);
+      const sharedBalance = await calculateAccountBalance('Santander Pareja');
+      const totalPatrimony = normalTotal + brokerTotal; //Solo personal, sin la compartida
       
-      // Ahorro = Ingresos - Gastos Personales - Mi Aportación - Inversiones
-      // (Gastos Compartidos no cuentan aquí porque salen de la cuenta compartida)
-      const ahorroNeto = ingresos - gastosPersonales - myTotalContributions - inversiones;
-      const tasaAhorro = ingresos > 0 ? ((ahorroNeto / ingresos) * 100) : 0;
+      // Update patrimony card
+      document.getElementById('dashboard-total-patrimony').textContent = formatCurrency(totalPatrimony);
+      document.getElementById('dashboard-normal-total').textContent = formatCurrency(normalTotal);
+      document.getElementById('dashboard-investments-total').textContent = formatCurrency(brokerTotal);
+      document.getElementById('dashboard-shared-total').textContent = formatCurrency(sharedBalance);
+      
+      // Month evolution
+      document.getElementById('dashboard-current-month').textContent = MONTHS[currentMonthIndex];
+      
+      const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthExpenses = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0) +
+        (await getTransactionsByMonth(currentMonthIndex, 'gastos_compartidos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthInvestments = (await getTransactionsByMonth(currentMonthIndex, 'inversiones'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthSavings = monthIncome - monthExpenses - monthInvestments;
+      
+      document.getElementById('dashboard-month-income').textContent = formatCurrency(monthIncome);
+      document.getElementById('dashboard-month-expenses').textContent = formatCurrency(monthExpenses);
+      document.getElementById('dashboard-month-investments').textContent = formatCurrency(monthInvestments);
+      document.getElementById('dashboard-month-savings').textContent = formatCurrency(monthSavings);
+      document.getElementById('dashboard-month-savings').style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
+      
+      // Render charts
+      renderPatrimonyChart();
+      renderDistributionChart(normalTotal, brokerTotal, sharedBalance);
+    }
 
-      // Update subtitle
-      const patrimonio = data.accounts.reduce((sum, acc) => sum + acc.balance, 0);
-      document.getElementById('dashboard-subtitle').textContent = 
-        `Patrimonio Total: ${formatCurrency(patrimonio)}`;
+    async function renderPatrimonyChart() {
+      const ctx = document.getElementById('patrimony-chart');
+      
+      // Destroy previous chart if exists
+      if (window.patrimonyChart) {
+        window.patrimonyChart.destroy();
+      }
+      
+      // Calculate patrimony for each month (0 to current month)
+      const currentMonthIndex = new Date().getMonth();
+      const months = MONTHS.slice(0, currentMonthIndex + 1);
+      const patrimonyData = [];
+      
+      for (let month = 0; month <= currentMonthIndex; month++) {
+        const patrimony = await calculatePatrimonyEndOfMonth(month);
+        patrimonyData.push(patrimony);
+      }
+      
+      window.patrimonyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Patrimonio Personal',
+            data: patrimonyData,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return formatCurrency(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
 
-      // Render KPIs
-      const kpis = [
-        { label: 'Ingresos', value: ingresos, icon: '💰' },
-        { label: 'Gastos Personales', value: gastosPersonales, icon: '💳' },
-        { label: 'Mi Aportación Compartida', value: myTotalContributions, icon: '🏠' },
-        { label: 'Inversiones', value: inversiones, icon: '📈' },
-        { label: 'Ahorro Neto', value: ahorroNeto, icon: '🎯' },
-        { label: 'Tasa de Ahorro', value: tasaAhorro, icon: '📊', isPercent: true }
-      ];
-
-      const kpiGrid = document.getElementById('kpi-grid');
-      kpiGrid.innerHTML = kpis.map(kpi => `
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">${kpi.label}</span>
-            <span class="kpi-icon">${kpi.icon}</span>
-          </div>
-          <div class="kpi-value">
-            ${kpi.isPercent ? kpi.value.toFixed(1) + '%' : formatCurrency(kpi.value)}
-          </div>
-        </div>
-      `).join('');
+    function renderDistributionChart(normal, investments, shared) {
+      const ctx = document.getElementById('distribution-chart');
+      
+      // Destroy previous chart if exists
+      if (window.distributionChart) {
+        window.distributionChart.destroy();
+      }
+      
+      window.distributionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Cuentas Normales', 'Inversiones', 'Cuenta Compartida'],
+          datasets: [{
+            data: [normal, investments, shared],
+            backgroundColor: [
+              '#3B82F6',
+              '#8B5CF6',
+              '#F59E0B'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
     }
 
     async function renderMonthlyView() {
@@ -2089,8 +2290,8 @@
       await renderTable('inversiones');
       
       // Load contributions after DOM is ready
-      setTimeout(async() => {
-        await loadContributions();
+      setTimeout(async () => {
+        await renderContributionsList();
         await renderFixedExpensesInMonth();
         await updateMonthlyPatrimonyDisplay();
       }, 0);
@@ -2139,104 +2340,6 @@
     // ============================================================================
     // CONTRIBUTIONS MANAGEMENT
     // ============================================================================
-    
-    async function saveContributions() {
-      const myContribution = parseFloat(document.getElementById('my-contribution').value) || 0;
-      const partnerContribution = parseFloat(document.getElementById('partner-contribution').value) || 0;
-      const externalContributions = parseFloat(document.getElementById('external-contributions').value) || 0;
-      
-      const monthKey = `${currentMonth}-2025`;
-      
-      try {
-        // Check if contribution already exists for this month
-        const { data: existing, error: fetchError } = await supabaseClient
-          .from('contributions')
-          .select('*')
-          .eq('month_key', monthKey)
-          .maybeSingle();
-        
-        if (existing) {
-          // Update existing
-          const { error } = await supabaseClient
-            .from('contributions')
-            .update({
-              my: myContribution,
-              partner: partnerContribution,
-              external: externalContributions
-            })
-            .eq('month_key', monthKey);
-          
-          if (error) throw error;
-          console.log('Updated existing contribution for month', monthKey);
-        } else {
-          // Insert new
-          const { error } = await supabaseClient
-            .from('contributions')
-            .insert({
-              month_key: monthKey,
-              my: myContribution,
-              partner: partnerContribution,
-              external: externalContributions
-            });
-          
-          if (error) throw error;
-          console.log('Created new contribution for month', monthKey);
-        }
-        
-        invalidateCache();
-        await getData();
-        
-        // Recargar inputs después de guardar
-          setTimeout(() => loadContributions(),100);
-        
-        // Update total display
-        const total = myContribution + partnerContribution + externalContributions;
-        document.getElementById('total-contributions').textContent = formatCurrency(total);
-      } catch (error) {
-        console.error('Error saving contributions:', error);
-        showToast('Error al guardar aportaciones', 'error');
-      }
-    }
-    
-    async function loadContributions() {
-      const myInput = document.getElementById('my-contribution');
-      const partnerInput = document.getElementById('partner-contribution');
-      const externalInput = document.getElementById('external-contributions');
-      const totalDisplay = document.getElementById('total-contributions');
-      
-      // Check if elements exist
-      if (!myInput || !partnerInput || !externalInput || !totalDisplay) {
-        console.log('Contribution inputs not found - not in monthly view');
-        return;
-      }
-      
-      const data = await getData();
-      const monthKey = `${currentMonth}-2025`;
-      const contribution = data.contributions.find(c => c.month === monthKey);
-      
-      console.log(`Loading contributions for month ${monthKey}:`, contribution);
-      
-      if (contribution) {
-        const myValue = contribution.my || 0;
-        const partnerValue = contribution.partner || 0;
-        const externalValue = contribution.external || 0;
-        
-        // Set values - show empty if 0
-        myInput.value = myValue !== 0 ? myValue : '';
-        partnerInput.value = partnerValue !== 0 ? partnerValue : '';
-        externalInput.value = externalValue !== 0 ? externalValue : '';
-        
-        // Calculate total
-        const total = myValue + partnerValue + externalValue;
-        totalDisplay.textContent = formatCurrency(total);
-      } else {
-        console.log('No contributions found for this month, clearing inputs');
-        myInput.value = '';
-        partnerInput.value = '';
-        externalInput.value = '';
-        totalDisplay.textContent = '0,00 €';
-      }
-    }
     
     async function getMonthlyContributions(accountName) {
       // Only count partner and external contributions for Santander Pareja account
@@ -2721,6 +2824,158 @@ async function saveValueUpdate() {
   }
 }
 
+// ============================================================================
+// EXPENSE BREAKDOWN BY CATEGORY
+// ============================================================================
+
+async function showSharedExpensesBreakdown() {
+  const transactions = await getTransactionsByMonth(currentMonth, 'gastos_compartidos');
+  
+  if (transactions.length === 0) {
+    showToast('No hay gastos compartidos este mes', 'info');
+    return;
+  }
+  
+  // Calculate by category
+  const byCategory = {};
+  let total = 0;
+  
+  transactions.forEach(t => {
+    const amount = parseFloat(t.amount);
+    if (!byCategory[t.category]) byCategory[t.category] = 0;
+    byCategory[t.category] += amount;
+    total += amount;
+  });
+  
+  // Sort by amount descending
+  const sorted = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1]);
+  
+  // Create breakdown HTML
+  const breakdown = sorted.map(([category, amount]) => {
+    const percent = (amount / total * 100).toFixed(1);
+    return `
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      ">
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${category}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary);">${percent}% del total</div>
+        </div>
+        <div style="font-weight: 700; color: var(--text-primary);">${formatCurrency(amount)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Show modal
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🏠 Gastos Compartidos por Categoría</h2>
+        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div style="padding: 24px;">
+        <div style="margin-bottom: 16px; padding: 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 12px; text-align: center;">
+          <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px;">Total del mes</div>
+          <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">${formatCurrency(total)}</div>
+        </div>
+        ${breakdown}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target.className === 'modal-overlay active') {
+      overlay.remove();
+    }
+  });
+}
+
+async function showPersonalExpensesBreakdown() {
+  const transactions = await getTransactionsByMonth(currentMonth, 'gastos_personales');
+  
+  if (transactions.length === 0) {
+    showToast('No hay gastos personales este mes', 'info');
+    return;
+  }
+  
+  // Calculate by category
+  const byCategory = {};
+  let total = 0;
+  
+  transactions.forEach(t => {
+    const amount = parseFloat(t.amount);
+    if (!byCategory[t.category]) byCategory[t.category] = 0;
+    byCategory[t.category] += amount;
+    total += amount;
+  });
+  
+  // Sort by amount descending
+  const sorted = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1]);
+  
+  // Create breakdown HTML
+  const breakdown = sorted.map(([category, amount]) => {
+    const percent = (amount / total * 100).toFixed(1);
+    return `
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      ">
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${category}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary);">${percent}% del total</div>
+        </div>
+        <div style="font-weight: 700; color: var(--text-primary);">${formatCurrency(amount)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Show modal
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">💳 Gastos Personales por Categoría</h2>
+        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div style="padding: 24px;">
+        <div style="margin-bottom: 16px; padding: 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 12px; text-align: center;">
+          <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px;">Total del mes</div>
+          <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">${formatCurrency(total)}</div>
+        </div>
+        ${breakdown}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target.className === 'modal-overlay active') {
+      overlay.remove();
+    }
+  });
+}
+
     // ============================================================================
     // NAVIGATION
     // ============================================================================
@@ -2867,6 +3122,11 @@ async function calculateAccountBalance(accountName) {
   }
   
   return account.initialBalance + ingresos - gastos - inversiones + transfersReceived - transfersSent + contributions;
+}
+
+function filterAccountMovements() {
+  // Esta función puede quedar vacía por ahora o implementar filtrado local
+  console.log('Filter changed');
 }
 
 // Render Accounts View
@@ -3167,6 +3427,171 @@ async function saveTransferClick() {
   await renderAccountsView();
   await renderDashboard();
   showToast('Transferencia guardada correctamente', 'success');
+}
+
+// ============================================================================
+// CONTRIBUTION MODAL & FUNCTIONS
+// ============================================================================
+
+function openContributionModal() {
+  document.getElementById('contribution-type').value = 'partner';
+  document.getElementById('contribution-amount').value = '';
+  document.getElementById('contribution-description').value = '';
+  document.getElementById('contribution-modal').classList.add('active');
+}
+
+function closeContributionModal() {
+  document.getElementById('contribution-modal').classList.remove('active');
+}
+
+async function saveContribution() {
+  const type = document.getElementById('contribution-type').value;
+  const amount = parseFloat(document.getElementById('contribution-amount').value);
+  const description = document.getElementById('contribution-description').value;
+  
+  if (!amount || amount <= 0) {
+    showToast('Por favor ingresa un importe válido', 'error');
+    return;
+  }
+  
+  const monthKey = `${currentMonth}-2025`;
+  
+  try {
+    const { data: existing } = await supabaseClient
+      .from('contributions')
+      .select('*')
+      .eq('month_key', monthKey)
+      .maybeSingle();
+    
+    let myTotal = 0;
+    let partnerTotal = 0;
+    let externalTotal = 0;
+    
+    if (existing) {
+      myTotal = parseFloat(existing.my) || 0;
+      partnerTotal = parseFloat(existing.partner) || 0;
+      externalTotal = parseFloat(existing.external) || 0;
+    }
+    
+    if (type === 'my') myTotal += amount;
+    if (type === 'partner') partnerTotal += amount;
+    if (type === 'external') externalTotal += amount;
+    
+    if (existing) {
+      await supabaseClient
+        .from('contributions')
+        .update({
+          my: myTotal,
+          partner: partnerTotal,
+          external: externalTotal
+        })
+        .eq('month_key', monthKey);
+    } else {
+      await supabaseClient
+        .from('contributions')
+        .insert({
+          month_key: monthKey,
+          my: myTotal,
+          partner: partnerTotal,
+          external: externalTotal
+        });
+    }
+    
+    if (type === 'my') {
+      await supabaseClient.from('transfers').insert({
+        date: new Date(2025, currentMonth, new Date().getDate()).toISOString().split('T')[0],
+        from_account: 'Santander Gastos',
+        to_account: 'Santander Pareja',
+        amount: amount,
+        concept: description || 'Mi aportación mensual'
+      });
+    }
+    
+    invalidateCache();
+    closeContributionModal();
+    await renderMonthlyView();
+    await renderAccountsView();
+    await renderDashboard();
+    showToast('Aportación guardada correctamente', 'success');
+  } catch (error) {
+    console.error('Error saving contribution:', error);
+    showToast('Error al guardar aportación: ' + error.message, 'error');
+  }
+}
+
+async function renderContributionsList() {
+  const data = await getData();
+  const monthKey = `${currentMonth}-2025`;
+  const contribution = data.contributions.find(c => c.month === monthKey);
+  
+  const container = document.getElementById('contributions-list');
+  
+  if (!contribution || (contribution.my === 0 && contribution.partner === 0 && contribution.external === 0)) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 32px; color: var(--text-tertiary);">
+        No hay aportaciones registradas este mes
+      </div>
+    `;
+    document.getElementById('contributions-total').textContent = '0,00 €';
+    return;
+  }
+  
+  const items = [];
+  
+  if (contribution.my > 0) {
+    items.push({
+      type: 'Mi aportación',
+      amount: contribution.my,
+      icon: '💳',
+      color: 'var(--primary)'
+    });
+  }
+  
+  if (contribution.partner > 0) {
+    items.push({
+      type: 'Aportación pareja',
+      amount: contribution.partner,
+      icon: '👥',
+      color: 'var(--orange)'
+    });
+  }
+  
+  if (contribution.external > 0) {
+    items.push({
+      type: 'Aportaciones externas',
+      amount: contribution.external,
+      icon: '🏛️',
+      color: 'var(--green)'
+    });
+  }
+  
+  container.innerHTML = items.map(item => `
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+    ">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 24px;">${item.icon}</span>
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary);">${item.type}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 2px;">
+            ${item.type === 'Mi aportación' ? 'Registrado como transferencia' : 'Suma al saldo compartido'}
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 20px; font-weight: 700; color: ${item.color};">
+        ${formatCurrency(item.amount)}
+      </div>
+    </div>
+  `).join('');
+  
+  const total = contribution.my + contribution.partner + contribution.external;
+  document.getElementById('contributions-total').textContent = formatCurrency(total);
 }
 
 async function openAccountModal(accountName) {
