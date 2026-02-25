@@ -1,0 +1,4964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Financiero - App Completa</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #FAFAFA;
+      --bg-secondary: #FFFFFF;
+      --border-light: #E8E8E8;
+      --border-medium: #D1D1D1;
+      
+      --text-primary: #1A1A1A;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
+      
+      --green: #34C759; /* Verde iOS */
+      --red: #FF3B30;   /* Rojo iOS */
+      --orange: #F59E0B;
+      --purple: #8B5CF6;
+      --blue: #007AFF;  /* Azul iOS */
+      --teal: #14B8A6;
+      
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+      letter-spacing: -0.022em;
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+
+      /* FONDO LÍQUIDO DE ESQUINAS */
+      background: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+        var(--bg-primary);
+      
+      /* Esto hace que el fondo no se mueva al hacer scroll */
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navigation */
+    .nav {
+      /* Posicionamiento */
+      position: sticky;
+      top: 15px; /* Separación del techo para que parezca que flota */
+      z-index: 1000;
+      
+      /* Layout: Centrado y flexible */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: fit-content; /* Se ajusta al contenido */
+      margin: 0 auto 32px auto; /* Centrado horizontal */
+      
+      /* Estética Segmented Control iOS */
+      background: rgba(230, 230, 230, 0.4); 
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 4px; /* Espacio mínimo para que el selector active resalte */
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.2s;
+      margin: 2px;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .nav-btn.active {
+      background: var(--text-primary);
+      color: white;
+    }
+
+    .nav-container {
+      display: flex;
+      background: white;
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+
+    .nav-item {
+      text-decoration: none;
+      color: var(--text-secondary);
+      padding: 8px 20px; /* Más aire a los lados */
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none !important;
+      white-space: nowrap;
+    }
+
+    .nav-item.active {
+      background: #FFFFFF !important; /* Blanco sólido para resaltar sobre el cristal */
+      color: #000000 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); /* Sombra para dar volumen */
+      transform: scale(1.02);
+    }
+
+    .nav-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .kpi-icon {
+      font-size: 18px;
+      opacity: 0.6;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-card, .section {
+      /* 1. Fondo: Subimos ligeramente la opacidad para que el texto sea más legible */
+      background: rgba(255, 255, 255, 0.75); 
+      
+      /* 2. Desenfoque: 20px es el punto dulce de Apple para el cristal grueso */
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      
+      /* 3. El Borde: Lo hacemos un poco más brillante (0.6) para simular el reflejo del borde */
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      
+      border-radius: 24px;
+      
+      /* 4. Sombra: Eliminamos el azul y usamos dos sombras. 
+        Una muy pegada para definir la forma y otra muy larga para la profundidad. */
+      box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.02), 
+        0 20px 40px rgba(0, 0, 0, 0.06);
+      
+      /* 5. Transición: Usamos una curva "Out-Quint" para que sea más elegante */
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    /* Efecto al pasar el ratón (Hover) */
+    .kpi-card:hover, .section:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.85); /* Se vuelve un poco más sólido */
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .kpi-card:hover, .section:hover {
+      transform: translateY(-6px) scale(1.01);
+      background: rgba(255, 255, 255, 0.85); /* Más opaco al acercarse */
+      
+      /* Sombra más amplia y suave (profundidad) */
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      
+      /* Borde más brillante (reflejo de luz) */
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* Efecto de "clic" en botones */
+    button:active {
+      transform: scale(0.96);
+    }
+
+    /* Month Selector */
+    .month-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .month-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .month-btn:hover {
+      border-color: var(--border-medium);
+    }
+
+    .month-btn.active {
+      background: var(--text-primary);
+      color: white;
+      border-color: var(--text-primary);
+    }
+
+    /* Section */
+    .section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-total {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .add-btn {
+      background: var(--text-primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .add-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 4px; /* Espacio sutil entre filas */
+      margin-top: 8px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    th:last-child {
+      text-align: right;
+    }
+
+    /* Filas como pastillas de cristal */
+    tbody tr {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    /* Fondo de la fila completa */
+    tbody td {
+      padding: 14px 16px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.2); /* Base muy sutil */
+      border-top: 1px solid rgba(255, 255, 255, 0.1); /* Brillo superior */
+      border-bottom: 1px solid rgba(0, 0, 0, 0.02); /* Sombra inferior */
+    }
+
+    /* Redondeado de los extremos de la fila */
+    tbody td:first-child {
+      border-radius: 12px 0 0 12px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    tbody td:last-child {
+      border-radius: 0 12px 12px 0;
+      text-align: right;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 600; /* Resalta el importe */
+    }
+
+    /* Efecto hover: la fila se ilumina y destaca */
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.7);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      color: var(--text-primary);
+    }
+
+    .date-cell {
+      color: var(--text-secondary);
+      font-size: 13px;
+      width: 120px;
+    }
+
+    .description-cell {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+    }
+
+    .amount-cell {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+
+    .action-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .action-btn.delete:hover {
+      color: var(--red);
+    }
+
+    /* --- ESTRUCTURA FUNCIONAL DE LOS MODALES --- */
+
+    .modal-overlay {
+      display: none; /* Vital: oculta el modal por defecto */
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 3000; /* Aseguramos que esté por encima de todo */
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* Clase que activa el JS para mostrarlo */
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-height: 95vh;
+      overflow-y: auto;
+      /* El diseño visual (cristal, bordes, etc.) lo toma del bloque que pusimos al FINAL */
+    }
+
+    .modal-header {
+      padding: 24px 24px 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    /* --- CAMPOS DE FORMULARIO (ESTILO LIMPIO) --- */
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px !important;
+      font-size: 15px;
+      background: #f2f2f7 !important; /* Gris claro tipo iOS */
+      border: 1px solid rgba(0,0,0,0.05) !important;
+      color: #000 !important;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      background: #ffffff !important;
+      border-color: #007AFF !important;
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 24px;
+    }
+
+    /* --- BOTONES MINIMALISTAS (ESTILO APPLE 2024) --- */
+
+    .btn-primary, .btn-secondary {
+      /* Hacemos el botón más fino y elegante */
+      padding: 8px 20px !important; 
+      height: 38px; /* Altura fija para que no se vean gordos */
+      border-radius: 10px !important; /* Redondeado más sutil, menos "juguete" */
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none !important;
+    }
+
+    /* Botón Principal: Azul traslúcido o plano suave */
+    .btn-primary {
+      background: #007AFF !important; /* Azul sólido pero vibrante */
+      color: white !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important; /* Casi sin sombra */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Botón Secundario: Totalmente limpio, solo texto */
+    .btn-secondary {
+      background: transparent !important;
+      color: #007AFF !important; /* Solo el texto en azul */
+      box-shadow: none !important;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 122, 255, 0.05) !important; /* Un brillo azul ligerísimo */
+    }
+
+    .btn-primary:hover {
+      background: #0066d6 !important;
+      transform: none !important; /* Quitamos el salto para que sea más serio */
+    }
+
+    /* Contenedor de botones: Eliminamos la línea superior para que sea más limpio */
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      border: none !important;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-tertiary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    /* View Toggle */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Account Cards */
+    .account-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .account-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--account-color);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .account-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .account-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .account-card-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .account-card-type {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .account-card-badge {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--bg-primary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .account-card-balance {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .account-card-change {
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .account-card-change.positive {
+      color: var(--green);
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(52, 199, 89, 0.2); /* Resplandor sutil */
+    }
+
+    .account-card-change.negative {
+      color: var(--red);
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(255, 59, 48, 0.2);
+    }
+
+    /* Específico para las filas de la tabla */
+    .amount-positive {
+      color: var(--green) !important;
+      font-feature-settings: "tnum"; /* Alineación perfecta de números */
+      font-weight: 600;
+    }
+
+    .amount-negative {
+      color: var(--red) !important;
+      font-feature-settings: "tnum";
+      font-weight: 600;
+    }
+
+    .amount-negative::before {
+      content: "−"; /* Usamos el signo menos tipográfico, no el guion del teclado */
+      margin-right: 2px;
+    }
+
+    /* Category Badges */
+    .category-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+
+    .category-chip:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .category-chip .delete-chip {
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: 16px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .category-chip .delete-chip:hover {
+      color: var(--red);
+    }
+
+    /* Fixed Expenses Checkbox */
+    .fixed-expense-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .fixed-expense-item:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .fixed-expense-item.paid {
+      opacity: 0.7;
+      background: var(--bg-secondary);
+    }
+
+    .fixed-expense-checkbox {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: var(--green);
+    }
+
+    .fixed-expense-details {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .fixed-expense-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .fixed-expense-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .fixed-expense-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .fixed-expense-amount {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        /* Mismo ajuste: 0 arriba, 16px a los lados */
+        padding: 0 16px 24px 16px;
+      }
+
+      .nav {
+        /* Posicionamiento en la base de la pantalla */
+        position: fixed;
+        top: auto;
+        bottom: 20px; /* Separación del borde inferior para efecto flotante */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+
+        /* Estética de Tab Bar de iOS */
+        width: calc(100% - 32px); /* Un poco de margen a los lados */
+        max-width: 450px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        
+        padding: 6px;
+        border-radius: 24px; /* Muy redondeado */
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        
+        display: flex;
+        justify-content: space-around; /* Distribuye los iconos uniformemente */
+        gap: 12px;
+        margin: 0;
+      }
+
+      .nav::-webkit-scrollbar {
+        display: none; /* Escondemos la barra de scroll */
+      }
+
+      .nav-item {
+        flex: 1; /* Todos los botones miden lo mismo */
+        text-align: center;
+        padding: 10px 5px;
+        font-size: 12px; /* Un poco más pequeña para que quepa todo */
+        border-radius: 22px;
+      }
+
+      .nav-item:active {
+        transform: scale(0.92); /* Efecto de rebote al pulsar con el dedo */
+        transition: transform 0.1s ease;
+      }
+
+      /* Añadimos un espacio al final de la página para que el menú 
+        no tape el último contenido al hacer scroll */
+      body {
+        padding-bottom: 100px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        max-width: 100%;
+      }
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      
+      /* Efecto Cristal para el Toast */
+      background: rgba(26, 26, 26, 0.8) !important; /* var(--text-primary) con transparencia */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      
+      color: white;
+      padding: 16px 24px;
+      border-radius: 20px; /* Más redondeado */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 10000;
+      
+      /* Usamos la nueva animación con la curva de Apple */
+      animation: ios-entrance 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      max-width: 400px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .toast.error {
+      background: var(--red);
+    }
+
+    .toast.success {
+      background: var(--green);
+    }
+
+    /* Modal form styles */
+    .modal-form {
+      padding: 24px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px; /* Un poco más pequeño */
+      font-weight: 600;
+      text-transform: uppercase; /* Estilo profesional */
+      letter-spacing: 0.03em;
+      color: var(--text-secondary); /* Gris en lugar de negro */
+      margin-bottom: 6px;
+      margin-left: 4px; /* Alineado con el redondeado del input */
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px; /* Más redondeado, estilo iOS */
+      font-size: 15px;
+      font-family: inherit;
+      /* Efecto Hendidura: Fondo oscuro muy sutil */
+      background: rgba(0, 0, 0, 0.04); 
+      /* Borde fino que apenas se ve */
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      /* Sombra interna para dar profundidad (el "surco") */
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.9); /* Se ilumina */
+      border-color: var(--blue); /* Usa tu variable --blue de la línea 34 */
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), 
+                  inset 0 1px 2px rgba(0, 0, 0, 0.02);
+      transform: translateY(-1px); /* Pequeña elevación al activarse */
+    }
+
+    .form-group input:disabled {
+      background: var(--bg-secondary);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 24px;
+      border-top: 1px solid var(--border-light);
+      margin-top: 0;
+    }
+
+    /* Efecto al pasar el ratón por las tablas y listas */
+    .movement-item:hover, .contribution-item:hover, tr:hover {
+      background-color: #F8FAFC !important;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    /* Animación de entrada para las vistas */
+    .view.active {
+      /* Misma animación, pero un poco más lenta para que sea elegante */
+      animation: ios-entrance 0.7s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+    }
+
+    /* --- ARREGLO FINAL: MODAL LIQUID GLASS --- */
+
+    /* 1. El fondo oscuro (Overlay) */
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.2) !important; /* Velo muy suave */
+      backdrop-filter: blur(10px) !important;    /* Desenfoca el fondo */
+      -webkit-backdrop-filter: blur(10px) !important;
+      display: none; /* Se controla por JS */
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 2. La tarjeta blanca (Ahora sí usamos .modal porque así está en tu HTML) */
+    .modal-overlay .modal {
+      background: rgba(255, 255, 255, 0.95) !important; /* Blanco casi sólido para que se lea bien */
+      backdrop-filter: blur(20px) brightness(1.1) !important;
+      -webkit-backdrop-filter: blur(20px) brightness(1.1) !important;
+      
+      padding: 24px;
+      border-radius: 28px !important;
+      width: 90%;
+      max-width: 450px;
+      
+      /* Borde y Sombra para legibilidad total */
+      border: 1px solid #FFFFFF !important;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2) !important;
+      
+      /* Animación */
+      animation: ios-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    }
+
+    /* 3. Forzar texto negro para que no sea gris */
+    .modal-overlay .modal-title,
+    .modal-overlay .form-label,
+    .modal-overlay .form-input,
+    .modal-overlay .form-select {
+      color: #000000 !important;
+      opacity: 1 !important;
+    }
+
+    /* 4. Estilo para los inputs dentro del modal */
+    .form-input, .form-select {
+      background: #F2F2F7 !important; /* Gris clarito iOS */
+      border: 1px solid #E5E5EA !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      margin-top: 4px;
+    }
+
+    /* Animación nueva */
+    @keyframes ios-pop {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.05); /* Círculo muy suave */
+      border: none;
+      color: #000;
+      font-size: 20px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 59, 48, 0.1); /* Se vuelve rojizo al pasar el ratón */
+      color: #FF3B30;
+      transform: rotate(90deg); /* Gira suavemente */
+    }
+
+    /* --- CHECKBOX PROFESIONAL (ESTILO NATIVO APPLE) --- */
+
+    input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;  /* Un pelín más pequeño es más elegante */
+      height: 18px;
+      border-radius: 5px;
+      background: #ffffff;
+      border: 1px solid #c5c5c7;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.12, 0, 0.07, 1);
+      vertical-align: middle;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Sombra interna para profundidad */
+    }
+
+    /* Estado: Hover */
+    input[type="checkbox"]:hover {
+      border-color: #007AFF;
+      background: #fbfbfd;
+    }
+
+    /* Estado: Marcado (Checked) */
+    input[type="checkbox"]:checked {
+      background: #007AFF !important;
+      border-color: #007AFF !important;
+      box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2), 
+                  inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    /* El Tic animado */
+    input[type="checkbox"]::after {
+      content: "";
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: translate(-50%, -60%) rotate(45deg) scale(0); /* Empieza invisible y pequeño */
+      transition: all 0.2s cubic-bezier(0.12, 0, 0.07, 1);
+      opacity: 0;
+    }
+
+    /* Animación del Tic cuando se marca */
+    input[type="checkbox"]:checked::after {
+      opacity: 1;
+      transform: translate(-50%, -60%) rotate(45deg) scale(1.1); /* "Explota" suavemente hacia afuera */
+    }
+
+    /* Micro-rebote al hacer clic */
+    input[type="checkbox"]:active {
+      transform: scale(0.92);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Navigation -->
+    <nav class="nav">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="monthly">Vista Mensual</button>
+      <button class="nav-btn" data-view="accounts">Cuentas</button>
+      <button class="nav-btn" data-view="inversiones">Inversiones</button>
+      <button class="nav-btn" data-view="settings">⚙️ Configuración</button>
+    </nav>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="view active">
+      <header class="header">
+        <div>
+          <h1 class="page-title">Control Financiero</h1>
+          <p class="page-subtitle">Tu resumen financiero</p>
+        </div>
+      </header>
+
+      <!-- Patrimonio Total (destacado) -->
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); padding: 32px; border-radius: 20px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+        <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">💰 Patrimonio Personal</div>
+        <div style="font-size: 48px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary);" id="dashboard-total-patrimony">0,00 €</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Cuentas Normales</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-normal-total">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Inversiones</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-investments-total">0,00 €</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Cuenta Compartida</div>
+            <div style="font-size: 18px; font-weight: 600;" id="dashboard-shared-total">0,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución del Mes Actual -->
+      <div class="section" style="margin-bottom: 32px;">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📊</span>
+            Evolución del Mes Actual
+          </h2>
+          <span id="dashboard-current-month" style="font-size: 14px; color: var(--text-tertiary);"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div class="kpi-card">
+            <div class="kpi-label">Ingresos</div>
+            <div class="kpi-value" style="color: var(--green);" id="dashboard-month-income">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Gastos</div>
+            <div class="kpi-value" style="color: var(--red);" id="dashboard-month-expenses">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Inversiones</div>
+            <div class="kpi-value" style="color: var(--purple);" id="dashboard-month-investments">0,00 €</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Ahorro Neto</div>
+            <div class="kpi-value" id="dashboard-month-savings">0,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficos en Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        
+        <!-- Evolución Anual -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span>📈</span>
+              Evolución del Patrimonio 2025
+            </h2>
+          </div>
+          <canvas id="patrimony-chart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- Distribución -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span>🥧</span>
+              Distribución del Patrimonio
+            </h2>
+          </div>
+          <canvas id="distribution-chart" style="max-height: 300px;"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Monthly View -->
+    <div id="monthly-view" class="view">
+      <header class="header">
+        <div>
+          <h1 class="page-title" id="current-month-title">Febrero 2025</h1>
+        </div>
+      </header>
+
+      <div class="month-selector" id="month-selector">
+        <!-- Meses se generan dinámicamente -->
+      </div>
+
+      <!-- Patrimonio Total del Mes -->
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); padding: 32px; border-radius: 20px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 14px; opacity: 0.95; margin-bottom: 8px; color: black;">💰 Patrimonio Total</div>
+            <div style="font-size: 32px; font-weight: 700; color: black;" id="monthly-patrimonio">0,00 €</div>
+            <div style="font-size: 13px; opacity: 0.9; margin-top: 4px; color: black;" id="monthly-patrimonio-change"></div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 13px; opacity: 0.9; color: black;">Inicio del mes</div>
+            <div style="font-size: 20px; font-weight: 600; margin-top: 4px; color: black;" id="monthly-patrimonio-start">0,00 €</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="monthly-kpis">
+        <!-- Monthly KPIs -->
+      </div>
+
+      <!-- Ingresos -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>💰</span>
+            Ingresos
+          </h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="ingresos-total">0,00 €</span>
+            <button class="add-btn" onclick="openTransactionModal('ingresos')">+ Añadir</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ingresos-table">
+              <!-- Rows generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Gastos Personales -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>💳</span>
+            Gastos Personales
+            <button onclick="showPersonalExpensesBreakdown()" style="
+              margin-left: 12px;
+              background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-size: 12px;
+              font-weight: 500;
+              color: var(--text-secondary);
+              cursor: pointer;
+              transition: all 0.2s;
+            " onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25))'" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))'">
+              📊 Por categoría
+            </button>
+          </h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="gastos-personales-total">0,00 €</span>
+            <button class="add-btn" onclick="openTransactionModal('gastos_personales')">+ Añadir</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="gastos-personales-table">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Gastos Compartidos -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🏠</span>
+            Gastos Compartidos
+            <button onclick="showSharedExpensesBreakdown()" style="
+              margin-left: 12px;
+              background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-size: 12px;
+              font-weight: 500;
+              color: var(--text-secondary);
+              cursor: pointer;
+              transition: all 0.2s;
+            " onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25))'" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15))'">
+              📊 Por categoría
+            </button>
+          </h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="gastos-compartidos-total">0,00 €</span>
+            <button class="add-btn" onclick="openTransactionModal('gastos_compartidos')">+ Añadir</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="gastos-compartidos-table">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Inversiones -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📈</span>
+            Inversiones
+          </h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="inversiones-total">0,00 €</span>
+            <button class="add-btn" onclick="openTransactionModal('inversiones')">+ Añadir</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="inversiones-table">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Fixed Expenses Checklist -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>✅</span>
+            Gastos Fijos del Mes
+          </h2>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+            <span style="font-size: 14px; color: var(--text-secondary);" id="fixed-expenses-counter">0 de 0 pagados</span>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="font-size: 13px; color: var(--text-tertiary);">Total:</span>
+              <span style="font-size: 18px; font-weight: 600; color: var(--text-primary);" id="fixed-expenses-total">0,00 €</span>
+            </div>
+          </div>
+        </div>
+        <div id="fixed-expenses-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Generated dynamically -->
+        </div>
+        <div style="text-align: center; margin-top: 16px;">
+          <a href="#" onclick="event.preventDefault(); switchView('settings')" style="color: var(--primary); text-decoration: none; font-size: 14px;">
+            → Gestionar gastos fijos en Configuración
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title"><span>💸</span> Aportaciones a Cuenta Compartida</h2>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <span class="section-total" id="contributions-total">0,00 €</span>
+            <button class="add-btn" onclick="openContributionModal()">+ Añadir</button>
+          </div>
+        </div>
+        <div id="contributions-list" style="display: flex; flex-direction: column; gap: 12px;">
+          </div>
+      </section>
+    </div>
+   
+    <!-- Accounts View -->
+    <div id="accounts-view" class="view">
+      <header class="header">
+        <div>
+          <h1 class="page-title">Mis Cuentas</h1>
+          <p class="page-subtitle" id="accounts-subtitle">Patrimonio Total: 0,00 €</p>
+        </div>
+        <button class="add-btn" onclick="openTransferModal()">+ Nueva Transferencia</button>
+      </header>
+
+      <div class="kpi-grid" id="accounts-kpis">
+        <!-- Accounts KPIs -->
+      </div>
+
+      <!-- Accounts Grid -->
+      <div id="accounts-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 32px;">
+          <!-- Account cards generated dynamically -->
+      </div>
+
+      <!-- Balance por Cuenta -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>💸</span>
+            Flujo por Cuenta (Año Completo)
+          </h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cuenta</th>
+                <th style="text-align: right;">Ingresos</th>
+                <th style="text-align: right;">Gastos</th>
+                <th style="text-align: right;">Inversiones</th>
+                <th style="text-align: right;">Flujo Neto</th>
+              </tr>
+            </thead>
+            <tbody id="account-flow-table">
+              <!-- Flows generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Transferencias -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🔄</span>
+            Transferencias entre Cuentas
+          </h2>
+          <button class="add-btn" onclick="openTransferModal()">+ Nueva Transferencia</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Concepto</th>
+                <th style="text-align: right;">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="transfers-table">
+              <!-- Transfers generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Historial por Cuenta -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📋</span>
+            Movimientos por Cuenta
+          </h2>
+          <div class="form-group" style="margin: 0;">
+              <select class="form-select" id="account-filter" onchange="filterAccountMovements()"></select>
+              <option value="">Todas las cuentas</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Tipo</th>
+                <th>Categoría</th>
+                <th style="text-align: right;">Importe</th>
+              </tr>
+            </thead>
+            <tbody id="account-movements-table">
+              <!-- Movements generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Inversiones View -->
+    <div id="inversiones-view" class="view">
+      <header class="header">
+        <div>
+          <h1 class="page-title">Cartera de Inversiones</h1>
+          <p class="page-subtitle" id="portfolio-subtitle">Capital invertido: 0,00 €</p>
+        </div>
+        <button class="add-btn" onclick="openInvestmentModal()">+ Nueva Posición</button>
+      </header>
+
+      <div class="kpi-grid" id="investment-kpis">
+        <!-- Investment KPIs -->
+      </div>
+
+      <!-- Holdings Table -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📊</span>
+            Posiciones Actuales
+          </h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Activo</th>
+                <th>Tipo</th>
+                <th>Cuenta</th>
+                <th style="text-align: right;">Capital Invertido</th>
+                <th style="text-align: right;">Valor Actual</th>
+                <th style="text-align: right;">G/P</th>
+                <th style="text-align: right;">Rentabilidad</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="holdings-table">
+              <!-- Holdings generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Transaction History -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📝</span>
+            Historial de Aportaciones
+          </h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Activo</th>
+                <th>Tipo</th>
+                <th>Cuenta</th>
+                <th style="text-align: right;">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="investment-history-table">
+              <!-- Investment history generated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  <!-- Settings View -->
+  <div id="settings-view" class="view">
+    <header class="header">
+      <h1 class="page-title">Configuración</h1>
+    </header>
+
+    <!-- Accounts Management -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>💳</span>
+          Gestionar Cuentas
+        </h2>
+        <button class="add-btn" onclick="openAddAccountModal()">+ Añadir Cuenta</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Color</th>
+              <th style="text-align: center;">Incluir en Patrimonio</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="settings-accounts-table">
+            <!-- Generated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Fixed Expenses Management -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>✅</span>
+          Gastos Fijos Mensuales
+        </h2>
+        <button class="add-btn" onclick="openAddFixedExpenseModal()">+ Añadir Gasto Fijo</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Categoría</th>
+              <th>Cuenta</th>
+              <th>Importe</th>
+              <th>Meses</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="fixed-expenses-table">
+            <!-- Generated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Categories Management -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>🏷️</span>
+          Gestionar Categorías
+        </h2>
+      </div>
+      
+      <div style="display: grid; gap: 24px;">
+        <!-- Ingresos Categories -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; font-weight: 600;">💰 Categorías de Ingresos</h3>
+            <button class="add-btn" style="padding: 6px 12px; font-size: 13px;" onclick="openAddCategoryModal('ingresos')">+ Añadir</button>
+          </div>
+          <div id="categories-ingresos" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Gastos Personales Categories -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; font-weight: 600;">💳 Categorías de Gastos Personales</h3>
+            <button class="add-btn" style="padding: 6px 12px; font-size: 13px;" onclick="openAddCategoryModal('gastos_personales')">+ Añadir</button>
+          </div>
+          <div id="categories-gastos_personales" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Gastos Compartidos Categories -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; font-weight: 600;">🏠 Categorías de Gastos Compartidos</h3>
+            <button class="add-btn" style="padding: 6px 12px; font-size: 13px;" onclick="openAddCategoryModal('gastos_compartidos')">+ Añadir</button>
+          </div>
+          <div id="categories-gastos_compartidos" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Inversiones Categories -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; font-weight: 600;">📈 Categorías de Inversiones</h3>
+            <button class="add-btn" style="padding: 6px 12px; font-size: 13px;" onclick="openAddCategoryModal('inversiones')">+ Añadir</button>
+          </div>
+          <div id="categories-inversiones" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Transaction Modal -->
+  <div class="modal-overlay" id="transaction-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Nueva Transacción</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="transaction-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-input" id="txn-date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-input" id="txn-description" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="txn-category" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cuenta</label>
+            <select class="form-select" id="txn-account" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Importe (€)</label>
+            <input type="number" step="0.01" class="form-input" id="txn-amount" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveTransactionClick()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Investment Modal -->
+  <div class="modal-overlay" id="investment-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="investment-modal-title">Nueva Posición</h3>
+        <button class="close-btn" onclick="closeInvestmentModal()">&times;</button>
+      </div>
+      <form id="investment-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre del Activo</label>
+            <input type="text" class="form-input" id="inv-name" placeholder="ej. VWCE, Bitcoin" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="inv-type" required>
+              <option value="Acciones">Acciones</option>
+              <option value="ETFs">ETFs</option>
+              <option value="Criptomonedas">Criptomonedas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cuenta</label>
+            <select class="form-select" id="inv-account" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capital Invertido (€)</label>
+            <input type="number" step="0.01" class="form-input" id="inv-capital" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valor Actual (€)</label>
+            <input type="number" step="0.01" class="form-input" id="inv-current-value" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeInvestmentModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveInvestmentClick()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Update Value Modal -->
+  <div id="update-value-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="update-value-title">Actualizar Valor de Posición</h2>
+        <button class="close-btn" onclick="closeUpdateValueModal()">&times;</button>
+      </div>
+      <form class="modal-form" onsubmit="event.preventDefault(); saveValueUpdate();">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Posición</label>
+            <input type="text" id="update-holding-name" disabled style="background: var(--bg-secondary); cursor: not-allowed;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Valor actual</label>
+            <input type="text" id="update-current-value" disabled style="background: var(--bg-secondary); cursor: not-allowed;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="update-new-value">Nuevo valor *</label>
+            <input type="number" id="update-new-value" step="0.01" min="0" placeholder="Ejemplo: 1250.50" required>
+          </div>
+          <div class="form-group">
+            <label for="update-value-date">Fecha *</label>
+            <input type="date" id="update-value-date" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeUpdateValueModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Actualización</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Transfer Modal -->
+  <div class="modal-overlay" id="transfer-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="transfer-modal-title">Nueva Transferencia</h3>
+        <button class="close-btn" onclick="closeTransferModal()">&times;</button>
+      </div>
+      <form id="transfer-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-input" id="transfer-date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cuenta Origen</label>
+            <select class="form-select" id="transfer-from" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cuenta Destino</label>
+            <select class="form-select" id="transfer-to" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Importe (€)</label>
+            <input type="number" step="0.01" class="form-input" id="transfer-amount" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Concepto</label>
+            <input type="text" class="form-input" id="transfer-concept" placeholder="ej. Traspaso ahorro mensual">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeTransferModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveTransferClick()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Account Edit Modal -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="account-modal-title">Editar Cuenta</h3>
+        <button class="close-btn" onclick="closeAccountModal()">&times;</button>
+      </div>
+      <form id="account-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre de la Cuenta</label>
+            <input type="text" class="form-input" id="account-name" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Saldo Inicial (€)</label>
+            <input type="number" step="0.01" class="form-input" id="account-initial-balance" required>
+            <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 4px; display: block;">
+              Este es el saldo con el que empezaste el año
+            </small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeAccountModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveAccountClick()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contribution Modal -->
+  <div id="contribution-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Nueva Aportación a Cuenta Compartida</h2>
+        <button class="close-btn" onclick="closeContributionModal()">&times;</button>
+      </div>
+      <form class="modal-form" onsubmit="event.preventDefault(); saveContribution();">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contribution-type">Tipo de aportación *</label>
+            <select class="form-select" id="contribution-type" required>
+              <option value="my">Mi aportación (solo informativo)</option>
+              <option value="partner">Aportación pareja</option>
+              <option value="external">Aportación externa (ayudas, etc.)</option>
+            </select>
+            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+              "Mi aportación" se registra como transferencia a la cuenta compartida
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="contribution-amount">Importe (€) *</label>
+            <input type="number" step="0.01" class="form-input" id="contribution-amount" placeholder="0.00" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contribution-description">Descripción</label>
+            <input type="text" class="form-input" id="contribution-description" placeholder="Ej: Nómina febrero, Ayuda alquiler...">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeContributionModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar Aportación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Account Modal -->
+  <div class="modal-overlay" id="add-account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Nueva Cuenta</h3>
+        <button class="close-btn" onclick="closeAddAccountModal()">&times;</button>
+      </div>
+      <form id="add-account-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre de la Cuenta</label>
+            <input type="text" class="form-input" id="new-account-name" required placeholder="ej. ING Ahorro">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="new-account-type" required>
+              <option value="Cuenta Corriente">Cuenta Corriente</option>
+              <option value="Cuenta Ahorro">Cuenta Ahorro</option>
+              <option value="Cuenta Compartida">Cuenta Compartida</option>
+              <option value="Broker">Broker</option>
+              <option value="Exchange Crypto">Exchange Crypto</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="color" class="form-input" id="new-account-color" value="#3B82F6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Saldo Inicial (€)</label>
+            <input type="number" step="0.01" class="form-input" id="new-account-balance" value="0">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddAccountModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="handleSaveNewAccount()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <!-- Add Category Modal -->
+  <div class="modal-overlay" id="add-category-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="add-category-modal-title">Nueva Categoría</h3>
+        <button class="close-btn" onclick="closeAddCategoryModal()">&times;</button>
+      </div>
+      <form id="add-category-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre de la Categoría</label>
+            <input type="text" class="form-input" id="new-category-name" required placeholder="ej. Gimnasio">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddCategoryModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveNewCategory()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Account Modal -->
+  <div class="modal-overlay" id="edit-account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="edit-account-modal-title">Editar Cuenta</h3>
+        <button class="close-btn" onclick="closeEditAccountModal()">&times;</button>
+      </div>
+      <form id="edit-account-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre de la Cuenta</label>
+            <input type="text" class="form-input" id="edit-account-name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="edit-account-type" required>
+              <option value="Cuenta Corriente">Cuenta Corriente</option>
+              <option value="Cuenta Ahorro">Cuenta Ahorro</option>
+              <option value="Cuenta Compartida">Cuenta Compartida</option>
+              <option value="Broker">Broker</option>
+              <option value="Exchange Crypto">Exchange Crypto</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="color" class="form-input" id="edit-account-color">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeEditAccountModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="handleSaveEditedAccount()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit Fixed Expense Modal -->
+  <div class="modal-overlay" id="fixed-expense-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="fixed-expense-modal-title">Nuevo Gasto Fijo</h3>
+        <button class="close-btn" onclick="closeFixedExpenseModal()">&times;</button>
+      </div>
+      <form id="fixed-expense-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-input" id="fixed-expense-name" required placeholder="ej. Netflix, Alquiler">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de Gasto</label>
+            <select class="form-select" id="fixed-expense-type" required onchange="updateFixedExpenseCategories()">
+              <option value="gastos_personales">Gasto Personal</option>
+              <option value="gastos_compartidos">Gasto Compartido</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="fixed-expense-category" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cuenta de Pago</label>
+            <select class="form-select" id="fixed-expense-account" required>
+              <!-- Options generated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Importe (€)</label>
+            <input type="number" step="0.01" class="form-input" id="fixed-expense-amount" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Meses en los que aplica</label>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="0" class="month-checkbox" checked> Ene
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="1" class="month-checkbox" checked> Feb
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="2" class="month-checkbox" checked> Mar
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="3" class="month-checkbox" checked> Abr
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="4" class="month-checkbox" checked> May
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="5" class="month-checkbox" checked> Jun
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="6" class="month-checkbox" checked> Jul
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="7" class="month-checkbox" checked> Ago
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="8" class="month-checkbox" checked> Sep
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="9" class="month-checkbox" checked> Oct
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="10" class="month-checkbox" checked> Nov
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" value="11" class="month-checkbox" checked> Dic
+              </label>
+            </div>
+            <div style="margin-top: 8px;">
+              <button type="button" class="btn-secondary" style="padding: 4px 12px; font-size: 13px;" onclick="toggleAllMonths(true)">Todos</button>
+              <button type="button" class="btn-secondary" style="padding: 4px 12px; font-size: 13px; margin-left: 8px;" onclick="toggleAllMonths(false)">Ninguno</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeFixedExpenseModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveFixedExpense()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+  <script>
+    // ============================================================================
+    // SUPABASE CONFIGURATION
+    // ============================================================================
+    const SUPABASE_URL = 'https://orqporqvtyfktcsumnhb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ycXBvcnF2dHlma3Rjc3VtbmhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDI0NjksImV4cCI6MjA4NzI3ODQ2OX0.H4lRaqHDUl399qPJeIl4jBapJ9ozB3m18gf_w5hxc3o';
+    
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let dataCache = null;
+    console.log('✅ Supabase initialized');
+
+    function invalidateCache() {
+      dataCache = null;
+    }
+
+    // ============================================================================
+    // DATA MANAGEMENT
+    // ============================================================================
+
+    const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    // Default accounts and categories (can be modified)
+    let ACCOUNTS = [
+      'Santander Gastos', 'Santander Facturas', 'Santander Pareja',
+      'Trade Republic Ahorro', 'Trade Republic Broker', 'Revolut', 'Binance BTC'
+    ];
+
+    let CATEGORIES = {
+      ingresos: ['Salario', 'Freelance/Extra', 'Dividendos', 'Alquiler', 'Bonificación', 'Otro'],
+      gastos_personales: ['Alimentación', 'Transporte', 'Ocio y restaurantes', 'Salud', 
+                          'Ropa y compras', 'Suscripciones', 'Educación', 'Moto', 'Otros'],
+      gastos_compartidos: ['Alquiler/Hipoteca', 'Supermercado', 'Restaurantes', 'Suministros',
+                           'Vacaciones', 'Hogar', 'Ocio Pareja', 'Otros'],
+      inversiones: ['Acciones', 'ETFs', 'Criptomonedas']
+    };
+
+    let ACCOUNT_COLORS = {
+      'Santander Gastos': '#EF4444',
+      'Santander Facturas': '#F59E0B',
+      'Santander Pareja': '#F59E0B',
+      'Trade Republic Ahorro': '#14B8A6',
+      'Trade Republic Broker': '#8B5CF6',
+      'Revolut': '#3B82F6',
+      'Binance BTC': '#1A1A1A'
+    };
+
+    let ACCOUNT_TYPES = {
+      'Santander Gastos': 'Cuenta Corriente',
+      'Santander Facturas': 'Cuenta Corriente',
+      'Santander Pareja': 'Cuenta Compartida',
+      'Trade Republic Ahorro': 'Cuenta Ahorro',
+      'Trade Republic Broker': 'Broker',
+      'Revolut': 'Cuenta Corriente',
+      'Binance BTC': 'Exchange Crypto'
+    };
+
+    let currentMonth = 1; // Febrero (0-indexed)
+    let currentType = '';
+    let editingId = null;
+
+    // Initialize data structure
+    async function initData() {
+      try {
+        const { data: existingAccounts } = await supabaseClient.from('accounts').select('name');
+        
+        if (!existingAccounts || existingAccounts.length === 0) {
+          const defaultAccounts = ACCOUNTS.map(name => ({
+            name,
+            type: ACCOUNT_TYPES[name] || 'Cuenta',
+            color: ACCOUNT_COLORS[name] || '#3B82F6',
+            initial_balance: 0,
+            include_in_patrimony: true
+          }));
+          
+          await supabaseClient.from('accounts').insert(defaultAccounts);
+          console.log('✅ Default accounts created');
+        }
+        
+        return await getData();
+      } catch (error) {
+        console.error('Error initializing data:', error);
+        showToast('Error al inicializar datos', 'error');
+        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
+      }
+    }
+
+    async function getData() {
+      if (dataCache) return dataCache;
+      
+      try {
+        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes] = await Promise.all([
+          supabaseClient.from('accounts').select('*').order('name'),
+          supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
+          supabaseClient.from('holdings').select('*').order('name'),
+          supabaseClient.from('transfers').select('*').order('date', { ascending: false }),
+          supabaseClient.from('contributions').select('*'),
+          supabaseClient.from('fixed_expenses').select('*').order('name'),
+          supabaseClient.from('fixed_expenses_paid').select('*'),
+          supabaseClient.from('monthly_patrimony').select('*')
+        ]);
+
+        const data = {
+          accounts: (accountsRes.data || []).map(a => ({ name: a.name, type: a.type, color: a.color, initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), includeInPatrimony: a.include_in_patrimony })),
+          transactions: (transactionsRes.data || []).map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
+          holdings: (holdingsRes.data || []).map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
+          transfers: (transfersRes.data || []).map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
+          contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
+          fixedExpenses: (fixedExpensesRes.data || []).map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
+          fixedExpensesPaid: {},
+          monthlyPatrimony: {},
+          customCategories: {}
+        };
+
+        (fixedExpensesPaidRes.data || []).forEach(item => { if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); });
+        (monthlyPatrimonyRes.data || []).forEach(item => { data.monthlyPatrimony[item.month_key] = parseFloat(item.value); });
+
+        if (data.accounts.length > 0) { ACCOUNTS.length = 0; data.accounts.forEach(acc => { ACCOUNTS.push(acc.name); ACCOUNT_COLORS[acc.name] = acc.color; ACCOUNT_TYPES[acc.name] = acc.type; }); }
+
+        dataCache = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error al cargar datos', 'error');
+        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
+      }
+    }
+
+    function saveData(data) {
+      localStorage.setItem('financialData', JSON.stringify(data));
+    }
+
+    async function addTransaction(transaction) {
+      try {
+        const { data, error } = await supabaseClient.from('transactions').insert({
+          type: transaction.type,
+          date: transaction.date,
+          description: transaction.description,
+          category: transaction.category,
+          account: transaction.account,
+          amount: transaction.amount,
+          fixed_expense_id: transaction.fixedExpenseId || null
+        }).select();
+        
+        if (error) throw error;
+        invalidateCache();
+        console.log('Transaction added:', data);
+        return data[0];
+      } catch (error) {
+        console.error('Error adding transaction:', error);
+        showToast('Error al guardar transacción', 'error');
+        throw error;
+      }
+    }
+
+    async function updateTransaction(id, updates) {
+      try {
+        const { error } = await supabaseClient.from('transactions').update({
+          type: updates.type,
+          date: updates.date,
+          description: updates.description,
+          category: updates.category,
+          account: updates.account,
+          amount: updates.amount
+        }).eq('id', id);
+        
+        if (error) throw error;
+        invalidateCache();
+      } catch (error) {
+        console.error('Error updating transaction:', error);
+        showToast('Error al actualizar transacción', 'error');
+      }
+    }
+
+    async function deleteTransaction(id) {
+      try {
+        const { error } = await supabaseClient.from('transactions').delete().eq('id', id);
+        if (error) throw error;
+        invalidateCache();
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+        showToast('Error al eliminar transacción', 'error');
+      }
+    }
+
+    async function getTransactionsByMonth(month, type = null) {
+      const data = await getData();
+      return data.transactions.filter(t => {
+        const txnMonth = new Date(t.date).getMonth();
+        const matchesMonth = txnMonth === month;
+        const matchesType = type ? t.type === type : true;
+        return matchesMonth && matchesType;
+      });
+    }
+
+    // Investment Holdings Management
+    async function addHolding(holding) {
+      try {
+        const { error } = await supabaseClient.from('holdings').insert({
+          name: holding.name,
+          type: holding.type,
+          account: holding.account,
+          capital: holding.capital,
+          current_value: holding.currentValue
+        });
+        
+        if (error) throw error;
+        invalidateCache();
+      } catch (error) {
+        console.error('Error adding holding:', error);
+        showToast('Error al añadir posición', 'error');
+      }
+    }
+
+    async function updateHolding(id, updates) {
+      try {
+        const { error } = await supabaseClient.from('holdings').update({
+          name: updates.name,
+          type: updates.type,
+          account: updates.account,
+          capital: updates.capital,
+          current_value: updates.currentValue
+        }).eq('id', id);
+        
+        if (error) throw error;
+        invalidateCache();
+      } catch (error) {
+        console.error('Error updating holding:', error);
+        showToast('Error al actualizar posición', 'error');
+      }
+    }
+
+    async function deleteHolding(id) {
+      try {
+        const { error } = await supabaseClient.from('holdings').delete().eq('id', id);
+        if (error) throw error;
+        invalidateCache();
+      } catch (error) {
+        console.error('Error deleting holding:', error);
+        showToast('Error al eliminar posición', 'error');
+      }
+    }
+
+    // Contributions Management
+    // ============================================================================
+    // UI RENDERING
+    // ============================================================================
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('es-ES', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount) + ' €';
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    async function renderDashboard() {
+      const data = await getData();
+      const currentMonthIndex = new Date().getMonth();
+      
+      // Calculate totals
+      const normalAccounts = data.accounts.filter(a => 
+        a.name !== 'Santander Pareja' && 
+        a.type !== 'Broker' && 
+        a.type !== 'Exchange Crypto' &&
+        a.includeInPatrimony !== false  // Solo incluir si está marcado
+      );
+      const brokerAccounts = data.accounts.filter(a => 
+        (a.type === 'Broker' || a.type === 'Exchange Crypto') &&
+        a.includeInPatrimony !== false  // Solo incluir si está marcado
+      );
+      
+      const normalTotal = await Promise.all(
+        normalAccounts.map(a => calculateAccountBalance(a.name))
+      ).then(balances => balances.reduce((sum, b) => sum + b, 0));
+      
+      const brokerTotal = await Promise.all(
+        brokerAccounts.map(a => calculateAccountBalance(a.name))
+      ).then(balances => balances.reduce((sum, b) => sum + b, 0));
+      
+      const sharedBalance = await calculateAccountBalance('Santander Pareja');
+      const totalPatrimony = normalTotal + brokerTotal; //Solo personal, sin la compartida
+      
+      // Update patrimony card
+      document.getElementById('dashboard-total-patrimony').textContent = formatCurrency(totalPatrimony);
+      document.getElementById('dashboard-normal-total').textContent = formatCurrency(normalTotal);
+      document.getElementById('dashboard-investments-total').textContent = formatCurrency(brokerTotal);
+      document.getElementById('dashboard-shared-total').textContent = formatCurrency(sharedBalance);
+      
+      // Month evolution
+      document.getElementById('dashboard-current-month').textContent = MONTHS[currentMonthIndex];
+      
+      const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthExpenses = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0) +
+        (await getTransactionsByMonth(currentMonthIndex, 'gastos_compartidos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthInvestments = (await getTransactionsByMonth(currentMonthIndex, 'inversiones'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const monthSavings = monthIncome - monthExpenses - monthInvestments;
+      
+      document.getElementById('dashboard-month-income').textContent = formatCurrency(monthIncome);
+      document.getElementById('dashboard-month-expenses').textContent = formatCurrency(monthExpenses);
+      document.getElementById('dashboard-month-investments').textContent = formatCurrency(monthInvestments);
+      document.getElementById('dashboard-month-savings').textContent = formatCurrency(monthSavings);
+      document.getElementById('dashboard-month-savings').style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
+      
+      // Render charts
+      renderPatrimonyChart();
+      renderDistributionChart(normalTotal, brokerTotal, sharedBalance);
+    }
+
+    async function renderPatrimonyChart() {
+      const ctx = document.getElementById('patrimony-chart');
+      
+      // Destroy previous chart if exists
+      if (window.patrimonyChart) {
+        window.patrimonyChart.destroy();
+      }
+      
+      // Calculate patrimony for each month (0 to current month)
+      const currentMonthIndex = new Date().getMonth();
+      const months = MONTHS.slice(0, currentMonthIndex + 1);
+      const patrimonyData = [];
+      
+      for (let month = 0; month <= currentMonthIndex; month++) {
+        const patrimony = await calculatePatrimonyEndOfMonth(month);
+        patrimonyData.push(patrimony);
+      }
+      
+      window.patrimonyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Patrimonio Personal',
+            data: patrimonyData,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return formatCurrency(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderDistributionChart(normal, investments, shared) {
+      const ctx = document.getElementById('distribution-chart');
+      
+      // Destroy previous chart if exists
+      if (window.distributionChart) {
+        window.distributionChart.destroy();
+      }
+      
+      window.distributionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Cuentas Normales', 'Inversiones', 'Cuenta Compartida'],
+          datasets: [{
+            data: [normal, investments, shared],
+            backgroundColor: [
+              '#3B82F6',
+              '#8B5CF6',
+              '#F59E0B'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    async function renderMonthlyView() {
+      await getData();
+      // Render month selector
+      const monthSelector = document.getElementById('month-selector');
+      monthSelector.innerHTML = MONTHS.map((month, index) => `
+        <button class="month-btn ${index === currentMonth ? 'active' : ''}" 
+                onclick="changeMonth(${index})">
+          ${month}
+        </button>
+      `).join('');
+
+      // Update title
+      document.getElementById('current-month-title').textContent = 
+        `${MONTHS[currentMonth]} 2025`;
+
+      // Calculate monthly totals
+      const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+      
+      const ahorroNeto = ingresos - gastosPersonales - inversiones;
+
+      // Render monthly KPIs
+      const monthlyKpis = document.getElementById('monthly-kpis');
+      monthlyKpis.innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label">Ingresos</div>
+          <div class="kpi-value">${formatCurrency(ingresos)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Gastos Personales</div>
+          <div class="kpi-value">${formatCurrency(gastosPersonales)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Inversiones</div>
+          <div class="kpi-value">${formatCurrency(inversiones)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ahorro Neto</div>
+          <div class="kpi-value">${formatCurrency(ahorroNeto)}</div>
+        </div>
+      `;
+
+      // Update totals
+      document.getElementById('ingresos-total').textContent = formatCurrency(ingresos);
+      document.getElementById('gastos-personales-total').textContent = formatCurrency(gastosPersonales);
+      document.getElementById('gastos-compartidos-total').textContent = formatCurrency(gastosCompartidos);
+      document.getElementById('inversiones-total').textContent = formatCurrency(inversiones);
+
+      // Render tables
+      await renderTable('ingresos');
+      await renderTable('gastos_personales');
+      await renderTable('gastos_compartidos');
+      await renderTable('inversiones');
+      
+      // Load contributions after DOM is ready
+      setTimeout(async () => {
+        await renderContributionsList();
+        await renderFixedExpensesInMonth();
+        await updateMonthlyPatrimonyDisplay();
+      }, 0);
+    }
+
+    async function renderTable(type) {
+      const transactions = await getTransactionsByMonth(currentMonth, type);
+      const tableId = type.replace('_', '-') + '-table';
+      const tbody = document.getElementById(tableId);
+
+      if (transactions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+              No hay transacciones este mes
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = transactions
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map(txn => `
+          <tr>
+            <td class="date-cell">${formatDate(txn.date)}</td>
+            <td class="description-cell">${txn.description}</td>
+            <td><span class="category-badge">${txn.category}</span></td>
+            <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
+            <td class="amount-cell">${formatCurrency(txn.amount)}</td>
+            <td>
+              <div class="row-actions">
+                <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
+                <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+    }
+
+    function changeMonth(monthIndex) {
+      currentMonth = monthIndex;
+      renderMonthlyView();
+    }
+
+    // ============================================================================
+    // CONTRIBUTIONS MANAGEMENT
+    // ============================================================================
+    
+    async function getMonthlyContributions(accountName) {
+      // Only count partner and external contributions for Santander Pareja account
+      if (accountName !== 'Santander Pareja') return 0;
+      
+      const data = await getData();
+      if (!data.contributions) {
+        console.log('No contributions data found');
+        return 0;
+      }
+      
+      console.log('Calculating contributions for', accountName);
+      console.log('All contributions:', JSON.stringify(data.contributions));
+      
+      const total = data.contributions.reduce((sum, c) => {
+        const partner = parseFloat(c.partner) || 0;
+        const external = parseFloat(c.external) || 0;
+        console.log(`Month ${c.month}: partner=${partner}, external=${external}`);
+        return sum + partner + external;
+      }, 0);
+      
+      console.log('Total contributions:', total);
+      return total;
+    }
+
+    async function renderInvestmentsView() {
+      const data = await getData();
+      const holdings = data.holdings || [];
+      const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
+
+      // Calculate totals
+      const totalCapital = holdings.reduce((sum, h) => sum + parseFloat(h.capital), 0);
+      const totalValue = holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
+      const totalGainLoss = totalValue - totalCapital;
+      const totalReturn = totalCapital > 0 ? ((totalGainLoss / totalCapital) * 100) : 0;
+
+      // Update subtitle
+      document.getElementById('portfolio-subtitle').textContent = 
+        `Capital invertido: ${formatCurrency(totalCapital)}`;
+
+      // Render KPIs
+      const investmentKpis = document.getElementById('investment-kpis');
+      investmentKpis.innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Capital Invertido</span>
+            <span class="kpi-icon">💰</span>
+          </div>
+          <div class="kpi-value">${formatCurrency(totalCapital)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Valor Actual</span>
+            <span class="kpi-icon">📈</span>
+          </div>
+          <div class="kpi-value">${formatCurrency(totalValue)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Ganancia/Pérdida</span>
+            <span class="kpi-icon">${totalGainLoss >= 0 ? '✅' : '❌'}</span>
+          </div>
+          <div class="kpi-value" style="color: ${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
+            ${formatCurrency(totalGainLoss)}
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Rentabilidad Total</span>
+            <span class="kpi-icon">📊</span>
+          </div>
+          <div class="kpi-value" style="color: ${totalReturn >= 0 ? 'var(--green)' : 'var(--red)'}">
+            ${totalReturn.toFixed(2)}%
+          </div>
+        </div>
+      `;
+
+      // Render holdings table
+      const holdingsTable = document.getElementById('holdings-table');
+      if (holdings.length === 0) {
+        holdingsTable.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+              No hay posiciones en tu cartera
+            </td>
+          </tr>
+        `;
+      } else {
+        holdingsTable.innerHTML = holdings.map(holding => {
+          const capital = parseFloat(holding.capital);
+          const currentValue = parseFloat(holding.currentValue);
+          const gainLoss = currentValue - capital;
+          const returnPercent = capital > 0 ? ((gainLoss / capital) * 100) : 0;
+
+          return `
+            <tr>
+              <td class="description-cell">${holding.name}</td>
+              <td><span class="category-badge">${holding.type}</span></td>
+              <td style="color: var(--text-tertiary); font-size: 13px;">${holding.account}</td>
+              <td class="amount-cell">${formatCurrency(capital)}</td>
+              <td class="amount-cell">${formatCurrency(currentValue)}</td>
+              <td class="amount-cell" style="color: ${gainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
+                ${gainLoss >= 0 ? '+' : ''}${formatCurrency(gainLoss)}
+              </td>
+              <td class="amount-cell" style="color: ${returnPercent >= 0 ? 'var(--green)' : 'var(--red)'}">
+                ${returnPercent >= 0 ? '+' : ''}${returnPercent.toFixed(2)}%
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button class="action-btn" onclick="handleEditHolding('${holding.id}')">Editar</button>
+                  <button class="action-btn" style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.3)); backdrop-filter: blur(10px); border: 1px solid rgba(52, 211, 153, 0.3); color: #10B981; font-weight: 600; border-radius: 12px; padding: 8px 16px;" onclick="openUpdateValueModal('${holding.id}', '${holding.name}', ${currentValue})">📈 Actualizar</button>
+                  <button class="action-btn delete" onclick="handleConfirmDeleteHolding('${holding.id}')">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Render investment history
+      const historyTable = document.getElementById('investment-history-table');
+      if (investmentTransactions.length === 0) {
+        historyTable.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+              No hay aportaciones registradas
+            </td>
+          </tr>
+        `;
+      } else {
+        historyTable.innerHTML = investmentTransactions
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .map(txn => `
+            <tr>
+              <td class="date-cell">${formatDate(txn.date)}</td>
+              <td class="description-cell">${txn.description}</td>
+              <td><span class="category-badge">${txn.category}</span></td>
+              <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
+              <td class="amount-cell">${formatCurrency(txn.amount)}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
+                  <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          `).join('');
+      }
+    }
+
+    // ============================================================================
+    // MODAL MANAGEMENT
+    // ============================================================================
+
+    function openTransactionModal(type) {
+      currentType = type;
+      editingId = null;
+      
+      const titles = {
+        ingresos: 'Nuevo Ingreso',
+        gastos_personales: 'Nuevo Gasto Personal',
+        gastos_compartidos: 'Nuevo Gasto Compartido',
+        inversiones: 'Nueva Inversión'
+      };
+
+      document.getElementById('modal-title').textContent = titles[type];
+      document.getElementById('transaction-form').reset();
+      
+      // Set today's date
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('txn-date').value = today;
+
+      // Populate categories
+      const categorySelect = document.getElementById('txn-category');
+      categorySelect.innerHTML = CATEGORIES[type]
+        .map(cat => `<option value="${cat}">${cat}</option>`)
+        .join('');
+
+      // Populate accounts
+      const accountSelect = document.getElementById('txn-account');
+      accountSelect.innerHTML = ACCOUNTS
+        .map(acc => `<option value="${acc}">${acc}</option>`)
+        .join('');
+
+      document.getElementById('transaction-modal').classList.add('active');
+    }
+
+    async function editTransaction(id) {
+      const data = await getData();
+      const txn = data.transactions.find(t => t.id === id);
+      if (!txn) return;
+
+      editingId = id;
+      currentType = txn.type;
+
+      const titles = {
+        ingresos: 'Editar Ingreso',
+        gastos_personales: 'Editar Gasto Personal',
+        gastos_compartidos: 'Editar Gasto Compartido',
+        inversiones: 'Editar Inversión'
+      };
+
+      document.getElementById('modal-title').textContent = titles[txn.type];
+      document.getElementById('txn-date').value = txn.date;
+      document.getElementById('txn-description').value = txn.description;
+      document.getElementById('txn-amount').value = txn.amount;
+
+      // Populate categories
+      const categorySelect = document.getElementById('txn-category');
+      categorySelect.innerHTML = CATEGORIES[txn.type]
+        .map(cat => `<option value="${cat}" ${cat === txn.category ? 'selected' : ''}>${cat}</option>`)
+        .join('');
+
+      // Populate accounts
+      const accountSelect = document.getElementById('txn-account');
+      accountSelect.innerHTML = ACCOUNTS
+        .map(acc => `<option value="${acc}" ${acc === txn.account ? 'selected' : ''}>${acc}</option>`)
+        .join('');
+
+      document.getElementById('transaction-modal').classList.add('active');
+    }
+
+    async function handleEditTransaction(id) {
+      await editTransaction(id);
+    }
+
+    async function handleSaveNewAccount() {
+      await saveNewAccount();
+    }
+
+    async function handleTogglePatrimony(accountName) {
+      await toggleAccountInPatrimony(accountName);
+    }
+
+    async function handleOpenEditAccount(accountName) {
+      await openEditAccountModal(accountName);
+    }
+
+    async function handleSaveEditedAccount() {
+      await saveEditedAccount();
+    }
+
+    function closeModal() {
+      document.getElementById('transaction-modal').classList.remove('active');
+      editingId = null;
+    }
+
+    function saveTransaction(event) {
+      event.preventDefault();
+
+      try {
+        const transaction = {
+          type: currentType,
+          date: document.getElementById('txn-date').value,
+          description: document.getElementById('txn-description').value,
+          category: document.getElementById('txn-category').value,
+          account: document.getElementById('txn-account').value,
+          amount: parseFloat(document.getElementById('txn-amount').value)
+        };
+
+        console.log('Saving transaction:', transaction);
+
+        if (editingId) {
+          updateTransaction(editingId, transaction);
+        } else {
+          addTransaction(transaction);
+        }
+
+        closeModal();
+        renderMonthlyView();
+        renderDashboard();
+      } catch (error) {
+        console.error('Error saving transaction:', error);
+        showToast('Error al guardar la transacción: ' + error.message, 'error');
+      }
+    }
+
+    async function saveTransactionClick() {
+      // Validate required fields
+      const date = document.getElementById('txn-date').value;
+      const description = document.getElementById('txn-description').value;
+      const amount = document.getElementById('txn-amount').value;
+
+      if (!date || !description || !amount) {
+        showToast('Por favor completa todos los campos requeridos', 'error');
+        return;
+      }
+
+      try {
+        const transaction = {
+          type: currentType,
+          date: date,
+          description: description,
+          category: document.getElementById('txn-category').value,
+          account: document.getElementById('txn-account').value,
+          amount: parseFloat(amount)
+        };
+
+        console.log('Saving transaction:', transaction);
+
+        if (editingId) {
+          await updateTransaction(editingId, transaction);
+        } else {
+          await addTransaction(transaction);
+        }
+        
+        closeModal();
+        await getData(); // AÑADÍ ESTA LÍNEA
+        renderMonthlyView();
+        renderDashboard();
+        showToast('Transacción guardada correctamente', 'success'); // ← Opcional pero útil
+      } catch (error) {
+        console.error('Error saving transaction:', error);
+        showToast('Error al guardar la transacción: ' + error.message, 'error');
+      }
+    }
+
+    async function confirmDelete(id) {
+      console.log('Deleting transaction:', id);
+      await deleteTransaction(id);
+      await renderMonthlyView();
+      await renderDashboard();
+      await renderInvestmentsView();
+      showToast('Transacción eliminada','success');
+    }
+
+    async function handleConfirmDelete(id) {
+      await confirmDelete(id);
+    }
+
+    let editingHoldingId = null;
+
+    function openInvestmentModal() {
+      editingHoldingId = null;
+      document.getElementById('investment-modal-title').textContent = 'Nueva Posición';
+      document.getElementById('investment-form').reset();
+      
+      // Populate accounts
+      const accountSelect = document.getElementById('inv-account');
+      accountSelect.innerHTML = ACCOUNTS
+        .map(acc => `<option value="${acc}">${acc}</option>`)
+        .join('');
+
+      document.getElementById('investment-modal').classList.add('active');
+    }
+
+    async function editHolding(id) {
+      const data = await getData();
+      const holding = data.holdings.find(h => h.id === id);
+      if (!holding) return;
+
+      editingHoldingId = id;
+      document.getElementById('investment-modal-title').textContent = 'Editar Posición';
+      document.getElementById('inv-name').value = holding.name;
+      document.getElementById('inv-type').value = holding.type;
+      document.getElementById('inv-capital').value = holding.capital;
+      document.getElementById('inv-current-value').value = holding.currentValue;
+
+      // Populate accounts
+      const accountSelect = document.getElementById('inv-account');
+      accountSelect.innerHTML = ACCOUNTS
+        .map(acc => `<option value="${acc}" ${acc === holding.account ? 'selected' : ''}>${acc}</option>`)
+        .join('');
+
+      document.getElementById('investment-modal').classList.add('active');
+    }
+
+    async function handleEditHolding(id) {
+      await editHolding(id);
+    }
+
+    function closeInvestmentModal() {
+      document.getElementById('investment-modal').classList.remove('active');
+      editingHoldingId = null;
+    }
+
+    function saveInvestment(event) {
+      event.preventDefault();
+
+      const holding = {
+        name: document.getElementById('inv-name').value,
+        type: document.getElementById('inv-type').value,
+        account: document.getElementById('inv-account').value,
+        capital: parseFloat(document.getElementById('inv-capital').value),
+        currentValue: parseFloat(document.getElementById('inv-current-value').value)
+      };
+
+      if (editingHoldingId) {
+        updateHolding(editingHoldingId, holding);
+      } else {
+        addHolding(holding);
+      }
+
+      closeInvestmentModal();
+      renderInvestmentsView();
+      renderDashboard();
+    }
+
+    async function saveInvestmentClick() {
+      const name = document.getElementById('inv-name').value;
+      const capital = document.getElementById('inv-capital').value;
+      const currentValue = document.getElementById('inv-current-value').value;
+
+      if (!name || !capital || !currentValue) {
+        showToast('Por favor completa todos los campos requeridos', 'error'); return;
+      }
+
+      const holding = {
+        name: name,
+        type: document.getElementById('inv-type').value,
+        account: document.getElementById('inv-account').value,
+        capital: parseFloat(capital),
+        currentValue: parseFloat(currentValue)
+      };
+
+      if (editingHoldingId) {
+        await updateHolding(editingHoldingId, holding);
+      } else {
+        await addHolding(holding);
+      }
+
+      closeInvestmentModal();
+      renderInvestmentsView();
+      renderDashboard();
+    }
+
+    async function confirmDeleteHolding(id) {
+      console.log('Deleting holding:', id);
+      await deleteHolding(id);
+      await renderInvestmentsView();
+      await renderDashboard();
+    }
+
+    async function handleConfirmDeleteHolding(id) {
+      await confirmDeleteHolding(id);
+    }
+
+    // ============================================================================
+// UPDATE VALUE MODAL
+// ============================================================================
+
+let updatingHoldingId = null;
+
+async function openUpdateValueModal(holdingId, holdingName, currentValue) {
+  updatingHoldingId = holdingId;
+  document.getElementById('update-value-title').textContent = `Actualizar ${holdingName}`;
+  document.getElementById('update-holding-name').value = holdingName;
+  document.getElementById('update-current-value').value = formatCurrency(currentValue);
+  document.getElementById('update-new-value').value = '';
+  document.getElementById('update-value-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('update-value-modal').classList.add('active');
+}
+
+function closeUpdateValueModal() {
+  document.getElementById('update-value-modal').classList.remove('active');
+  updatingHoldingId = null;
+}
+
+async function saveValueUpdate() {
+  const newValue = parseFloat(document.getElementById('update-new-value').value);
+  const date = document.getElementById('update-value-date').value;
+  
+  if (!newValue || newValue <= 0) {
+    showToast('Por favor ingresa un valor válido', 'error');
+    return;
+  }
+  
+  if (!date) {
+    showToast('Por favor selecciona una fecha', 'error');
+    return;
+  }
+  
+  try {
+    // Save to history
+    const { error: historyError } = await supabaseClient.from('holdings_history').insert({
+      holding_id: updatingHoldingId,
+      date: date,
+      value: newValue
+    });
+    
+    if (historyError) throw historyError;
+    
+    // Update current value in holdings table
+    const { error: updateError } = await supabaseClient.from('holdings').update({
+      current_value: newValue
+    }).eq('id', updatingHoldingId);
+    
+    if (updateError) throw updateError;
+    
+    invalidateCache();
+    closeUpdateValueModal();
+    await renderInvestmentsView();
+    await renderDashboard();
+    showToast('Valor actualizado correctamente ✓', 'success');
+  } catch (error) {
+    console.error('Error updating value:', error);
+    showToast('Error al actualizar valor: ' + error.message, 'error');
+  }
+}
+
+// ============================================================================
+// EXPENSE BREAKDOWN BY CATEGORY
+// ============================================================================
+
+async function showSharedExpensesBreakdown() {
+  const transactions = await getTransactionsByMonth(currentMonth, 'gastos_compartidos');
+  
+  if (transactions.length === 0) {
+    showToast('No hay gastos compartidos este mes', 'info');
+    return;
+  }
+  
+  // Calculate by category
+  const byCategory = {};
+  let total = 0;
+  
+  transactions.forEach(t => {
+    const amount = parseFloat(t.amount);
+    if (!byCategory[t.category]) byCategory[t.category] = 0;
+    byCategory[t.category] += amount;
+    total += amount;
+  });
+  
+  // Sort by amount descending
+  const sorted = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1]);
+  
+  // Create breakdown HTML
+  const breakdown = sorted.map(([category, amount]) => {
+    const percent = (amount / total * 100).toFixed(1);
+    return `
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      ">
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${category}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary);">${percent}% del total</div>
+        </div>
+        <div style="font-weight: 700; color: var(--text-primary);">${formatCurrency(amount)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Show modal
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🏠 Gastos Compartidos por Categoría</h2>
+        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div style="padding: 24px;">
+        <div style="margin-bottom: 16px; padding: 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 12px; text-align: center;">
+          <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px;">Total del mes</div>
+          <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">${formatCurrency(total)}</div>
+        </div>
+        ${breakdown}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target.className === 'modal-overlay active') {
+      overlay.remove();
+    }
+  });
+}
+
+async function showPersonalExpensesBreakdown() {
+  const transactions = await getTransactionsByMonth(currentMonth, 'gastos_personales');
+  
+  if (transactions.length === 0) {
+    showToast('No hay gastos personales este mes', 'info');
+    return;
+  }
+  
+  // Calculate by category
+  const byCategory = {};
+  let total = 0;
+  
+  transactions.forEach(t => {
+    const amount = parseFloat(t.amount);
+    if (!byCategory[t.category]) byCategory[t.category] = 0;
+    byCategory[t.category] += amount;
+    total += amount;
+  });
+  
+  // Sort by amount descending
+  const sorted = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1]);
+  
+  // Create breakdown HTML
+  const breakdown = sorted.map(([category, amount]) => {
+    const percent = (amount / total * 100).toFixed(1);
+    return `
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 8px;
+      ">
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${category}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary);">${percent}% del total</div>
+        </div>
+        <div style="font-weight: 700; color: var(--text-primary);">${formatCurrency(amount)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Show modal
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">💳 Gastos Personales por Categoría</h2>
+        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div style="padding: 24px;">
+        <div style="margin-bottom: 16px; padding: 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 12px; text-align: center;">
+          <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px;">Total del mes</div>
+          <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">${formatCurrency(total)}</div>
+        </div>
+        ${breakdown}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target.className === 'modal-overlay active') {
+      overlay.remove();
+    }
+  });
+}
+
+    // ============================================================================
+    // NAVIGATION
+    // ============================================================================
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const view = btn.dataset.view;
+        
+        // Update active nav
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Show view
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(`${view}-view`).classList.add('active');
+
+        // Render view
+        if (view === 'dashboard') await renderDashboard();
+        if (view === 'monthly') await renderMonthlyView();
+        if (view === 'inversiones') await renderInvestmentsView();
+        if (view === 'accounts') await renderAccountsView();
+        if (view === 'settings') await renderSettingsView();
+        if (view === 'accounts') await renderAccountsView();
+      });
+    });
+
+    function switchView(viewName) {
+      // Update active nav button
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.view === viewName) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Show view
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`${viewName}-view`).classList.add('active');
+
+      // Render view
+      if (viewName === 'dashboard') renderDashboard();
+      if (viewName === 'monthly') renderMonthlyView();
+      if (viewName === 'inversiones') renderInvestmentsView();
+      if (viewName === 'accounts') renderAccountsView();
+      if (viewName === 'settings') renderSettingsView();
+    }
+
+    // Close modals on overlay click
+    document.getElementById('transaction-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'transaction-modal') closeModal();
+    });
+
+    document.getElementById('investment-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'investment-modal') closeInvestmentModal();
+    });
+
+    // ============================================================================
+// ============================================================================
+// ADICIONAL PARA VISTA DE CUENTAS
+// ============================================================================
+
+// Transfer Management
+async function addTransfer(transfer) {
+  try {
+    const { error } = await supabaseClient.from('transfers').insert({
+      date: transfer.date,
+      from_account: transfer.from,
+      to_account: transfer.to,
+      amount: transfer.amount,
+      concept: transfer.concept
+    });
+    
+    if (error) throw error;
+    invalidateCache();
+  } catch (error) {
+    console.error('Error adding transfer:', error);
+    showToast('Error al añadir transferencia', 'error');
+  }
+}
+
+async function deleteTransfer(id) {
+  try {
+    const { error } = await supabaseClient.from('transfers').delete().eq('id', id);
+    if (error) throw error;
+    invalidateCache();
+  } catch (error) {
+    console.error('Error deleting transfer:', error);
+    showToast('Error al eliminar transferencia', 'error');
+  }
+}
+
+// Account Management
+let editingAccountName = null;
+
+async function updateAccountBalance(accountName, initialBalance) {
+  try {
+    const { error } = await supabaseClient.from('accounts').update({
+      initial_balance: parseFloat(initialBalance)
+    }).eq('name', accountName);
+    
+    if (error) throw error;
+    invalidateCache();
+  } catch (error) {
+    console.error('Error updating account balance:', error);
+    showToast('Error al actualizar saldo', 'error');
+  }
+}
+
+async function calculateAccountBalance(accountName) {
+  const data = await getData();
+  const account = data.accounts.find(a => a.name === accountName);
+  if (!account) return 0;
+  
+  const ingresos = data.transactions
+    .filter(t => t.type === 'ingresos' && t.account === accountName)
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const gastos = data.transactions
+    .filter(t => (t.type === 'gastos_personales' || t.type === 'gastos_compartidos') && t.account === accountName)
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const inversiones = data.transactions
+    .filter(t => t.type === 'inversiones' && t.account === accountName)
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const transfersReceived = (data.transfers || [])
+    .filter(t => t.to === accountName)
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const transfersSent = (data.transfers || [])
+    .filter(t => t.from === accountName)
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  // Add partner and external contributions for shared account
+  const contributions = await getMonthlyContributions(accountName);
+
+  // For broker accounts, add current value of holdings
+  if (account.type === 'Broker' || account.type === 'Exchange Crypto') {
+    const holdingsValue = data.holdings
+      .filter(h => h.account === accountName)
+      .reduce((sum, h) => sum + parseFloat(h.currentValue || 0), 0);
+    
+    return holdingsValue; // Para cuentas broker, el balance ES el valor de las posiciones
+  }
+  
+  return account.initialBalance + ingresos - gastos - inversiones + transfersReceived - transfersSent + contributions;
+}
+
+function filterAccountMovements() {
+  // Esta función puede quedar vacía por ahora o implementar filtrado local
+  console.log('Filter changed');
+}
+
+// Render Accounts View
+async function renderAccountsView() {
+  const data = await getData();
+  const filterAccount = document.getElementById('account-filter')?.value || '';
+  
+  // Calculate total patrimonio
+  const totalPatrimonio = ACCOUNTS.reduce((sum, acc) => sum + calculateAccountBalance(acc), 0);
+  document.getElementById('accounts-subtitle').textContent = 
+    `Patrimonio Total: ${formatCurrency(totalPatrimonio)}`;
+  
+  // Render KPIs
+  const accountsKpis = document.getElementById('accounts-kpis');
+
+  // Calculate balances
+  const balancesForKPI = await Promise.all(
+    ACCOUNTS.map(accountName => calculateAccountBalance(accountName))
+  );
+
+  // Separate personal accounts from shared
+  const personalAccounts = ACCOUNTS.filter(acc => acc !== 'Santander Pareja');
+  const personalBalances = await Promise.all(
+    personalAccounts.map(accountName => calculateAccountBalance(accountName))
+  );
+
+  // Separate normal accounts from broker/crypto
+    const normalAccounts = data.accounts.filter(a => 
+      a.name !== 'Santander Pareja' && 
+      a.type !== 'Broker' && 
+      a.type !== 'Exchange Crypto' &&
+      a.includeInPatrimony !== false
+    );
+    const brokerAccounts = data.accounts.filter(a => 
+      (a.type === 'Broker' || a.type === 'Exchange Crypto') &&
+      a.includeInPatrimony !== false
+    );
+
+  const normalTotal = await Promise.all(
+    normalAccounts.map(a => calculateAccountBalance(a.name))
+  ).then(balances => balances.reduce((sum, b) => sum + b, 0));
+
+  const brokerTotal = await Promise.all(
+    brokerAccounts.map(a => calculateAccountBalance(a.name))
+  ).then(balances => balances.reduce((sum, b) => sum + b, 0));
+
+  const personalTotal = normalTotal + brokerTotal;
+  const normalPercent = personalTotal > 0 ? (normalTotal / personalTotal * 100) : 0;
+  const brokerPercent = personalTotal > 0 ? (brokerTotal / personalTotal * 100) : 0;
+
+  // Shared account balance
+  const sharedBalance = await calculateAccountBalance('Santander Pareja');
+
+  accountsKpis.innerHTML = `
+    <div class="kpi-card" style="grid-column: span 2;">
+      <div class="kpi-header">
+        <span class="kpi-label">💰 Total Personal</span>
+      </div>
+      <div class="kpi-value">${formatCurrency(personalTotal)}</div>
+      <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
+        <div style="flex: 1;">
+          <div style="color: var(--text-tertiary); margin-bottom: 4px;">Cuentas Normales</div>
+          <div style="font-weight: 600;">${formatCurrency(normalTotal)} <span style="color: var(--text-tertiary);">(${normalPercent.toFixed(1)}%)</span></div>
+        </div>
+        <div style="flex: 1;">
+          <div style="color: var(--text-tertiary); margin-bottom: 4px;">Inversiones</div>
+          <div style="font-weight: 600;">${formatCurrency(brokerTotal)} <span style="color: var(--text-tertiary);">(${brokerPercent.toFixed(1)}%)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">🏠 Cuenta Compartida</span>
+      </div>
+      <div class="kpi-value">${formatCurrency(sharedBalance)}</div>
+    </div>
+  `;
+  
+  // Render Account Cards
+  const cardsGrid = document.getElementById('accounts-cards-grid');
+
+  // Calculate all balances first
+  const balances = await Promise.all(
+    ACCOUNTS.map(accountName => calculateAccountBalance(accountName))
+  );
+
+  cardsGrid.innerHTML = ACCOUNTS.map((accountName, index) => {
+    const balance = balances[index];
+    const account = data.accounts.find(a => a.name === accountName);
+    const change = balance - (account?.initialBalance || 0);
+    
+    return `
+      <div class="account-card" style="--account-color: ${ACCOUNT_COLORS[accountName]}" 
+           onclick="handleAccountClick('${accountName}')">
+        <div class="account-card-header">
+          <div>
+            <div class="account-card-name">${accountName}</div>
+            <div class="account-card-type">${ACCOUNT_TYPES[accountName]}</div>
+          </div>
+          <span class="account-card-badge">Cuenta</span>
+        </div>
+        <div class="account-card-balance">${formatCurrency(balance)}</div>
+        <div class="account-card-change ${change >= 0 ? 'positive' : 'negative'}">
+          <span>${change >= 0 ? '↑' : '↓'}</span>
+          <span>${formatCurrency(Math.abs(change))} vs inicial</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Render Flow Table
+  const flowTable = document.getElementById('account-flow-table');
+  flowTable.innerHTML = ACCOUNTS.map(accountName => {
+    const ingresos = data.transactions
+      .filter(t => t.type === 'ingresos' && t.account === accountName)
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    
+    const gastos = data.transactions
+      .filter(t => (t.type === 'gastos_personales' || t.type === 'gastos_compartidos') && t.account === accountName)
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    
+    const inversiones = data.transactions
+      .filter(t => t.type === 'inversiones' && t.account === accountName)
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    
+    const flujoNeto = ingresos - gastos - inversiones;
+    
+    return `
+      <tr>
+        <td class="description-cell">${accountName}</td>
+        <td class="amount-cell" style="color: var(--green)">${formatCurrency(ingresos)}</td>
+        <td class="amount-cell" style="color: var(--red)">${formatCurrency(gastos)}</td>
+        <td class="amount-cell" style="color: var(--purple)">${formatCurrency(inversiones)}</td>
+        <td class="amount-cell" style="color: ${flujoNeto >= 0 ? 'var(--green)' : 'var(--red)'}">
+          ${formatCurrency(flujoNeto)}
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  // Render Transfers Table
+  const transfersTable = document.getElementById('transfers-table');
+  const allTransfers = data.transfers || [];
+  
+  if (allTransfers.length === 0) {
+    transfersTable.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+          No hay transferencias registradas
+        </td>
+      </tr>
+    `;
+  } else {
+    transfersTable.innerHTML = allTransfers
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .map(transfer => `
+        <tr>
+          <td class="date-cell">${formatDate(transfer.date)}</td>
+          <td class="description-cell">${transfer.from}</td>
+          <td class="description-cell">${transfer.to}</td>
+          <td style="color: var(--text-secondary); font-size: 14px;">${transfer.concept || '-'}</td>
+          <td class="amount-cell">${formatCurrency(transfer.amount)}</td>
+          <td>
+            <div class="row-actions">
+              <button class="action-btn delete" onclick="event.stopPropagation(); handleConfirmDeleteTransfer('${transfer.id}')">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+  }
+  
+  // Populate account filter
+  const accountFilter = document.getElementById('account-filter');
+  if (accountFilter && accountFilter.options.length === 1) {
+    ACCOUNTS.forEach(acc => {
+      const option = document.createElement('option');
+      option.value = acc;
+      option.textContent = acc;
+      accountFilter.appendChild(option);
+    });
+  }
+  
+  // Render Movements Table
+  const movementsTable = document.getElementById('account-movements-table');
+  let movements = data.transactions;
+  
+  if (filterAccount) {
+    movements = movements.filter(t => t.account === filterAccount);
+  }
+  
+  if (movements.length === 0) {
+    movementsTable.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+          No hay movimientos${filterAccount ? ' para esta cuenta' : ''}
+        </td>
+      </tr>
+    `;
+  } else {
+    const typeLabels = {
+      'ingresos': '💰 Ingreso',
+      'gastos_personales': '💳 Gasto Personal',
+      'gastos_compartidos': '🏠 Gasto Compartido',
+      'inversiones': '📈 Inversión'
+    };
+    
+    movementsTable.innerHTML = movements
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 50) // Limit to 50 most recent
+      .map(txn => `
+        <tr>
+          <td class="date-cell">${formatDate(txn.date)}</td>
+          <td class="description-cell">${txn.description}</td>
+          <td><span class="category-badge">${typeLabels[txn.type]}</span></td>
+          <td><span class="category-badge">${txn.category}</span></td>
+          <td class="amount-cell" style="color: ${txn.type === 'ingresos' ? 'var(--green)' : 'var(--red)'}">
+            ${txn.type === 'ingresos' ? '+' : '-'}${formatCurrency(txn.amount)}
+          </td>
+        </tr>
+      `).join('');
+  }
+}
+
+// Modal Handlers
+let editingTransferId = null;
+
+function openTransferModal() {
+  editingTransferId = null;
+  document.getElementById('transfer-modal-title').textContent = 'Nueva Transferencia';
+  document.getElementById('transfer-form').reset();
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('transfer-date').value = today;
+  
+  // Populate accounts
+  const fromSelect = document.getElementById('transfer-from');
+  const toSelect = document.getElementById('transfer-to');
+  
+  const accountOptions = ACCOUNTS.map(acc => `<option value="${acc}">${acc}</option>`).join('');
+  fromSelect.innerHTML = accountOptions;
+  toSelect.innerHTML = accountOptions;
+  
+  document.getElementById('transfer-modal').classList.add('active');
+}
+
+function closeTransferModal() {
+  document.getElementById('transfer-modal').classList.remove('active');
+  editingTransferId = null;
+}
+
+function saveTransfer(event) {
+  event.preventDefault();
+  
+  const transfer = {
+    date: document.getElementById('transfer-date').value,
+    from: document.getElementById('transfer-from').value,
+    to: document.getElementById('transfer-to').value,
+    amount: parseFloat(document.getElementById('transfer-amount').value),
+    concept: document.getElementById('transfer-concept').value
+  };
+  
+  if (transfer.from === transfer.to) {
+    showToast('La cuenta origen y destino no pueden ser la misma', 'error');
+    return;
+  }
+  
+  addTransfer(transfer);
+  closeTransferModal();
+  renderAccountsView();
+  renderDashboard();
+}
+
+async function saveTransferClick() {
+  const date = document.getElementById('transfer-date').value;
+  const from = document.getElementById('transfer-from').value;
+  const to = document.getElementById('transfer-to').value;
+  const amount = document.getElementById('transfer-amount').value;
+  
+  if (!date || !amount) {
+    showToast('Por favor completa todos los campos requeridos', 'error'); return;
+  }
+  
+  if (from === to) {
+    showToast('La cuenta origen y destino no pueden ser la misma', 'error');
+    return;
+  }
+  
+  const transfer = {
+    date: date,
+    from: from,
+    to: to,
+    amount: parseFloat(amount),
+    concept: document.getElementById('transfer-concept').value
+  };
+  
+  await addTransfer(transfer);
+  closeTransferModal();
+  await getData(); // Recargar datos para actualizar la vista
+  await renderAccountsView();
+  await renderDashboard();
+  showToast('Transferencia guardada correctamente', 'success');
+}
+
+// ============================================================================
+// CONTRIBUTION MODAL & FUNCTIONS
+// ============================================================================
+
+function openContributionModal() {
+  document.getElementById('contribution-type').value = 'partner';
+  document.getElementById('contribution-amount').value = '';
+  document.getElementById('contribution-description').value = '';
+  document.getElementById('contribution-modal').classList.add('active');
+}
+
+function closeContributionModal() {
+  document.getElementById('contribution-modal').classList.remove('active');
+}
+
+async function saveContribution() {
+  const type = document.getElementById('contribution-type').value;
+  const amount = parseFloat(document.getElementById('contribution-amount').value);
+  const description = document.getElementById('contribution-description').value;
+  
+  if (!amount || amount <= 0) {
+    showToast('Por favor ingresa un importe válido', 'error');
+    return;
+  }
+  
+  const monthKey = `${currentMonth}-2025`;
+  
+  try {
+    const { data: existing } = await supabaseClient
+      .from('contributions')
+      .select('*')
+      .eq('month_key', monthKey)
+      .maybeSingle();
+    
+    let myTotal = 0;
+    let partnerTotal = 0;
+    let externalTotal = 0;
+    
+    if (existing) {
+      myTotal = parseFloat(existing.my) || 0;
+      partnerTotal = parseFloat(existing.partner) || 0;
+      externalTotal = parseFloat(existing.external) || 0;
+    }
+    
+    if (type === 'my') myTotal += amount;
+    if (type === 'partner') partnerTotal += amount;
+    if (type === 'external') externalTotal += amount;
+    
+    if (existing) {
+      await supabaseClient
+        .from('contributions')
+        .update({
+          my: myTotal,
+          partner: partnerTotal,
+          external: externalTotal
+        })
+        .eq('month_key', monthKey);
+    } else {
+      await supabaseClient
+        .from('contributions')
+        .insert({
+          month_key: monthKey,
+          my: myTotal,
+          partner: partnerTotal,
+          external: externalTotal
+        });
+    }
+    
+    if (type === 'my') {
+      await supabaseClient.from('transfers').insert({
+        date: new Date(2025, currentMonth, new Date().getDate()).toISOString().split('T')[0],
+        from_account: 'Santander Gastos',
+        to_account: 'Santander Pareja',
+        amount: amount,
+        concept: description || 'Mi aportación mensual'
+      });
+    }
+    
+    invalidateCache();
+    closeContributionModal();
+    await renderMonthlyView();
+    await renderAccountsView();
+    await renderDashboard();
+    showToast('Aportación guardada correctamente', 'success');
+  } catch (error) {
+    console.error('Error saving contribution:', error);
+    showToast('Error al guardar aportación: ' + error.message, 'error');
+  }
+}
+
+async function renderContributionsList() {
+  const data = await getData();
+  const monthKey = `${currentMonth}-2025`;
+  const contribution = data.contributions.find(c => c.month === monthKey);
+  
+  const container = document.getElementById('contributions-list');
+  
+  if (!contribution || (contribution.my === 0 && contribution.partner === 0 && contribution.external === 0)) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 32px; color: var(--text-tertiary);">
+        No hay aportaciones registradas este mes
+      </div>
+    `;
+    document.getElementById('contributions-total').textContent = '0,00 €';
+    return;
+  }
+  
+  const items = [];
+  
+  if (contribution.my > 0) {
+    items.push({
+      type: 'Mi aportación',
+      amount: contribution.my,
+      icon: '💳',
+      color: 'var(--primary)'
+    });
+  }
+  
+  if (contribution.partner > 0) {
+    items.push({
+      type: 'Aportación pareja',
+      amount: contribution.partner,
+      icon: '👥',
+      color: 'var(--orange)'
+    });
+  }
+  
+  if (contribution.external > 0) {
+    items.push({
+      type: 'Aportaciones externas',
+      amount: contribution.external,
+      icon: '🏛️',
+      color: 'var(--green)'
+    });
+  }
+  
+  container.innerHTML = items.map(item => `
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+    ">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 24px;">${item.icon}</span>
+        <div>
+          <div style="font-weight: 600; color: var(--text-primary);">${item.type}</div>
+          <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 2px;">
+            ${item.type === 'Mi aportación' ? 'Registrado como transferencia' : 'Suma al saldo compartido'}
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 20px; font-weight: 700; color: ${item.color};">
+        ${formatCurrency(item.amount)}
+      </div>
+    </div>
+  `).join('');
+  
+  const total = contribution.my + contribution.partner + contribution.external;
+  document.getElementById('contributions-total').textContent = formatCurrency(total);
+}
+
+async function openAccountModal(accountName) {
+  editingAccountName = accountName;
+  const data = await getData();
+  const account = data.accounts.find(a => a.name === accountName);
+  
+  document.getElementById('account-modal-title').textContent = `Editar ${accountName}`;
+  document.getElementById('account-name').value = accountName;
+  document.getElementById('account-initial-balance').value = account?.initialBalance || 0;
+  
+  document.getElementById('account-modal').classList.add('active');
+}
+
+async function handleAccountClick(accountName) {
+  await openAccountModal(accountName);
+}
+
+function closeAccountModal() {
+  document.getElementById('account-modal').classList.remove('active');
+  editingAccountName = null;
+}
+
+async function saveAccountClick() {
+  const initialBalance = document.getElementById('account-initial-balance').value;
+  
+  if (!initialBalance) {
+    showToast('Por favor introduce el saldo inicial', 'error');
+    return;
+  }
+  
+  await updateAccountBalance(editingAccountName, parseFloat(initialBalance));
+  closeAccountModal();
+  renderAccountsView();
+  renderDashboard();
+}
+
+// ============================================================================
+// SETTINGS MANAGEMENT
+// ============================================================================
+
+// Variables to track current editing state
+let currentCategoryType = '';
+
+// ============================================================================
+// ACCOUNTS MANAGEMENT
+// ============================================================================
+
+function openAddAccountModal() {
+  document.getElementById('add-account-form').reset();
+  document.getElementById('new-account-color').value = '#3B82F6';
+  document.getElementById('add-account-modal').classList.add('active');
+}
+
+function closeAddAccountModal() {
+  document.getElementById('add-account-modal').classList.remove('active');
+}
+
+let editingAccountInSettings = null;
+
+async function openEditAccountModal(accountName) {
+  // Protect shared account from name/type changes
+  const isSharedAccount = accountName === 'Santander Pareja';
+  
+  editingAccountInSettings = accountName;
+  const data = await getData();
+  const account = data.accounts.find(a => a.name === accountName);
+  
+  document.getElementById('edit-account-modal-title').textContent = `Editar ${accountName}`;
+  document.getElementById('edit-account-name').value = accountName;
+  document.getElementById('edit-account-name').readOnly = isSharedAccount;
+  document.getElementById('edit-account-type').value = account?.type || ACCOUNT_TYPES[accountName] || 'Cuenta';
+  document.getElementById('edit-account-type').disabled = isSharedAccount;
+  document.getElementById('edit-account-color').value = account?.color || ACCOUNT_COLORS[accountName] || '#3B82F6';
+  
+  document.getElementById('edit-account-modal').classList.add('active');
+}
+
+function closeEditAccountModal() {
+  document.getElementById('edit-account-modal').classList.remove('active');
+  editingAccountInSettings = null;
+}
+
+async function saveEditedAccount() {
+  const newName = document.getElementById('edit-account-name').value.trim();
+  const newType = document.getElementById('edit-account-type').value;
+  const newColor = document.getElementById('edit-account-color').value;
+  
+  if (!newName) {
+    showToast('Por favor introduce un nombre', 'error');
+    return;
+  }
+  
+  const data = await getData();
+  const account = data.accounts.find(a => a.name === editingAccountInSettings);
+  
+  if (!account) {
+    showToast('Cuenta no encontrada', 'error');
+    return;
+  }
+  
+  // Check if name changed and if new name already exists
+  if (newName !== editingAccountInSettings) {
+    if (data.accounts.find(a => a.name === newName)) {
+      showToast('Ya existe una cuenta con ese nombre', 'error');
+      return;
+    }
+    
+    // Update name in all transactions, transfers, and holdings
+    data.transactions.forEach(t => {
+      if (t.account === editingAccountInSettings) t.account = newName;
+    });
+    
+    (data.transfers || []).forEach(t => {
+      if (t.from === editingAccountInSettings) t.from = newName;
+      if (t.to === editingAccountInSettings) t.to = newName;
+    });
+    
+    (data.holdings || []).forEach(h => {
+      if (h.account === editingAccountInSettings) h.account = newName;
+    });
+    
+    // Update in ACCOUNTS array
+    const index = ACCOUNTS.indexOf(editingAccountInSettings);
+    if (index > -1) {
+      ACCOUNTS[index] = newName;
+    }
+    
+    // Update in ACCOUNT_COLORS and ACCOUNT_TYPES
+    ACCOUNT_COLORS[newName] = ACCOUNT_COLORS[editingAccountInSettings];
+    ACCOUNT_TYPES[newName] = ACCOUNT_TYPES[editingAccountInSettings];
+    delete ACCOUNT_COLORS[editingAccountInSettings];
+    delete ACCOUNT_TYPES[editingAccountInSettings];
+    
+    // Update account name
+    account.name = newName;
+  }
+  
+  // Update type and color
+  account.type = newType;
+  account.color = newColor;
+  ACCOUNT_TYPES[account.name] = newType;
+  ACCOUNT_COLORS[account.name] = newColor;
+  
+  saveData(data);
+  closeEditAccountModal();
+  renderSettingsView();
+  renderAccountsView();
+  showToast('Cuenta actualizada correctamente', 'success');
+}
+
+async function toggleAccountInPatrimony(accountName) {
+  try {
+    console.log('Toggle called for:', accountName);
+    const data = await getData();
+    const account = data.accounts.find(a => a.name === accountName);
+    console.log('Current value:', account?.includeInPatrimony);
+    if (!account) return;
+    
+    const newValue = !account.includeInPatrimony;
+
+    console.log('About to update to:', newValue);
+    
+    const { error } = await supabaseClient.from('accounts').update({
+      include_in_patrimony: newValue
+    }).eq('name', accountName);
+    
+    if (error) throw error;
+
+    console.log('Update successful, reloading...');
+    
+    invalidateCache();
+    await renderSettingsView();
+    showToast(newValue ? 
+      `${accountName} incluida en patrimonio` : 
+      `${accountName} excluida de patrimonio`, 
+      'info');
+  } catch (error) {
+    console.error('Error toggling account:', error);
+    showToast('Error al actualizar cuenta', 'error');
+  }
+}
+
+async function saveNewAccount() {
+  const name = document.getElementById('new-account-name').value;
+  const type = document.getElementById('new-account-type').value;
+  const color = document.getElementById('new-account-color').value;
+  const initialBalance = parseFloat(document.getElementById('new-account-balance').value) || 0;
+
+  if (!name) {
+    showToast('Por favor introduce un nombre', 'error');
+    return;
+  }
+
+  try {
+    const data = await getData();
+    
+    // Check if account already exists
+    if (data.accounts.find(a => a.name === name)) {
+      showToast('Ya existe una cuenta con ese nombre', 'error');
+      return;
+    }
+
+    // Insert into Supabase
+    const { error } = await supabaseClient.from('accounts').insert({
+      name: name,
+      type: type,
+      color: color,
+      initial_balance: initialBalance,
+      include_in_patrimony: true
+    });
+
+    if (error) throw error;
+
+    // Add to ACCOUNTS array (for backward compatibility)
+    if (!ACCOUNTS.includes(name)) {
+      ACCOUNTS.push(name);
+    }
+
+    // Update ACCOUNT_COLORS and ACCOUNT_TYPES
+    ACCOUNT_COLORS[name] = color;
+    ACCOUNT_TYPES[name] = type;
+
+    invalidateCache();
+    closeAddAccountModal();
+    await renderSettingsView();
+    await renderAccountsView();
+    showToast('Cuenta añadida correctamente', 'success');
+  } catch (error) {
+    console.error('Error saving account:', error);
+    showToast('Error al guardar cuenta: ' + error.message, 'error');
+  }
+}
+
+function deleteAccount(accountName) {
+  // Protect shared account
+  if (accountName === 'Santander Pareja') {
+    showToast('No puedes eliminar la cuenta compartida (tiene mecánicas especiales)', 'error');
+    return;
+  }
+
+  const data = getData();
+  
+  // Check if account has transactions
+  const hasTransactions = data.transactions.some(t => t.account === accountName);
+  const hasTransfers = (data.transfers || []).some(t => t.from === accountName || t.to === accountName);
+  
+  if (hasTransactions || hasTransfers) {
+    showToast('No puedes eliminar una cuenta con movimientos', 'error');
+    return;
+  }
+
+  // Remove account
+  data.accounts = data.accounts.filter(a => a.name !== accountName);
+  
+  // Remove from ACCOUNTS array
+  const index = ACCOUNTS.indexOf(accountName);
+  if (index > -1) {
+    ACCOUNTS.splice(index, 1);
+  }
+
+  // Remove from ACCOUNT_COLORS and ACCOUNT_TYPES
+  delete ACCOUNT_COLORS[accountName];
+  delete ACCOUNT_TYPES[accountName];
+
+  saveData(data);
+  renderSettingsView();
+  showToast('Cuenta eliminada', 'success');
+}
+
+// ============================================================================
+// CATEGORIES MANAGEMENT
+// ============================================================================
+
+function openAddCategoryModal(type) {
+  currentCategoryType = type;
+  document.getElementById('add-category-form').reset();
+  
+  const titles = {
+    'ingresos': 'Nueva Categoría de Ingresos',
+    'gastos_personales': 'Nueva Categoría de Gastos Personales',
+    'gastos_compartidos': 'Nueva Categoría de Gastos Compartidos',
+    'inversiones': 'Nueva Categoría de Inversiones'
+  };
+  
+  document.getElementById('add-category-modal-title').textContent = titles[type];
+  document.getElementById('add-category-modal').classList.add('active');
+}
+
+function closeAddCategoryModal() {
+  document.getElementById('add-category-modal').classList.remove('active');
+  currentCategoryType = '';
+}
+
+function saveNewCategory() {
+  const name = document.getElementById('new-category-name').value.trim();
+  
+  if (!name) {
+    showToast('Por favor introduce un nombre', 'error');
+    return;
+  }
+
+  // Check if category already exists
+  if (CATEGORIES[currentCategoryType].includes(name)) {
+    showToast('Ya existe esa categoría', 'error');
+    return;
+  }
+
+  // Add category
+  CATEGORIES[currentCategoryType].push(name);
+
+  // Save to localStorage
+  const data = getData();
+  if (!data.customCategories) data.customCategories = {};
+  data.customCategories[currentCategoryType] = CATEGORIES[currentCategoryType];
+  saveData(data);
+
+  closeAddCategoryModal();
+  renderSettingsView();
+  showToast('Categoría añadida correctamente', 'success');
+}
+
+function deleteCategory(type, categoryName) {
+  const data = getData();
+  
+  // Check if category has transactions
+  const hasTransactions = data.transactions.some(t => 
+    t.type === type && t.category === categoryName
+  );
+  
+  if (hasTransactions) {
+    showToast('No puedes eliminar una categoría con transacciones', 'error');
+    return;
+  }
+
+  // Remove category
+  const index = CATEGORIES[type].indexOf(categoryName);
+  if (index > -1) {
+    CATEGORIES[type].splice(index, 1);
+  }
+
+  // Save to localStorage
+  if (!data.customCategories) data.customCategories = {};
+  data.customCategories[type] = CATEGORIES[type];
+  saveData(data);
+
+  renderSettingsView();
+  showToast('Categoría eliminada', 'success');
+}
+
+// ============================================================================
+// SETTINGS VIEW RENDERING
+// ============================================================================
+
+async function renderSettingsView() {
+  const data = await getData();
+
+  // Render accounts table
+  const accountsTable = document.getElementById('settings-accounts-table');
+  accountsTable.innerHTML = data.accounts.map(account => {
+    const includeInPatrimony = account.includeInPatrimony !== false; // default true
+    return `
+    <tr style="cursor: pointer;" onclick="handleOpenEditAccount('${account.name}')">
+      <td class="description-cell">${account.name}</td>
+      <td>${account.type || ACCOUNT_TYPES[account.name] || 'Cuenta'}</td>
+      <td>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 24px; height: 24px; border-radius: 6px; background: ${account.color || ACCOUNT_COLORS[account.name] || '#3B82F6'};"></div>
+        </div>
+      </td>
+      <td style="text-align: center;">
+        <input type="checkbox" ${includeInPatrimony ? 'checked' : ''} 
+               onclick="event.stopPropagation(); handleTogglePatrimony('${account.name}')"
+               style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--green);">
+      </td>
+      <td>
+        <div class="row-actions" style="opacity: 1;">
+          <button class="action-btn" onclick="event.stopPropagation(); handleOpenEditAccount('${account.name}')">Editar</button>
+          <button class="action-btn delete" onclick="event.stopPropagation(); deleteAccount('${account.name}')">Eliminar</button>
+        </div>
+      </td>
+    </tr>
+  `;
+  }).join('');
+
+  // Render fixed expenses
+  await renderFixedExpensesInSettings();
+
+  // Render categories
+  Object.keys(CATEGORIES).forEach(type => {
+    const container = document.getElementById(`categories-${type}`);
+    if (container) {
+      container.innerHTML = CATEGORIES[type].map(category => `
+        <div class="category-chip">
+          <span>${category}</span>
+          <span class="delete-chip" onclick="deleteCategory('${type}', '${category}')">&times;</span>
+        </div>
+      `).join('');
+    }
+  });
+}
+
+// Add event listeners for modal close on overlay click
+document.getElementById('add-account-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'add-account-modal') closeAddAccountModal();
+});
+
+document.getElementById('add-category-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'add-category-modal') closeAddCategoryModal();
+});
+
+document.getElementById('edit-account-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'edit-account-modal') closeEditAccountModal();
+});
+
+// ============================================================================
+// FIXED EXPENSES MANAGEMENT
+// ============================================================================
+
+let editingFixedExpenseId = null;
+
+// ============================================================================
+// MODAL FUNCTIONS
+// ============================================================================
+
+function openAddFixedExpenseModal() {
+  editingFixedExpenseId = null;
+  document.getElementById('fixed-expense-modal-title').textContent = 'Nuevo Gasto Fijo';
+  document.getElementById('fixed-expense-form').reset();
+  
+  // Check all months by default
+  document.querySelectorAll('.month-checkbox').forEach(cb => cb.checked = true);
+  
+  // Populate categories and accounts
+  updateFixedExpenseCategories();
+  populateFixedExpenseAccounts();
+  
+  document.getElementById('fixed-expense-modal').classList.add('active');
+}
+
+function openEditFixedExpenseModal(id) {
+  const data = getData();
+  const expense = (data.fixedExpenses || []).find(e => e.id === id);
+  if (!expense) return;
+  
+  editingFixedExpenseId = id;
+  document.getElementById('fixed-expense-modal-title').textContent = 'Editar Gasto Fijo';
+  
+  document.getElementById('fixed-expense-name').value = expense.name;
+  document.getElementById('fixed-expense-type').value = expense.type;
+  document.getElementById('fixed-expense-amount').value = expense.amount;
+  
+  updateFixedExpenseCategories();
+  document.getElementById('fixed-expense-category').value = expense.category;
+  
+  populateFixedExpenseAccounts();
+  document.getElementById('fixed-expense-account').value = expense.account;
+  
+  // Set months checkboxes
+  const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
+  document.querySelectorAll('.month-checkbox').forEach(cb => {
+    cb.checked = months.includes(parseInt(cb.value));
+  });
+  
+  document.getElementById('fixed-expense-modal').classList.add('active');
+}
+
+function toggleAllMonths(checked) {
+  document.querySelectorAll('.month-checkbox').forEach(cb => cb.checked = checked);
+}
+
+function closeFixedExpenseModal() {
+  document.getElementById('fixed-expense-modal').classList.remove('active');
+  editingFixedExpenseId = null;
+}
+
+function updateFixedExpenseCategories() {
+  const type = document.getElementById('fixed-expense-type').value;
+  const categorySelect = document.getElementById('fixed-expense-category');
+  
+  categorySelect.innerHTML = CATEGORIES[type]
+    .map(cat => `<option value="${cat}">${cat}</option>`)
+    .join('');
+}
+
+function populateFixedExpenseAccounts() {
+  const accountSelect = document.getElementById('fixed-expense-account');
+  accountSelect.innerHTML = ACCOUNTS
+    .map(acc => `<option value="${acc}">${acc}</option>`)
+    .join('');
+}
+
+// ============================================================================
+// CRUD FUNCTIONS
+// ============================================================================
+
+async function saveFixedExpense() {
+  const name = document.getElementById('fixed-expense-name').value.trim();
+  const type = document.getElementById('fixed-expense-type').value;
+  const category = document.getElementById('fixed-expense-category').value;
+  const account = document.getElementById('fixed-expense-account').value;
+  const amount = parseFloat(document.getElementById('fixed-expense-amount').value);
+  
+  // Get selected months
+  const months = Array.from(document.querySelectorAll('.month-checkbox:checked'))
+    .map(cb => parseInt(cb.value));
+  
+  if (!name || !amount) {
+    showToast('Por favor completa todos los campos', 'error');
+    return;
+  }
+  
+  if (months.length === 0) {
+    showToast('Selecciona al menos un mes', 'error');
+    return;
+  }
+  
+  try {
+    if (editingFixedExpenseId) {
+      // Update existing
+      const { error } = await supabaseClient.from('fixed_expenses').update({
+        name,
+        type,
+        category,
+        account,
+        amount,
+        months
+      }).eq('id', editingFixedExpenseId);
+      
+      if (error) throw error;
+    } else {
+      // Insert new
+      const { error } = await supabaseClient.from('fixed_expenses').insert({
+        name,
+        type,
+        category,
+        account,
+        amount,
+        months
+      });
+      
+      if (error) throw error;
+    }
+    
+    invalidateCache();
+    closeFixedExpenseModal();
+    await renderSettingsView();
+    showToast('Gasto fijo guardado correctamente', 'success');
+  } catch (error) {
+    console.error('Error saving fixed expense:', error);
+    showToast('Error al guardar: ' + error.message, 'error');
+  }
+}
+
+function deleteFixedExpense(id) {
+  const data = getData();
+  data.fixedExpenses = (data.fixedExpenses || []).filter(e => e.id !== id);
+  saveData(data);
+  renderSettingsView();
+  showToast('Gasto fijo eliminado', 'success');
+}
+
+// ============================================================================
+// MONTHLY CHECKLIST FUNCTIONS
+// ============================================================================
+
+async function toggleFixedExpense(expenseId, month) {
+  try {
+    const data = await getData();
+    const monthKey = `${month}-2025`;
+    
+    const expense = (data.fixedExpenses || []).find(e => e.id === expenseId);
+    if (!expense) return;
+    
+    const isPaid = (data.fixedExpensesPaid[monthKey] || []).includes(expenseId);
+    
+    if (isPaid) {
+      // Uncheck: Remove from paid list and delete transaction
+      await supabaseClient
+        .from('fixed_expenses_paid')
+        .delete()
+        .eq('month_key', monthKey)
+        .eq('fixed_expense_id', expenseId);
+      
+      // Find and delete the associated transaction
+      const { data: transactions } = await supabaseClient
+        .from('transactions')
+        .select('id')
+        .eq('fixed_expense_id', expenseId)
+        .eq('date', `ilike`, `2025-${String(month + 1).padStart(2, '0')}%`);
+      
+      if (transactions && transactions.length > 0) {
+        await supabaseClient
+          .from('transactions')
+          .delete()
+          .eq('id', transactions[0].id);
+      }
+      
+      showToast('Gasto desmarcado y transacción eliminada', 'info');
+    } else {
+      // Check: Add to paid list
+      await supabaseClient
+        .from('fixed_expenses_paid')
+        .insert({
+          month_key: monthKey,
+          fixed_expense_id: expenseId
+        });
+      
+      // Create transaction
+      await supabaseClient
+        .from('transactions')
+        .insert({
+          fixed_expense_id: expenseId,
+          type: expense.type,
+          date: new Date(2025, month, new Date().getDate()).toISOString().split('T')[0],
+          description: expense.name,
+          category: expense.category,
+          account: expense.account,
+          amount: expense.amount
+        });
+      
+      showToast(`✓ ${expense.name} pagado - ${expense.amount}€ descontado de ${expense.account}`, 'success');
+    }
+    
+    invalidateCache();
+    await renderMonthlyView();
+    await renderDashboard();
+    await renderAccountsView();
+  } catch (error) {
+    console.error('Error toggling fixed expense:', error);
+    showToast('Error al procesar el gasto', 'error');
+  }
+}
+
+async function renderFixedExpensesInMonth() {
+  const data = await getData();
+  const allFixedExpenses = data.fixedExpenses || [];
+  
+  // Filter expenses for current month
+  const fixedExpenses = allFixedExpenses.filter(expense => {
+    const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
+    return months.includes(currentMonth);
+  });
+  
+  const monthKey = `${currentMonth}-2025`;
+  const paidExpenses = (data.fixedExpensesPaid || {})[monthKey] || [];
+  
+  const container = document.getElementById('fixed-expenses-list');
+  
+  if (fixedExpenses.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 32px; color: var(--text-tertiary);">
+        No hay gastos fijos para este mes.
+        <br><br>
+        <a href="#" onclick="event.preventDefault(); switchView('settings')" style="color: var(--primary);">
+          Configura gastos fijos en Configuración →
+        </a>
+      </div>
+    `;
+    document.getElementById('fixed-expenses-counter').textContent = '0 de 0 pagados';
+    document.getElementById('fixed-expenses-total').textContent = '0,00 €';
+    return;
+  }
+  
+  if (allFixedExpenses.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 32px; color: var(--text-tertiary);">
+        No hay gastos fijos configurados.
+        <br><br>
+        <a href="#" onclick="event.preventDefault(); switchView('settings')" style="color: var(--primary);">
+          Añade gastos fijos en Configuración →
+        </a>
+      </div>
+    `;
+    document.getElementById('fixed-expenses-counter').textContent = '0 de 0 pagados';
+    document.getElementById('fixed-expenses-total').textContent = '0,00 €';
+    return;
+  }
+  
+  /*container.innerHTML = fixedExpenses.map(expense => {
+    const isPaid = paidExpenses.includes(expense.id);
+    const typeLabel = expense.type === 'gastos_personales' ? '💳 Personal' : '🏠 Compartido';
+    
+    return `
+      <div class="fixed-expense-item ${isPaid ? 'paid' : ''}">
+        <input 
+          type="checkbox" 
+          class="fixed-expense-checkbox" 
+          ${isPaid ? 'checked' : ''}
+          onchange="toggleFixedExpense('${expense.id}', ${currentMonth})"
+        >
+        <div class="fixed-expense-details">
+          <div class="fixed-expense-info">
+            <div class="fixed-expense-name">${expense.name}</div>
+            <div class="fixed-expense-meta">
+              ${typeLabel} • ${expense.category} • ${expense.account}
+            </div>
+          </div>
+          <div class="fixed-expense-amount">${formatCurrency(expense.amount)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');*/
+
+  // Group expenses by account for display
+const expensesByAccount = {};
+fixedExpenses.forEach(expense => {
+  if (!expensesByAccount[expense.account]) {
+    expensesByAccount[expense.account] = [];
+  }
+  expensesByAccount[expense.account].push(expense);
+});
+
+// Render by account columns
+container.innerHTML = `
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+    ${Object.entries(expensesByAccount).map(([account, expenses]) => {
+      const accountTotal = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+      const accountPaid = expenses.filter(exp => paidExpenses.includes(exp.id)).length;
+      
+      return `
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px;">
+          <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light);">
+            <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${account}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--text-tertiary);">${accountPaid} de ${expenses.length} pagados</span>
+              <span style="font-weight: 600; color: var(--text-primary);">${formatCurrency(accountTotal)}</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${expenses.map(expense => {
+              const isPaid = paidExpenses.includes(expense.id);
+              const typeLabel = expense.type === 'gastos_personales' ? '💳' : '🏠';
+              
+              return `
+                <div class="fixed-expense-item ${isPaid ? 'paid' : ''}" style="margin: 0;">
+                  <input 
+                    type="checkbox" 
+                    class="fixed-expense-checkbox" 
+                    ${isPaid ? 'checked' : ''}
+                    onchange="toggleFixedExpense('${expense.id}', ${currentMonth})"
+                  >
+                  <div class="fixed-expense-details">
+                    <div class="fixed-expense-info">
+                      <div class="fixed-expense-name">${typeLabel} ${expense.name}</div>
+                      <div class="fixed-expense-meta">${expense.category}</div>
+                    </div>
+                    <div class="fixed-expense-amount">${formatCurrency(expense.amount)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }).join('')}
+  </div>
+`;
+  
+  const paidCount = paidExpenses.length;
+  const totalCount = fixedExpenses.length;
+  const totalAmount = fixedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  // Calculate total by account
+  const byAccount = {};
+  fixedExpenses.forEach(exp => {
+    if (!byAccount[exp.account]) byAccount[exp.account] = 0;
+    byAccount[exp.account] += exp.amount;
+  });
+
+  const accountBreakdown = Object.entries(byAccount)
+    .map(([account, amount]) => `${account}: ${formatCurrency(amount)}`)
+    .join(' • ');
+
+  document.getElementById('fixed-expenses-counter').textContent = `${paidCount} de ${totalCount} pagados`;
+  document.getElementById('fixed-expenses-total').innerHTML = `
+  <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">
+    ${formatCurrency(totalAmount)}
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+    ${Object.entries(byAccount).map(([account, amount]) => `
+      <div style="
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      ">
+        <div style="color: var(--text-tertiary); font-size: 10px; margin-bottom: 2px;">${account}</div>
+        <div style="color: var(--text-primary); font-weight: 600;">${formatCurrency(amount)}</div>
+      </div>
+    `).join('')}
+  </div>
+`;
+}
+
+// ============================================================================
+// SETTINGS VIEW RENDERING
+// ============================================================================
+
+async function renderFixedExpensesInSettings() {
+  const data = await getData();
+  const fixedExpenses = data.fixedExpenses || [];
+  const table = document.getElementById('fixed-expenses-table');
+  
+  const monthNames = ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+  
+  if (fixedExpenses.length === 0) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
+          No hay gastos fijos configurados
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  table.innerHTML = fixedExpenses.map(expense => {
+    const typeLabel = expense.type === 'gastos_personales' ? 'Personal' : 'Compartido';
+    const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
+    const monthsDisplay = months.length === 12 ? 'Todos' : months.map(m => monthNames[m]).join(', ');
+    
+    return `
+      <tr>
+        <td class="description-cell">${expense.name}</td>
+        <td>${typeLabel}</td>
+        <td>${expense.category}</td>
+        <td>${expense.account}</td>
+        <td>${formatCurrency(expense.amount)}</td>
+        <td style="font-size: 13px;">${monthsDisplay}</td>
+        <td>
+          <div class="row-actions" style="opacity: 1;">
+            <button class="action-btn" onclick="openEditFixedExpenseModal('${expense.id}')">Editar</button>
+            <button class="action-btn delete" onclick="deleteFixedExpense('${expense.id}')">Eliminar</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Event listener for modal
+// ============================================================================
+// MONTHLY PATRIMONY TRACKING
+// Add after fixed expenses functions
+// ============================================================================
+
+/**
+ * Calculate patrimony at the start of a given month
+ * Month 0 (January) = sum of initial balances of selected accounts
+ * Month N = patrimony end of month N-1
+ */
+async function getPatrimonyStartOfMonth(month) {
+  const data = await getData();
+  
+  // For January (month 0), use initial balances
+  if (month === 0) {
+    return data.accounts
+      .filter(acc => acc.includeInPatrimony !== false)
+      .reduce((sum, acc) => sum + (acc.initialBalance || 0), 0);
+  }
+  
+  // For other months, check if we have a saved snapshot
+  if (!data.monthlyPatrimony) data.monthlyPatrimony = {};
+  
+  const prevMonthKey = `${month - 1}-2025`;
+  if (data.monthlyPatrimony[prevMonthKey] !== undefined) {
+    return data.monthlyPatrimony[prevMonthKey];
+  }
+  
+  // If no snapshot, calculate recursively
+  return calculatePatrimonyEndOfMonth(month - 1);
+}
+
+/**
+ * Calculate patrimony at the end of a given month
+ */
+async function calculatePatrimonyEndOfMonth(month) {
+  const data = await getData();
+  const startPatrimony = await getPatrimonyStartOfMonth(month);
+  
+  // Get accounts included in patrimony
+  const includedAccounts = data.accounts
+    .filter(acc => acc.includeInPatrimony !== false)
+    .map(acc => acc.name);
+  
+  // Get all transactions for this month from included accounts
+  const transactions = data.transactions.filter(t => {
+    const txnMonth = new Date(t.date).getMonth();
+    return txnMonth === month && includedAccounts.includes(t.account);
+  });
+  
+  // Calculate net movement
+  const ingresos = transactions
+    .filter(t => t.type === 'ingresos')
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const gastos = transactions
+    .filter(t => t.type === 'gastos_personales' || t.type === 'gastos_compartidos')
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const inversiones = transactions
+    .filter(t => t.type === 'inversiones')
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  // Net transfers between included and excluded accounts
+  const transfers = (data.transfers || []).filter(t => {
+    const txnMonth = new Date(t.date).getMonth();
+    return txnMonth === month;
+  });
+  
+  let netTransfers = 0;
+  transfers.forEach(t => {
+    const fromIncluded = includedAccounts.includes(t.from);
+    const toIncluded = includedAccounts.includes(t.to);
+    
+    if (fromIncluded && !toIncluded) {
+      // Money leaving patrimony
+      netTransfers -= parseFloat(t.amount);
+    } else if (!fromIncluded && toIncluded) {
+      // Money entering patrimony
+      netTransfers += parseFloat(t.amount);
+    }
+    // If both included or both excluded, net effect is 0
+  });
+  
+  // Get contributions (partner + external) for shared account if included
+  let contributions = 0;
+  if (includedAccounts.includes('Santander Pareja')) {
+    const monthKey = `${month}-2025`;
+    const monthContributions = (data.contributions || []).find(c => c.month === monthKey);
+    if (monthContributions) {
+      contributions = (parseFloat(monthContributions.partner) || 0) + 
+                     (parseFloat(monthContributions.external) || 0);
+    }
+  }
+  
+  return startPatrimony + ingresos - gastos - inversiones + netTransfers + contributions;
+}
+
+/**
+ * Save patrimony snapshot for a month (call this when month is "closed")
+ */
+function saveMonthlyPatrimonySnapshot(month) {
+  const data = getData();
+  if (!data.monthlyPatrimony) data.monthlyPatrimony = {};
+  
+  const monthKey = `${month}-2025`;
+  const endPatrimony = calculatePatrimonyEndOfMonth(month);
+  
+  data.monthlyPatrimony[monthKey] = endPatrimony;
+  saveData(data);
+  
+  return endPatrimony;
+}
+
+/**
+ * Update patrimony display in monthly view
+ */
+async function updateMonthlyPatrimonyDisplay() {
+  const startPatrimony = await getPatrimonyStartOfMonth(currentMonth);
+  const endPatrimony = await calculatePatrimonyEndOfMonth(currentMonth);
+  const change = endPatrimony - startPatrimony;
+  const changePercent = startPatrimony > 0 ? ((change / startPatrimony) * 100) : 0;
+  
+  document.getElementById('monthly-patrimonio').textContent = formatCurrency(endPatrimony);
+  document.getElementById('monthly-patrimonio-start').textContent = formatCurrency(startPatrimony);
+  
+  const changeText = change >= 0 ? '+' : '';
+  const changeColor = change >= 0 ? '#10B981' : '#EF4444';
+  document.getElementById('monthly-patrimonio-change').innerHTML = `
+    <span style="color: ${changeColor};">
+      ${changeText}${formatCurrency(Math.abs(change))} (${changeText}${changePercent.toFixed(2)}%)
+    </span>
+  `;
+}
+document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'fixed-expense-modal') closeFixedExpenseModal();
+});
+
+    // ============================================================================
+    // UTILITIES
+    // ============================================================================
+    
+    // Toast notification system
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    window.resetApp = function() {
+      console.log('Clearing all data and reloading...');
+      localStorage.clear();
+      location.reload();
+    };
+
+    async function initializeApp() {
+      const data = await initData();
+      dataCache = data; // ← Asegurar que el cache tiene datos
+      await renderDashboard();
+    }
+
+  initializeApp();
+  </script>
+</body>
+</html> 
