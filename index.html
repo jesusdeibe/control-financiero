@@ -12,45 +12,111 @@
     }
 
     :root {
-      --bg-primary: #FAFAFA;
-      --bg-secondary: #FFFFFF;
-      --border-light: #E8E8E8;
-      --border-medium: #D1D1D1;
-      
-      --text-primary: #1A1A1A;
-      --text-secondary: #666666;
-      --text-tertiary: #999999;
-      
-      --green: #34C759; /* Verde iOS */
-      --red: #FF3B30;   /* Rojo iOS */
-      --orange: #F59E0B;
-      --purple: #8B5CF6;
-      --blue: #007AFF;  /* Azul iOS */
-      --teal: #14B8A6;
-      
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+        /* Fondos */
+        --bg-body: #F4F6F8; /* El gris clarito del fondo de la app */
+        --bg-surface: #FFFFFF; /* Blanco puro para las tarjetas */
+
+        /* Textos */
+        --text-primary: #181C32; /* Gris casi negro para los números y títulos */
+        --text-secondary: #7E8299; /* Gris medio para subtítulos */
+        --text-tertiary: #A1A5B7; /* Gris claro para fechas o ejes de gráficos */
+
+        /* Colores Principales extraídos de la imagen */
+        --primary: #5048E5; /* El azul eléctrico vibrante */
+        --primary-light: #EEEDFD; /* Azul muy clarito para fondos */
+        
+        /* Estados (Verde y Rojo estilo Primetrack) */
+        --green: #10B981; 
+        --green-bg: #D1FAE5;
+        --red: #F26464;
+        --red-bg: #FEE2E2;
+        --orange: #F59E0B;
+        --orange-bg: #FEF3C7;
+
+        /* Estructura */
+        --border-color: #E4E6EF; /* Bordes finos y sutiles */
+        --radius: 12px; /* Esquinas redondeadas suaves */
+        --shadow-sm: 0px 4px 12px rgba(0, 0, 0, 0.02); /* Sombra casi invisible */
+
+        /* Recuperamos las variables antiguas pero con los colores SaaS nuevos */
+        --bg-secondary: #FFFFFF; 
+        --border-light: #E4E6EF; 
+        --border-medium: #D1D5DB;
+        --bg-primary: #F3F4F6;
     }
 
+    /* 1. Estructura General de Pantalla Dividida */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
-      letter-spacing: -0.022em;
-      color: var(--text-primary);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh; /* Ocupa el 100% del alto de la ventana */
+    overflow: hidden; /* Evita que la página entera haga scroll, solo el contenido lo hará */
+    background-color: var(--bg-body);
+    }
 
-      /* FONDO LÍQUIDO DE ESQUINAS */
-      background: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-        var(--bg-primary);
-      
-      /* Esto hace que el fondo no se mueva al hacer scroll */
-      background-attachment: fixed;
-      min-height: 100vh;
+    /* 2. El Menú Lateral (Sidebar) */
+    .sidebar {
+    width: 260px;
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    flex-shrink: 0;
+    z-index: 100;
+    }
+
+    /* 3. Área Principal (Donde van tus vistas) */
+    .main-content {
+    flex-grow: 1; /* Ocupa el resto del espacio libre */
+    overflow-y: auto; /* Esta es la parte que hará scroll */
+    padding: 32px 40px;
+    position: relative;
+    }
+
+    /* 4. Estilo de los Botones del Menú */
+    .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    }
+
+    /* Efecto al pasar el ratón */
+    .nav-item:hover {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    }
+
+    /* Efecto cuando estás en esa pantalla (Azul Primetrack) */
+    .nav-item.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+    }
+
+    /* Títulos de secciones del menú (Ej: "Principal", "Ajustes") */
+    .nav-section-title {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 24px 0 8px 12px;
+    }
+
+    /* Ocultar el menú antiguo si usabas una barra de navegación con esta clase */
+    .bottom-nav, .top-nav {
+    display: none !important;
     }
 
     .container {
@@ -59,84 +125,120 @@
       padding: 0 20px;
     }
 
-    /* Navigation */
-    .nav {
-      /* Posicionamiento */
-      position: sticky;
-      top: 15px; /* Separación del techo para que parezca que flota */
-      z-index: 1000;
-      
-      /* Layout: Centrado y flexible */
+    /* --- ESTRUCTURA PRINCIPAL (SIDEBAR SAAS) --- */
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      width: fit-content; /* Se ajusta al contenido */
-      margin: 0 auto 32px auto; /* Centrado horizontal */
-      
-      /* Estética Segmented Control iOS */
-      background: rgba(230, 230, 230, 0.4); 
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      padding: 4px; /* Espacio mínimo para que el selector active resalte */
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      height: 100vh; /* Altura completa de la pantalla */
+      overflow: hidden; /* Evitamos el scroll de toda la página */
     }
 
-    .nav-btn {
-      background: none;
-      border: none;
-      padding: 8px 16px;
+    /* El Menú Lateral */
+    .sidebar {
+      width: 260px;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    /* Contenedor del Logo */
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-left: 12px;
+      margin-bottom: 32px;
+    }
+
+    .sidebar-logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .sidebar-logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    /* Títulos de sección del menú */
+    .nav-section-title {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 24px 0 8px 12px;
+    }
+
+    /* Botones del menú */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      color: var(--text-secondary);
+      margin-bottom: 4px;
       cursor: pointer;
-      border-radius: 12px;
-      transition: all 0.2s;
-      margin: 2px;
+      transition: all 0.2s ease;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
     }
 
-    .nav-btn:hover {
-      background: var(--bg-secondary);
+    .nav-item:hover {
+      background-color: var(--bg-body);
       color: var(--text-primary);
     }
 
-    .nav-btn.active {
-      background: var(--text-primary);
-      color: white;
-    }
-
-    .nav-container {
-      display: flex;
-      background: white;
-      padding: 8px;
-      border-radius: 12px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 24px;
-      gap: 8px;
-    }
-
-    .nav-item {
-      text-decoration: none;
-      color: var(--text-secondary);
-      padding: 8px 20px; /* Más aire a los lados */
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      border: none !important;
-      white-space: nowrap;
-    }
-
     .nav-item.active {
-      background: #FFFFFF !important; /* Blanco sólido para resaltar sobre el cristal */
-      color: #000000 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); /* Sombra para dar volumen */
-      transform: scale(1.02);
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
     }
 
-    .nav-item:hover:not(.active) {
-      background: rgba(255, 255, 255, 0.2);
+    /* Área Principal (Donde van las vistas y hace scroll) */
+    .main-content {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 40px;
+      position: relative;
+    }
+
+    /* Ajustes para móviles */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { 
+        width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; 
+        padding: 12px; border-right: none; border-bottom: 1px solid var(--border-color); 
+        justify-content: space-between; overflow-x: auto;
+      }
+      .nav-section-title, .sidebar-logo { display: none; }
+      .nav-item { width: auto; flex: 1; justify-content: center; text-align: center; font-size: 12px; padding: 8px; }
+      .main-content { padding: 16px; height: calc(100vh - 60px); }
     }
 
     /* Header */
@@ -159,6 +261,26 @@
       margin-top: 4px;
     }
 
+    .badge-green {
+    background-color: var(--green-bg);
+    color: var(--green);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    }
+
+    .badge-red {
+    background-color: var(--red-bg);
+    color: var(--red);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    }
+
     /* KPI Grid */
     .kpi-grid {
       display: grid;
@@ -168,16 +290,37 @@
     }
 
     .kpi-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 20px;
-      transition: all 0.2s ease;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.2s ease;
     }
 
+    /* Efecto al pasar el ratón opcional */
     .kpi-card:hover {
-      border-color: var(--border-medium);
-      box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+    }
+
+    .kpi-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary) !important; /* En este diseño los números grandes siempre son oscuros */
+    margin-top: 12px;
+    letter-spacing: -0.5px;
     }
 
     .kpi-header {
@@ -187,64 +330,29 @@
       margin-bottom: 12px;
     }
 
-    .kpi-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
     .kpi-icon {
       font-size: 18px;
       opacity: 0.6;
     }
 
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-    }
-
+    /* Tarjetas y Secciones (Estilo SaaS Flat) */
     .kpi-card, .section {
-      /* 1. Fondo: Subimos ligeramente la opacidad para que el texto sea más legible */
-      background: rgba(255, 255, 255, 0.75); 
-      
-      /* 2. Desenfoque: 20px es el punto dulce de Apple para el cristal grueso */
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      
-      /* 3. El Borde: Lo hacemos un poco más brillante (0.6) para simular el reflejo del borde */
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      
-      border-radius: 24px;
-      
-      /* 4. Sombra: Eliminamos el azul y usamos dos sombras. 
-        Una muy pegada para definir la forma y otra muy larga para la profundidad. */
-      box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.02), 
-        0 20px 40px rgba(0, 0, 0, 0.06);
-      
-      /* 5. Transición: Usamos una curva "Out-Quint" para que sea más elegante */
-      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      background: var(--bg-surface) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 12px !important;
+      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.02) !important; /* Sombra casi invisible */
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: all 0.2s ease !important;
     }
 
-    /* Efecto al pasar el ratón (Hover) */
+    /* Hover súper sutil, sin saltos exagerados */
     .kpi-card:hover, .section:hover {
-      transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.85); /* Se vuelve un poco más sólido */
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-
-    .kpi-card:hover, .section:hover {
-      transform: translateY(-6px) scale(1.01);
-      background: rgba(255, 255, 255, 0.85); /* Más opaco al acercarse */
-      
-      /* Sombra más amplia y suave (profundidad) */
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-      
-      /* Borde más brillante (reflejo de luz) */
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+      border-color: #D1D5DB !important;
     }
 
     /* Efecto de "clic" en botones */
@@ -252,36 +360,42 @@
       transform: scale(0.96);
     }
 
-    /* Month Selector */
+    /* Selector de Meses Estilo SaaS */
     .month-selector {
-      display: flex;
-      gap: 8px;
+      display: inline-flex;
+      background: var(--bg-body);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
       margin-bottom: 24px;
       overflow-x: auto;
-      padding-bottom: 8px;
+      max-width: 100%;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
     }
 
     .month-btn {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-light);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      background: transparent;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-secondary);
       cursor: pointer;
+      transition: all 0.2s ease;
       white-space: nowrap;
-      transition: all 0.2s;
     }
 
     .month-btn:hover {
-      border-color: var(--border-medium);
+      color: var(--text-primary);
     }
 
+    /* La pastilla blanca que indica el mes seleccionado */
     .month-btn.active {
-      background: var(--text-primary);
-      color: white;
-      border-color: var(--text-primary);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.02);
     }
 
     /* Section */
@@ -315,20 +429,27 @@
       color: var(--text-primary);
     }
 
+    /* Botones de añadir o acciones secundarias */
     .add-btn {
-      background: var(--text-primary);
-      color: white;
-      border: none;
-      padding: 8px 16px;
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
       border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
 
     .add-btn:hover {
-      opacity: 0.8;
+      background-color: var(--bg-body);
+      border-color: #D1D5DB;
+      color: var(--primary); /* El texto se vuelve azul al pasar el ratón */
     }
 
     /* Table */
@@ -336,10 +457,10 @@
       overflow-x: auto;
     }
 
+    /* Tablas Estilo SaaS */
     table {
       width: 100%;
-      border-collapse: separate;
-      border-spacing: 0 4px; /* Espacio sutil entre filas */
+      border-collapse: collapse !important; /* Quita la separación entre filas */
       margin-top: 8px;
     }
 
@@ -347,50 +468,48 @@
       text-align: left;
       padding: 12px 16px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     th:last-child {
       text-align: right;
     }
 
-    /* Filas como pastillas de cristal */
-    tbody tr {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-    }
-
-    /* Fondo de la fila completa */
+    /* Filas limpias con borde inferior */
     tbody td {
-      padding: 14px 16px;
-      font-size: 14px;
-      background: rgba(255, 255, 255, 0.2); /* Base muy sutil */
-      border-top: 1px solid rgba(255, 255, 255, 0.1); /* Brillo superior */
-      border-bottom: 1px solid rgba(0, 0, 0, 0.02); /* Sombra inferior */
-    }
-
-    /* Redondeado de los extremos de la fila */
-    tbody td:first-child {
-      border-radius: 12px 0 0 12px;
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      font-size: 13px;
+      background: transparent !important;
+      border-top: none !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      border-radius: 0 !important;
+      color: var(--text-primary);
     }
 
     tbody td:last-child {
-      border-radius: 0 12px 12px 0;
       text-align: right;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 600; /* Resalta el importe */
+      font-weight: 600;
     }
 
-    /* Efecto hover: la fila se ilumina y destaca */
+    /* Quitar borde a la última fila */
+    tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+
+    /* Efecto hover muy suave */
+    tbody tr {
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+    
     tbody tr:hover td {
-      background: rgba(255, 255, 255, 0.7);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      color: var(--text-primary);
+      background: #F9FAFB !important; /* Un gris blanquecino al pasar el ratón */
+      transform: none !important;
+      box-shadow: none !important;
     }
 
     .date-cell {
@@ -538,11 +657,12 @@
 
     /* Botón Principal: Azul traslúcido o plano suave */
     .btn-primary {
-      background: #007AFF !important; /* Azul sólido pero vibrante */
-      color: white !important;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important; /* Casi sin sombra */
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+        background-color: var(--primary) !important;
+      color: #FFFFFF !important;
+      border: none !important;
+      border-radius: 8px !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+      font-weight: 600 !important;
     }
 
     /* Botón Secundario: Totalmente limpio, solo texto */
@@ -557,8 +677,7 @@
     }
 
     .btn-primary:hover {
-      background: #0066d6 !important;
-      transform: none !important; /* Quitamos el salto para que sea más serio */
+        background-color: #4338CA !important; /* Un azul ligeramente más oscuro */
     }
 
     /* Contenedor de botones: Eliminamos la línea superior para que sea más limpio */
@@ -594,29 +713,33 @@
 
     /* Account Cards */
     .account-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 20px;
-      transition: all 0.2s ease;
+        background: var(--bg-surface) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 12px !important;
+      padding: 24px;
+      transition: all 0.2s ease !important;
       cursor: pointer;
       position: relative;
+      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.02) !important;
+      overflow: hidden; /* Evita que la línea de color se salga de las esquinas */
     }
 
+    /* La línea de color superior del banco */
     .account-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
+      height: 4px; /* Un poco más gruesa e intensa */
       background: var(--account-color);
-      border-radius: 12px 12px 0 0;
     }
 
+    /* Efecto al pasar el ratón */
     .account-card:hover {
-      border-color: var(--border-medium);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+      border-color: #D1D5DB !important;
     }
 
     .account-card-header {
@@ -982,14 +1105,13 @@
       animation: ios-entrance 0.7s cubic-bezier(0.23, 1, 0.32, 1) backwards;
     }
 
-    /* --- ARREGLO FINAL: MODAL LIQUID GLASS --- */
+    /* Modales Estilo SaaS Plano */
 
     /* 1. El fondo oscuro (Overlay) */
     .modal-overlay {
-      background: rgba(0, 0, 0, 0.2) !important; /* Velo muy suave */
-      backdrop-filter: blur(10px) !important;    /* Desenfoca el fondo */
-      -webkit-backdrop-filter: blur(10px) !important;
-      display: none; /* Se controla por JS */
+        background: rgba(15, 23, 42, 0.4) !important; /* Velo oscuro plano */
+      backdrop-filter: blur(3px) !important; /* Desenfoque ligerísimo */
+      display: none; 
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       z-index: 2000;
@@ -999,21 +1121,17 @@
 
     /* 2. La tarjeta blanca (Ahora sí usamos .modal porque así está en tu HTML) */
     .modal-overlay .modal {
-      background: rgba(255, 255, 255, 0.95) !important; /* Blanco casi sólido para que se lea bien */
-      backdrop-filter: blur(20px) brightness(1.1) !important;
-      -webkit-backdrop-filter: blur(20px) brightness(1.1) !important;
-      
+        background: #FFFFFF !important; /* Blanco sólido absoluto */
+      backdrop-filter: none !important;
       padding: 24px;
-      border-radius: 28px !important;
+      border-radius: 16px !important;
       width: 90%;
       max-width: 450px;
+      border: 1px solid var(--border-color) !important;
       
-      /* Borde y Sombra para legibilidad total */
-      border: 1px solid #FFFFFF !important;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2) !important;
-      
-      /* Animación */
-      animation: ios-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+      /* Sombra espectacular y realista */
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+      animation: ios-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
     }
 
     /* 3. Forzar texto negro para que no sea gris */
@@ -1275,15 +1393,75 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Navigation -->
-    <nav class="nav">
-      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
-      <button class="nav-btn" data-view="monthly">Vista Mensual</button>
-      <button class="nav-btn" data-view="accounts">Cuentas</button>
-      <button class="nav-btn" data-view="inversiones">Inversiones</button>
-      <button class="nav-btn" data-view="settings">⚙️ Configuración</button>
-    </nav>
+    <body>
+
+        <div id="fullscreen-login" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+    
+            <div style="background: var(--bg-surface); padding: 48px 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 420px; text-align: center; border: 1px solid var(--border-color);">
+              
+              <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <div style="width: 56px; height: 56px; background: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 24px; box-shadow: 0 8px 16px rgba(80, 72, 229, 0.25);">
+                  CF
+                </div>
+              </div>
+              
+              <h2 style="margin-bottom: 8px; font-size: 24px; color: var(--text-primary);">Bienvenido de nuevo</h2>
+              <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 15px;">Inicia sesión para acceder a tus finanzas</p>
+              
+              <form id="fullscreen-login-form" style="text-align: left;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-input" id="login-email" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 24px;">
+                  <label class="form-label">Contraseña</label>
+                  <input type="password" class="form-input" id="login-password" required placeholder="••••••••">
+                </div>
+                
+                <div id="login-error" style="color: var(--red); font-size: 13px; margin-bottom: 16px; display: none; text-align: center; font-weight: 500;"></div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px !important; height: auto; font-size: 16px !important; border-radius: 12px !important;">
+                  Entrar a mi cuenta
+                </button>
+              </form>
+        
+            </div>
+          </div>
+  
+        <aside class="sidebar">
+          <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">CF</div>
+            <div class="sidebar-logo-text">Control Financiero</div>
+          </div>
+      
+          <div class="nav-section-title">Principal</div>
+          <button class="nav-item nav-btn active" data-view="dashboard">📊 Dashboard</button>
+          <button class="nav-item nav-btn" data-view="monthly">📅 Vista Mensual</button>
+          <button class="nav-item nav-btn" data-view="accounts">💳 Mis Cuentas</button>
+      
+          <div class="nav-section-title">Patrimonio</div>
+          <button class="nav-item nav-btn" data-view="inversiones">📈 Inversiones</button>
+      
+          <div style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 16px;">
+      
+            <button class="nav-item nav-btn" data-view="settings">
+              <span style="font-size: 16px; width: 20px;">⚙️</span> Configuración
+            </button>
+      
+            <div id="user-profile-btn" onclick="openAuthModal()" style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onmouseover="this.style.background='var(--bg-body)'" onmouseout="this.style.background='transparent'">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
+                <span id="sidebar-initials">?</span>
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2;" id="sidebar-name">Inicia Sesión</span>
+                <span style="font-size: 11px; color: var(--text-tertiary);" id="sidebar-email">Click aquí</span>
+              </div>
+            </div>
+      
+          </div>
+        </aside>
+      
+        <main class="main-content">
 
     <!-- Dashboard View -->
     <div id="dashboard-view" class="view active">
@@ -1363,25 +1541,23 @@
         
         <!-- Evolución Anual -->
         <div class="section">
-          <div class="section-header">
-            <h2 class="section-title">
-              <span>📈</span>
-              Evolución del Patrimonio 2026
-            </h2>
+            <div class="section-header">
+              <h2 class="section-title">Evolución del Patrimonio 2026</h2>
+            </div>
+            <div style="height: 250px; position: relative;">
+              <canvas id="patrimony-chart"></canvas>
+            </div>
           </div>
-          <canvas id="patrimony-chart" style="max-height: 300px;"></canvas>
-        </div>
 
         <!-- Distribución -->
         <div class="section">
-          <div class="section-header">
-            <h2 class="section-title">
-              <span>🥧</span>
-              Distribución del Patrimonio
-            </h2>
+            <div class="section-header">
+              <h2 class="section-title">Distribución del Patrimonio</h2>
+            </div>
+            <div style="height: 250px; position: relative;">
+              <canvas id="distribution-chart"></canvas>
+            </div>
           </div>
-          <canvas id="distribution-chart" style="max-height: 300px;"></canvas>
-        </div>
 
       </div>
     </div>
@@ -1912,6 +2088,49 @@
       </div>
     </section>
   </div>
+</main>
+
+  <!-- Users Modal -->
+<div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="auth-title">Iniciar Sesión</h3>
+        <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+      </div>
+      
+      <form id="login-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-input" id="auth-email" required placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-input" id="auth-password" required placeholder="••••••••">
+          </div>
+          <div id="auth-error" style="color: var(--red); font-size: 13px; margin-top: 8px; display: none;"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeAuthModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Entrar</button>
+        </div>
+      </form>
+
+      <div id="profile-view" style="display: none;">
+        <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; margin: 0 auto 16px auto;">
+            <span id="profile-initials">CF</span>
+          </div>
+          <h3 style="font-size: 18px; color: var(--text-primary); margin-bottom: 4px;">Sesión Iniciada</h3>
+          <p style="font-size: 14px; color: var(--text-secondary);" id="profile-email">usuario@email.com</p>
+        </div>
+        <div class="form-actions" style="justify-content: center;">
+          <button type="button" class="btn-secondary" style="color: var(--red) !important;" onclick="handleSignOut()">Cerrar Sesión</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Transaction Modal -->
   <div class="modal-overlay" id="transaction-modal">
@@ -2432,6 +2651,16 @@
 
     async function getData() {
       if (dataCache) return dataCache;
+
+      // ¡NUEVO GUARDIA DE SEGURIDAD! 🛑
+      // Si no hay ningún usuario logueado, cortamos aquí y devolvemos la app vacía
+      if (!currentUser) {
+        return { 
+          accounts: [], transactions: [], holdings: [], transfers: [], 
+          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
+          monthlyPatrimony: {}, customCategories: {} 
+        };
+      }
       
       try {
           const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes] = await Promise.all([
@@ -2679,12 +2908,10 @@
     async function renderPatrimonyChart() {
       const ctx = document.getElementById('patrimony-chart');
       
-      // Destroy previous chart if exists
       if (window.patrimonyChart) {
         window.patrimonyChart.destroy();
       }
       
-      // Calculate patrimony for each month (0 to current month)
       const currentMonthIndex = new Date().getMonth();
       const months = MONTHS.slice(0, currentMonthIndex + 1);
       const patrimonyData = [];
@@ -2701,20 +2928,37 @@
           datasets: [{
             label: 'Patrimonio Personal',
             data: patrimonyData,
-            borderColor: '#3B82F6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.4,
+            borderColor: '#5048E5', /* Azul Primetrack */
+            backgroundColor: 'rgba(80, 72, 229, 0.05)', /* Fondo casi transparente */
+            borderWidth: 3,
+            tension: 0.4, /* Curva suave estilo Apple/SaaS */
             fill: true,
-            pointRadius: 4,
-            pointHoverRadius: 6
+            pointRadius: 0, /* Ocultamos los puntos para que la línea sea limpia */
+            pointHoverRadius: 6, /* Solo aparecen al pasar el ratón */
+            pointBackgroundColor: '#FFFFFF',
+            pointBorderColor: '#5048E5',
+            pointBorderWidth: 2
           }]
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
+              backgroundColor: '#FFFFFF',
+              titleColor: '#181C32',
+              bodyColor: '#7E8299',
+              borderColor: '#E4E6EF',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              titleFont: { size: 13, family: 'Inter', weight: '600' },
+              bodyFont: { size: 14, family: 'Inter', weight: '700' },
               callbacks: {
                 label: function(context) {
                   return formatCurrency(context.parsed.y);
@@ -2723,11 +2967,25 @@
             }
           },
           scales: {
+            x: {
+              grid: { display: false, drawBorder: false }, /* Sin líneas verticales */
+              ticks: { color: '#A1A5B7', font: { size: 11, family: 'Inter' } }
+            },
             y: {
-              beginAtZero: false,
+              beginAtZero: true,
+              border: { display: false }, /* Sin línea lateral dura */
+              grid: { 
+                color: '#E4E6EF', 
+                borderDash: [5, 5], /* Cuadrícula horizontal punteada y sutil */
+                drawBorder: false 
+              },
               ticks: {
+                color: '#A1A5B7',
+                font: { size: 11, family: 'Inter' },
+                padding: 10,
                 callback: function(value) {
-                  return formatCurrency(value);
+                  // Acorta los números (ej. 10.000 -> 10k) para que sea más limpio
+                  return value >= 1000 ? (value / 1000) + 'k' : value;
                 }
               }
             }
@@ -2739,7 +2997,6 @@
     function renderDistributionChart(normal, investments, shared) {
       const ctx = document.getElementById('distribution-chart');
       
-      // Destroy previous chart if exists
       if (window.distributionChart) {
         window.distributionChart.destroy();
       }
@@ -2751,24 +3008,47 @@
           datasets: [{
             data: [normal, investments, shared],
             backgroundColor: [
-              '#3B82F6',
-              '#8B5CF6',
-              '#F59E0B'
+              '#5048E5', /* Azul primario */
+              '#10B981', /* Verde SaaS */
+              '#F59E0B'  /* Naranja */
             ],
-            borderWidth: 0
+            borderWidth: 0,
+            hoverOffset: 4
           }]
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
+          cutout: '80%', /* Hace el anillo muy fino y elegante */
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels: {
+                usePointStyle: true, /* Puntos redondos en la leyenda */
+                padding: 20,
+                color: '#7E8299',
+                font: { size: 12, family: 'Inter', weight: '500' }
+              }
+            },
+            tooltip: {
+              backgroundColor: '#FFFFFF',
+              titleColor: '#181C32',
+              bodyColor: '#181C32',
+              borderColor: '#E4E6EF',
+              borderWidth: 1,
+              padding: 12,
+              usePointStyle: true,
+              bodyFont: { size: 13, family: 'Inter', weight: '600' },
+              callbacks: {
+                label: function(context) {
+                  return ' ' + formatCurrency(context.raw);
+                }
+              }
             }
           }
         }
       });
-    }
+    }   
 
     async function renderMonthlyView() {
   const data = await getData();
@@ -5676,16 +5956,17 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
             });
         }
 
-        // 3. Ordenar: El que más gasta primero (para que aparezca en la base)
+        // 3. Ordenar: El que más gasta primero
         const sortedCategories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]);
 
-        const appleColors = ['#007AFF', '#34C759', '#FF9500', '#AF52DE', '#FF3B30', '#5AC8FA', '#FFCC00', '#8E8E93'];
+        // Paleta de colores SaaS Moderna
+        const saasColors = ['#5048E5', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#F43F5E', '#8E8E93'];
 
-        // 4. Leyenda HTML Súper Nítida
+        // 4. Leyenda HTML
         const legendContainer = document.getElementById('chart-legend');
         legendContainer.innerHTML = sortedCategories.map((cat, i) => `
-          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: rgba(0,0,0,0.03); padding: 4px 10px; border-radius: 20px;">
-            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${appleColors[i % appleColors.length]};"></div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: var(--bg-surface); padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${saasColors[i % saasColors.length]};"></div>
             ${cat}
           </div>
         `).join('');
@@ -5693,8 +5974,6 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
         if (evolutionChartInstance) evolutionChartInstance.destroy();
 
         const ctx = canvas.getContext('2d');
-        
-        // Forzamos la resolución nativa del dispositivo
         const dpr = window.devicePixelRatio || 1;
         
         evolutionChartInstance = new Chart(ctx, {
@@ -5704,31 +5983,76 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
                 datasets: sortedCategories.map((cat, i) => ({
                     label: cat,
                     data: categoryData[cat],
-                    backgroundColor: appleColors[i % appleColors.length],
-                    borderRadius: i === 0 ? {topLeft: 0, topRight: 0, bottomLeft: 6, bottomRight: 6} : 0, // Solo redondeamos la base si quieres, o todo:
-                    borderRadius: 4,
-                    maxBarThickness: 40,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.2)' // Pequeña separación entre bloques apilados
+                    backgroundColor: saasColors[i % saasColors.length],
+                    borderRadius: 10, // Curvatura casi invisible, hace que parezca un bloque sólido
+                    barPercentage: 0.65, // Barras más anchas y legibles
+                    categoryPercentage: 0.8,
+                    borderWidth: 1, // Separador mínimo de 1px
+                    borderColor: '#FFFFFF' // Línea blanca muy fina para distinguir secciones
                 }))
             },
             options: {
                 devicePixelRatio: dpr,
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                // AQUÍ ESTÁ LA MAGIA DEL RATÓN:
+                // Solo interactúa con el elemento exacto que estás tocando
+                interaction: {
+                    mode: 'nearest',
+                    intersect: true, 
+                },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#FFFFFF',
+                        titleColor: '#181C32',
+                        bodyColor: '#7E8299',
+                        borderColor: '#E4E6EF',
+                        borderWidth: 1,
+                        padding: 12,
+                        usePointStyle: true,
+                        titleFont: { size: 13, family: 'Inter', weight: '600' },
+                        bodyFont: { size: 13, family: 'Inter', weight: '500' },
+                        callbacks: {
+                            // Ponemos el mes como título del cuadrito
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].label;
+                            },
+                            // Mostramos solo la categoría tocada y su precio
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    label += formatCurrency(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
                 scales: {
                     x: { 
                         stacked: true, 
-                        grid: { display: false },
-                        ticks: { font: { weight: '600' } }
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: '#A1A5B7', font: { size: 12, family: 'Inter', weight: '500' } }
                     },
                     y: { 
                         stacked: true, 
-                        reverse: false, // Asegura que el primero del array esté abajo
-                        grid: { color: 'rgba(0,0,0,0.03)' },
+                        beginAtZero: true,
                         border: { display: false },
-                        ticks: { callback: v => v + '€', font: { size: 10 } }
+                        grid: { 
+                            color: '#E4E6EF', 
+                            borderDash: [5, 5],
+                            drawBorder: false 
+                        },
+                        ticks: { 
+                            color: '#A1A5B7', 
+                            font: { size: 11, family: 'Inter' },
+                            padding: 10,
+                            callback: function(value) {
+                                return value >= 1000 ? (value / 1000) + 'k' : value;
+                            }
+                        }
                     }
                 }
             }
@@ -5772,10 +6096,151 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
     };
 
 // ============================================================================
+// SISTEMA DE USUARIOS Y AUTENTICACIÓN
+// ============================================================================
+
+let currentUser = null;
+
+// 1. Comprobar si ya hay alguien logueado al abrir la app
+async function checkSession() {
+  const loginScreen = document.getElementById('fullscreen-login');
+  
+  const { data: { session }, error } = await supabaseClient.auth.getSession();
+  
+  if (session && session.user) {
+    currentUser = session.user;
+    loginScreen.style.display = 'none'; // Si estás logueado, ocultamos el muro
+    updateSidebarUserUI(currentUser.email);
+  } else {
+    currentUser = null;
+    loginScreen.style.display = 'flex'; // Si NO estás logueado, levantamos el muro
+    updateSidebarUserUI(null);
+  }
+}
+
+// 2. Actualizar visualmente el menú lateral
+function updateSidebarUserUI(email) {
+  const nameEl = document.getElementById('sidebar-name');
+  const emailEl = document.getElementById('sidebar-email');
+  const initialsEl = document.getElementById('sidebar-initials');
+
+  if (email) {
+    nameEl.textContent = 'Mi Cuenta';
+    emailEl.textContent = email;
+    initialsEl.textContent = email.substring(0, 2).toUpperCase();
+  } else {
+    nameEl.textContent = 'Inicia Sesión';
+    emailEl.textContent = 'Modo local (Sin guardar)';
+    initialsEl.textContent = '?';
+  }
+}
+
+// 3. Abrir y gestionar el Modal de Cuenta
+function openAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  const loginForm = document.getElementById('login-form');
+  const profileView = document.getElementById('profile-view');
+  const title = document.getElementById('auth-title');
+  const errorEl = document.getElementById('auth-error');
+  
+  errorEl.style.display = 'none';
+
+  if (currentUser) {
+    // Si ya está logueado, mostramos su perfil
+    title.textContent = 'Mi Perfil';
+    loginForm.style.display = 'none';
+    profileView.style.display = 'block';
+    document.getElementById('profile-email').textContent = currentUser.email;
+    document.getElementById('profile-initials').textContent = currentUser.email.substring(0, 2).toUpperCase();
+  } else {
+    // Si no, mostramos el formulario de login
+    title.textContent = 'Iniciar Sesión';
+    loginForm.style.display = 'block';
+    profileView.style.display = 'none';
+  }
+  
+  modal.classList.add('active');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('active');
+}
+
+// 4. Iniciar Sesión (Submit del formulario)
+// 4. Iniciar Sesión desde la pantalla completa
+document.getElementById('fullscreen-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('login-error');
+  const btn = e.target.querySelector('button');
+  
+  // Efecto visual de carga
+  const originalText = btn.textContent;
+  btn.textContent = 'Iniciando sesión...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+  errorEl.style.display = 'none';
+  
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  // Restaurar botón
+  btn.textContent = originalText;
+  btn.style.opacity = '1';
+  btn.disabled = false;
+
+  if (error) {
+    errorEl.textContent = 'Credenciales incorrectas. Inténtalo de nuevo.';
+    errorEl.style.display = 'block';
+  } else {
+    currentUser = data.user;
+    document.getElementById('fullscreen-login').style.display = 'none'; // Bajamos el muro
+    updateSidebarUserUI(currentUser.email);
+    showToast('Sesión iniciada correctamente', 'success');
+    
+    // Vaciamos el formulario por si cierra sesión luego
+    document.getElementById('fullscreen-login-form').reset();
+    
+    // Cargamos los datos
+    invalidateCache();
+    await initializeApp();
+  }
+});
+
+// 5. Cerrar Sesión
+async function handleSignOut() {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  updateSidebarUserUI(null);
+  closeAuthModal();
+  showToast('Sesión cerrada', 'info');
+  
+  // Limpiamos los datos de la pantalla
+  invalidateCache();
+  await initializeApp();
+}
+
+// Escuchar cambios de sesión automáticos (ej. caducidad de token)
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    updateSidebarUserUI(null);
+  } else if (session) {
+    currentUser = session.user;
+    updateSidebarUserUI(currentUser.email);
+  }
+});
+
+// ============================================================================
 // INICIO DE LA APLICACIÓN
 // ============================================================================
 
     async function initializeApp() {
+        await checkSession();
       const data = await initData();
       dataCache = data; // ← Asegurar que el cache tiene datos
       await renderDashboard();
