@@ -1390,43 +1390,77 @@
         user-select: none;
     }
 
+    /* Estilos para el Selector de Perfiles (Estilo Netflix) */
+    .profile-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      padding: 16px;
+      border-radius: 16px;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-body);
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 32px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .profile-card:hover .profile-avatar {
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+
+    .profile-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
   </style>
 </head>
 <body>
     <body>
 
-        <div id="fullscreen-login" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+      <div id="fullscreen-login" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
     
-            <div style="background: var(--bg-surface); padding: 48px 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 420px; text-align: center; border: 1px solid var(--border-color);">
+        <div style="background: var(--bg-surface); padding: 48px 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 480px; border: 1px solid var(--border-color);">
+          
+          <div id="login-step-1" style="text-align: center;">
+            <h2 style="margin-bottom: 8px; font-size: 24px; color: var(--text-primary);">¿Quién va a entrar?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 15px;">Selecciona tu perfil para acceder</p>
+            
+            <div style="display: flex; justify-content: center; gap: 24px;">
               
-              <div style="display: flex; justify-content: center; margin-bottom: 24px;">
-                <div style="width: 56px; height: 56px; background: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 24px; box-shadow: 0 8px 16px rgba(80, 72, 229, 0.25);">
-                  CF
-                </div>
+              <div class="profile-card" onclick="autoLogin('jesusdeibe@gmail.com', 'sambita19')">
+                <div class="profile-avatar" style="background: var(--primary);">J</div>
+                <div class="profile-name">Jesús</div>
               </div>
-              
-              <h2 style="margin-bottom: 8px; font-size: 24px; color: var(--text-primary);">Bienvenido de nuevo</h2>
-              <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 15px;">Inicia sesión para acceder a tus finanzas</p>
-              
-              <form id="fullscreen-login-form" style="text-align: left;">
-                <div class="form-group" style="margin-bottom: 16px;">
-                  <label class="form-label">Correo electrónico</label>
-                  <input type="email" class="form-input" id="login-email" required placeholder="tu@email.com">
-                </div>
-                <div class="form-group" style="margin-bottom: 24px;">
-                  <label class="form-label">Contraseña</label>
-                  <input type="password" class="form-input" id="login-password" required placeholder="••••••••">
-                </div>
-                
-                <div id="login-error" style="color: var(--red); font-size: 13px; margin-bottom: 16px; display: none; text-align: center; font-weight: 500;"></div>
-                
-                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px !important; height: auto; font-size: 16px !important; border-radius: 12px !important;">
-                  Entrar a mi cuenta
-                </button>
-              </form>
-        
+    
+              <div class="profile-card" onclick="autoLogin('silviafernaandez26@gmail.com', 'sambita19')">
+                <div class="profile-avatar" style="background: #EC4899;">Sil</div>
+                <div class="profile-name">Silvia</div>
+              </div>
+    
             </div>
           </div>
+    
+        </div>
+      </div>
   
         <aside class="sidebar">
           <div class="sidebar-logo">
@@ -2339,9 +2373,9 @@
         <div class="form-group">
           <label for="contribution-origin">Origen de la aportación *</label>
           <select class="form-select" id="contribution-origin" required onchange="updateContributionFields()">
-            <option value="my">Mi aportación</option>
-            <option value="partner">Aportación de Silvia</option>
-            <option value="other">Otra cuenta</option>
+            <option value="my">Jesús</option>
+            <option value="partner">Silvia</option>
+            <option value="other">Externa</option>
           </select>
         </div>
       </div>
@@ -2651,19 +2685,12 @@
 
     async function getData() {
       if (dataCache) return dataCache;
-
-      // ¡NUEVO GUARDIA DE SEGURIDAD! 🛑
-      // Si no hay ningún usuario logueado, cortamos aquí y devolvemos la app vacía
       if (!currentUser) {
-        return { 
-          accounts: [], transactions: [], holdings: [], transfers: [], 
-          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
-          monthlyPatrimony: {}, customCategories: {} 
-        };
+        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
       }
       
       try {
-          const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes] = await Promise.all([
+        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes] = await Promise.all([
           supabaseClient.from('accounts').select('*').order('name'),
           supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
           supabaseClient.from('holdings').select('*').order('name'),
@@ -2675,28 +2702,35 @@
           supabaseClient.from('custom_categories').select('*')
         ]);
 
+        // 1. Filtrar Cuentas: Las mías o las compartidas
+        const validAccounts = (accountsRes.data || []).filter(a => 
+          a.user_id === currentUser.id || a.is_shared === true || a.is_shared === 'true' || a.isShared === true
+        );
+        
+        const validAccountNames = validAccounts.map(a => a.name);
+
+        // 2. Filtrar Movimientos: Solo los de las cuentas válidas
+        const validTransactions = (transactionsRes.data || []).filter(t => validAccountNames.includes(t.account));
+        const validHoldings = (holdingsRes.data || []).filter(h => validAccountNames.includes(h.account));
+        const validTransfers = (transfersRes.data || []).filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
+        const validFixedExpenses = (fixedExpensesRes.data || []).filter(f => validAccountNames.includes(f.account));
+        const validCategories = (customCategoriesRes.data || []).filter(c => c.user_id === currentUser.id);
+
         const data = {
-          // AQUÍ ESTÁ EL ARREGLO: Añadimos isShared: a.is_shared
-          accounts: (accountsRes.data || []).map(a => ({ 
-            id: a.id,
-            name: a.name, 
-            type: a.type, 
-            color: a.color, 
-            initialBalance: parseFloat(a.initial_balance), 
-            balance: parseFloat(a.initial_balance), 
-            includeInPatrimony: a.include_in_patrimony,
-            isDisposable: a.is_disposable,
-            isShared: a.is_shared // <--- ESTO ES LO QUE FALTABA
+          accounts: validAccounts.map(a => ({ 
+            id: a.id, name: a.name, type: a.type, color: a.color, 
+            initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), 
+            includeInPatrimony: a.include_in_patrimony, isDisposable: a.is_disposable, isShared: a.is_shared
           })),
-          transactions: (transactionsRes.data || []).map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
-          holdings: (holdingsRes.data || []).map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
-          transfers: (transfersRes.data || []).map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
+          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
+          holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
+          transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
-          fixedExpenses: (fixedExpensesRes.data || []).map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
-          fixedExpensesPaid: {},
-          monthlyPatrimony: {},
-          customCategories: {}
+          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
+          fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {}
         };
+
+        // ... (Tu código sigue igual a partir de aquí hacia abajo)
 
         (fixedExpensesPaidRes.data || []).forEach(item => { if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); });
         (monthlyPatrimonyRes.data || []).forEach(item => { data.monthlyPatrimony[item.month_key] = parseFloat(item.value); });
@@ -2722,6 +2756,7 @@
     async function addTransaction(transaction) {
       try {
         const { data, error } = await supabaseClient.from('transactions').insert({
+          user_id: currentUser.id, // <-- LÍNEA NUEVA
           type: transaction.type,
           date: transaction.date,
           description: transaction.description,
@@ -2786,6 +2821,7 @@
     async function addHolding(holding) {
       try {
         const { error } = await supabaseClient.from('holdings').insert({
+          user_id: currentUser.id, // <-- LÍNEA NUEVA
           name: holding.name,
           type: holding.type,
           account: holding.account,
@@ -3928,6 +3964,7 @@ async function showPersonalExpensesBreakdown() {
 async function addTransfer(transfer) {
   try {
     const { error } = await supabaseClient.from('transfers').insert({
+      user_id: currentUser.id, // <-- LÍNEA NUEVA
       date: transfer.date,
       from_account: transfer.from,
       to_account: transfer.to,
@@ -4479,7 +4516,7 @@ async function saveContribution() {
     fromAccountName = elSource.value; 
     finalConcept = `[EXTERNA] ${notes}`; 
   } else {
-    fromAccountName = 'Aportación Silvia'; // Evita errores de base de datos
+    fromAccountName = 'Silvia'; // Evita errores de base de datos
     finalConcept = `[PAREJA] ${notes}`;
   }
 
@@ -4593,7 +4630,7 @@ async function renderContributionsList() {
   let html = `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px;">
       <div style="background:rgba(59,130,246,0.05); padding:15px; border-radius:12px; border:1px solid rgba(59,130,246,0.2); text-align:center;">
-        <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px;">MIS APORTACIONES</div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px;">JESUS</div>
         <div style="font-size:20px; font-weight:700; color:var(--primary);">${formatCurrency(my)}</div>
       </div>
       <div style="background:rgba(249,115,22,0.05); padding:15px; border-radius:12px; border:1px solid rgba(249,115,22,0.2); text-align:center;">
@@ -4621,15 +4658,15 @@ async function renderContributionsList() {
 
       if (concept.includes('[EXTERNA]')) {
         icon = '🏛️';
-        label = t.from || 'Aportación Externa';
+        label = t.from || 'Externa';
         color = 'var(--green)';
       } else if (concept.includes('[PAREJA]')) {
         icon = '👥';
-        label = 'Aportación de Silvia';
+        label = 'Silvia';
         color = 'var(--orange)';
       } else {
         icon = '💳';
-        label = t.from || 'Mi Aportación';
+        label = t.from || 'Jesús';
         color = 'var(--primary)';
       }
 
@@ -5077,6 +5114,7 @@ async function saveNewAccount() {
 
     // Insert into Supabase
     const { error } = await supabaseClient.from('accounts').insert({
+      user_id: currentUser.id, // <-- LÍNEA NUEVA
       name: name,
       type: type,
       color: color,
@@ -5465,6 +5503,7 @@ async function saveFixedExpense() {
     if (editingFixedExpenseId) {
       // Update existing
       const { error } = await supabaseClient.from('fixed_expenses').update({
+        user_id: currentUser.id, // <-- LÍNEA NUEVA
         name,
         type,
         category,
@@ -5477,6 +5516,7 @@ async function saveFixedExpense() {
     } else {
       // Insert new
       const { error } = await supabaseClient.from('fixed_expenses').insert({
+        user_id: currentUser.id, // <-- LÍNEA NUEVA
         name,
         type,
         category,
@@ -6166,50 +6206,38 @@ function closeAuthModal() {
   document.getElementById('auth-modal').classList.remove('active');
 }
 
-// 4. Iniciar Sesión (Submit del formulario)
-// 4. Iniciar Sesión desde la pantalla completa
-document.getElementById('fullscreen-login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
+// ============================================================================
+// LOGIN AUTOMÁTICO AL HACER CLIC EN EL PERFIL
+// ============================================================================
+
+async function autoLogin(email, password) {
+  // Mostramos un mensajito de que está cargando
+  showToast('Iniciando sesión...', 'info');
   
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-  const errorEl = document.getElementById('login-error');
-  const btn = e.target.querySelector('button');
-  
-  // Efecto visual de carga
-  const originalText = btn.textContent;
-  btn.textContent = 'Iniciando sesión...';
-  btn.style.opacity = '0.7';
-  btn.disabled = true;
-  errorEl.style.display = 'none';
-  
+  // Hacemos el login en Supabase usando los datos invisibles
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email: email,
     password: password,
   });
 
-  // Restaurar botón
-  btn.textContent = originalText;
-  btn.style.opacity = '1';
-  btn.disabled = false;
-
   if (error) {
-    errorEl.textContent = 'Credenciales incorrectas. Inténtalo de nuevo.';
-    errorEl.style.display = 'block';
+    showToast('Error de conexión. Revisa el código.', 'error');
+    console.error("Error al loguear:", error.message);
   } else {
     currentUser = data.user;
-    document.getElementById('fullscreen-login').style.display = 'none'; // Bajamos el muro
+    
+    // Ocultamos la pantalla gigante
+    document.getElementById('fullscreen-login').style.display = 'none';
+    
+    // Actualizamos el menú lateral
     updateSidebarUserUI(currentUser.email);
-    showToast('Sesión iniciada correctamente', 'success');
+    showToast('¡Bienvenido!', 'success');
     
-    // Vaciamos el formulario por si cierra sesión luego
-    document.getElementById('fullscreen-login-form').reset();
-    
-    // Cargamos los datos
+    // Recargamos los datos para este usuario
     invalidateCache();
     await initializeApp();
   }
-});
+}
 
 // 5. Cerrar Sesión
 async function handleSignOut() {
