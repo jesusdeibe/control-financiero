@@ -1188,6 +1188,90 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
+    /* Contenedor de las tarjetas con scroll horizontal */
+    .wallet-container {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding: 10px 4px 20px 4px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none; /* Oculta scroll en Firefox */
+    }
+
+    .wallet-container::-webkit-scrollbar {
+        display: none; /* Oculta scroll en Chrome/Safari */
+    }
+
+    /* Diseño de la tarjeta individual */
+    .wallet-card {
+        flex: 0 0 280px; /* Ancho fijo de la tarjeta */
+        height: 160px;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        scroll-snap-align: start;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .wallet-card:active {
+        transform: scale(0.98);
+    }
+
+    /* Efecto de brillo/degradado sutil sobre la tarjeta */
+    .wallet-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .card-bank-name {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+
+    .card-balance {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    .card-number {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        letter-spacing: 2px;
+        opacity: 0.7;
+    }
+
+    /* Clase que se aplica mientras arrastras */
+    .sortable-ghost {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+
+    .sortable-chosen {
+        cursor: grabbing;
+    }
+
+    /* Cursor de mano para indicar que se puede mover */
+    .wallet-card {
+        cursor: grab;
+        user-select: none;
+    }
+
   </style>
 </head>
 <body>
@@ -1282,7 +1366,7 @@
           <div class="section-header">
             <h2 class="section-title">
               <span>📈</span>
-              Evolución del Patrimonio 2025
+              Evolución del Patrimonio 2026
             </h2>
           </div>
           <canvas id="patrimony-chart" style="max-height: 300px;"></canvas>
@@ -1306,7 +1390,7 @@
     <div id="monthly-view" class="view">
       <header class="header">
         <div>
-          <h1 class="page-title" id="current-month-title">Febrero 2025</h1>
+          <h1 class="page-title" id="current-month-title">Febrero 2026</h1>
         </div>
       </header>
 
@@ -1315,17 +1399,20 @@
       </div>
 
       <!-- Patrimonio Total del Mes -->
-      <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); padding: 32px; border-radius: 20px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 14px; opacity: 0.95; margin-bottom: 8px; color: black;">💰 Patrimonio Total</div>
-            <div style="font-size: 32px; font-weight: 700; color: black;" id="monthly-patrimonio">0,00 €</div>
-            <div style="font-size: 13px; opacity: 0.9; margin-top: 4px; color: black;" id="monthly-patrimonio-change"></div>
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); padding: 32px; border-radius: 20px; margin-bottom: 32px;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="font-size: 13px; color: #8E8E93; font-weight: 600; text-transform: uppercase;">💰 Dinero Disponible</div>
+              <div style="font-size: 32px; font-weight: 800; color: black;" id="monthly-disponible-total">Cargando...</div>
+              <div style="font-size: 13px; margin-top: 4px;" id="monthly-disponible-vs-inicio"></div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 12px; color: #8E8E93; font-weight: 600; text-transform: uppercase;">Inicio del mes</div>
+              <div style="font-size: 20px; font-weight: 700; color: black; margin-top: 4px;" id="monthly-disponible-inicio">0,00 €</div>
+            </div>
           </div>
-          <div style="text-align: right;">
-            <div style="font-size: 13px; opacity: 0.9; color: black;">Inicio del mes</div>
-            <div style="font-size: 20px; font-weight: 600; margin-top: 4px; color: black;" id="monthly-patrimonio-start">0,00 €</div>
-          </div>
+          <div id="monthly-disponible-breakdown" style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 16px; border-top: 1px solid #F2F2F7;"></div>
         </div>
       </div>
 
@@ -1509,17 +1596,25 @@
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title"><span>💸</span> Aportaciones a Cuenta Compartida</h2>
-          <div style="display: flex; gap: 16px; align-items: center;">
-            <span class="section-total" id="contributions-total">0,00 €</span>
-            <button class="add-btn" onclick="openContributionModal()">+ Añadir</button>
-          </div>
+    </section>
+
+    <!-- Aportaciones Cuenta Compartida -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">  
+          <span>💸</span>
+          Aportaciones a Cuenta Compartida
+        </h2>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span class="section-total" id="contributions-total">0,00 €</span>
+          <button class="add-btn" style="background: var(--red); font-size: 12px; padding: 6px 12px;" onclick="resetMonthContributions()">🔄 Resetear</button>
+          <button class="add-btn" onclick="openContributionModal()">+ Añadir</button>
         </div>
-        <div id="contributions-list" style="display: flex; flex-direction: column; gap: 12px;">
-          </div>
-      </section>
+      </div>
+      <div id="contributions-list" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Contributions generated dynamically -->
+      </div>
+    </section>
     </div>
    
     <!-- Accounts View -->
@@ -1721,7 +1816,8 @@
               <th>Tipo</th>
               <th>Color</th>
               <th style="text-align: center;">Incluir en Patrimonio</th>
-              <th></th>
+              <th style="text-align: center;">Dinero Disponible</th>
+              <th style="text-align: center;">Saldo Compartido</th> <th></th><th></th>
             </tr>
           </thead>
           <tbody id="settings-accounts-table">
@@ -2013,43 +2109,65 @@
   </div>
 
   <!-- Contribution Modal -->
-  <div id="contribution-modal" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 class="modal-title">Nueva Aportación a Cuenta Compartida</h2>
-        <button class="close-btn" onclick="closeContributionModal()">&times;</button>
-      </div>
-      <form class="modal-form" onsubmit="event.preventDefault(); saveContribution();">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="contribution-type">Tipo de aportación *</label>
-            <select class="form-select" id="contribution-type" required>
-              <option value="my">Mi aportación (solo informativo)</option>
-              <option value="partner">Aportación pareja</option>
-              <option value="external">Aportación externa (ayudas, etc.)</option>
-            </select>
-            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
-              "Mi aportación" se registra como transferencia a la cuenta compartida
-            </small>
-          </div>
-          <div class="form-group">
-            <label for="contribution-amount">Importe (€) *</label>
-            <input type="number" step="0.01" class="form-input" id="contribution-amount" placeholder="0.00" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="contribution-description">Descripción</label>
-            <input type="text" class="form-input" id="contribution-description" placeholder="Ej: Nómina febrero, Ayuda alquiler...">
-          </div>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" onclick="closeContributionModal()">Cancelar</button>
-          <button type="submit" class="btn-primary">Guardar Aportación</button>
-        </div>
-      </form>
+<div id="contribution-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Nueva Aportación a Cuenta Compartida</h2>
+      <button class="close-btn" onclick="closeContributionModal()">&times;</button>
     </div>
+    <form class="modal-form" onsubmit="event.preventDefault(); saveContribution();">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contribution-origin">Origen de la aportación *</label>
+          <select class="form-select" id="contribution-origin" required onchange="updateContributionFields()">
+            <option value="my">Mi aportación</option>
+            <option value="partner">Aportación de Silvia</option>
+            <option value="other">Otra cuenta</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Source account (for "my" and "other") -->
+      <div class="form-row" id="source-account-field" style="display: none;">
+        <div class="form-group">
+          <label for="contribution-source">Cuenta origen *</label>
+          <select class="form-select" id="contribution-source" required>
+            <!-- Options generated dynamically -->
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contribution-destination">Cuenta destino *</label>
+          <select class="form-select" id="contribution-destination" required>
+            <!-- Options generated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contribution-amount">Importe (€) *</label>
+          <input type="number" step="0.01" class="form-input" id="contribution-amount" placeholder="0.00" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contribution-date">Fecha *</label>
+          <input type="date" class="form-input" id="contribution-date" required>
+        </div>
+        <div class="form-group">
+          <label for="contribution-notes">Anotaciones</label>
+          <input type="text" class="form-input" id="contribution-notes" placeholder="Ej: Nómina febrero, Ayuda alquiler...">
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="closeContributionModal()">Cancelar</button>
+        <button type="submit" class="btn-primary">Guardar Aportación</button>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- Add Account Modal -->
   <div class="modal-overlay" id="add-account-modal">
@@ -2249,6 +2367,9 @@
   <!-- Load Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 
+  <!-- Load SortableJS from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
   <script>
     // ============================================================================
     // SUPABASE CONFIGURATION
@@ -2272,10 +2393,7 @@
                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     // Default accounts and categories (can be modified)
-    let ACCOUNTS = [
-      'Santander Gastos', 'Santander Facturas', 'Santander Pareja',
-      'Trade Republic Ahorro', 'Trade Republic Broker', 'Revolut', 'Binance BTC'
-    ];
+    let ACCOUNTS = [];
 
     let CATEGORIES = {
       ingresos: ['Salario', 'Freelance/Extra', 'Dividendos', 'Alquiler', 'Bonificación', 'Otro'],
@@ -2286,53 +2404,29 @@
       inversiones: ['Acciones', 'ETFs', 'Criptomonedas']
     };
 
-    let ACCOUNT_COLORS = {
-      'Santander Gastos': '#EF4444',
-      'Santander Facturas': '#F59E0B',
-      'Santander Pareja': '#F59E0B',
-      'Trade Republic Ahorro': '#14B8A6',
-      'Trade Republic Broker': '#8B5CF6',
-      'Revolut': '#3B82F6',
-      'Binance BTC': '#1A1A1A'
-    };
+    let ACCOUNT_COLORS = {};
+    let ACCOUNT_TYPES = {};
 
-    let ACCOUNT_TYPES = {
-      'Santander Gastos': 'Cuenta Corriente',
-      'Santander Facturas': 'Cuenta Corriente',
-      'Santander Pareja': 'Cuenta Compartida',
-      'Trade Republic Ahorro': 'Cuenta Ahorro',
-      'Trade Republic Broker': 'Broker',
-      'Revolut': 'Cuenta Corriente',
-      'Binance BTC': 'Exchange Crypto'
-    };
-
-    let currentMonth = 1; // Febrero (0-indexed)
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
     let currentType = '';
     let editingId = null;
+    let currentView = 'dashboard';
 
     // Initialize data structure
     async function initData() {
       try {
-        const { data: existingAccounts } = await supabaseClient.from('accounts').select('name');
-        
-        if (!existingAccounts || existingAccounts.length === 0) {
-          const defaultAccounts = ACCOUNTS.map(name => ({
-            name,
-            type: ACCOUNT_TYPES[name] || 'Cuenta',
-            color: ACCOUNT_COLORS[name] || '#3B82F6',
-            initial_balance: 0,
-            include_in_patrimony: true
-          }));
-          
-          await supabaseClient.from('accounts').insert(defaultAccounts);
-          console.log('✅ Default accounts created');
-        }
-        
-        return await getData();
+        // Solo obtenemos los datos, sin intentar crear nada si está vacío
+        const data = await getData();
+        return data;
       } catch (error) {
         console.error('Error initializing data:', error);
         showToast('Error al inicializar datos', 'error');
-        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
+        return { 
+          accounts: [], transactions: [], holdings: [], transfers: [], 
+          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
+          monthlyPatrimony: {}, customCategories: {} 
+        };
       }
     }
 
@@ -2353,7 +2447,18 @@
         ]);
 
         const data = {
-          accounts: (accountsRes.data || []).map(a => ({ name: a.name, type: a.type, color: a.color, initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), includeInPatrimony: a.include_in_patrimony })),
+          // AQUÍ ESTÁ EL ARREGLO: Añadimos isShared: a.is_shared
+          accounts: (accountsRes.data || []).map(a => ({ 
+            id: a.id,
+            name: a.name, 
+            type: a.type, 
+            color: a.color, 
+            initialBalance: parseFloat(a.initial_balance), 
+            balance: parseFloat(a.initial_balance), 
+            includeInPatrimony: a.include_in_patrimony,
+            isDisposable: a.is_disposable,
+            isShared: a.is_shared // <--- ESTO ES LO QUE FALTABA
+          })),
           transactions: (transactionsRes.data || []).map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
           holdings: (holdingsRes.data || []).map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
           transfers: (transfersRes.data || []).map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
@@ -2565,7 +2670,7 @@
       document.getElementById('dashboard-month-savings').textContent = formatCurrency(monthSavings);
       document.getElementById('dashboard-month-savings').style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
       
-      // Render charts
+      // Render charts (¡Adiós renderWallet!)
       renderPatrimonyChart();
       renderDistributionChart(normalTotal, brokerTotal, sharedBalance);
       renderEvolutionChart('personal');
@@ -2666,72 +2771,86 @@
     }
 
     async function renderMonthlyView() {
-      await getData();
-      // Render month selector
-      const monthSelector = document.getElementById('month-selector');
-      monthSelector.innerHTML = MONTHS.map((month, index) => `
-        <button class="month-btn ${index === currentMonth ? 'active' : ''}" 
-                onclick="changeMonth(${index})">
-          ${month}
-        </button>
-      `).join('');
+  const data = await getData();
+  
+  const monthSelector = document.getElementById('month-selector');
+  if (monthSelector) {
+    monthSelector.innerHTML = MONTHS.map((month, index) => `
+      <button class="month-btn ${index === currentMonth ? 'active' : ''}" 
+              onclick="changeMonth(${index})">
+        ${month}
+      </button>
+    `).join('');
+  }
 
-      // Update title
-      document.getElementById('current-month-title').textContent = 
-        `${MONTHS[currentMonth]} 2025`;
+  const titleEl = document.getElementById('current-month-title');
+  if (titleEl) {
+    titleEl.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+  }
 
-      // Calculate monthly totals
-      const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      
-      const ahorroNeto = ingresos - gastosPersonales - inversiones;
+  // 1. Cálculo de transacciones del mes
+  const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  
+  // 2. SALDO COMPARTIDO (Controlado por el botón de Configuración)
+  const cuentasCompartidas = data.accounts.filter(acc => 
+    acc.isShared === true || acc.isShared === 'true' || acc.is_shared === true
+  );
+  
+  let sharedBalanceTotal = 0;
+  for (const acc of cuentasCompartidas) {
+    // ¡AQUÍ ESTÁ LA MAGIA! Le pasamos 'currentMonth'
+    sharedBalanceTotal += await calculateAccountBalance(acc.name, currentMonth);
+  }
 
-      // Render monthly KPIs
-      const monthlyKpis = document.getElementById('monthly-kpis');
-      monthlyKpis.innerHTML = `
-        <div class="kpi-card">
-          <div class="kpi-label">Ingresos</div>
-          <div class="kpi-value">${formatCurrency(ingresos)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Gastos Personales</div>
-          <div class="kpi-value">${formatCurrency(gastosPersonales)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Inversiones</div>
-          <div class="kpi-value">${formatCurrency(inversiones)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Ahorro Neto</div>
-          <div class="kpi-value">${formatCurrency(ahorroNeto)}</div>
-        </div>
-      `;
+  // 3. ACTUALIZAR LAS 3 TARJETAS SUPERIORES
+  const monthlyKpis = document.getElementById('monthly-kpis');
+  if (monthlyKpis) {
+    monthlyKpis.innerHTML = `
+      <div class="kpi-card">
+        <div class="kpi-label">Ingresos</div>
+        <div class="kpi-value" style="color:var(--green)">${formatCurrency(ingresos)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Gastos Pers.</div>
+        <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
+      </div>
+      <div class="kpi-card" style="border: 1px solid var(--orange); background: rgba(245,158,11,0.05);">
+        <div class="kpi-label">👥 Saldo Compartido</div>
+        <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
+      </div>
+    `;
+  }
 
-      // Update totals
-      document.getElementById('ingresos-total').textContent = formatCurrency(ingresos);
-      document.getElementById('gastos-personales-total').textContent = formatCurrency(gastosPersonales);
-      document.getElementById('gastos-compartidos-total').textContent = formatCurrency(gastosCompartidos);
-      document.getElementById('inversiones-total').textContent = formatCurrency(inversiones);
+  // 4. Totales de las tablas
+  const setTotal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatCurrency(val); };
+  setTotal('ingresos-total', ingresos);
+  setTotal('gastos-personales-total', gastosPersonales);
+  setTotal('gastos-compartidos-total', gastosCompartidos);
+  setTotal('inversiones-total', inversiones);
 
-      // Render tables
-      await renderTable('ingresos');
-      await renderTable('gastos_personales');
-      await renderTable('gastos_compartidos');
-      await renderTable('inversiones');
-      
-      // Load contributions after DOM is ready
-      setTimeout(async () => {
-        await renderContributionsList();
-        await renderFixedExpensesInMonth();
-        await updateMonthlyPatrimonyDisplay();
-      }, 0);
-    }
+  await renderTable('ingresos');
+  await renderTable('gastos_personales');
+  await renderTable('gastos_compartidos');
+  await renderTable('inversiones');
+  
+  // 5. RENDERIZADO FINAL (Aquí solucionamos el "Cargando...")
+  setTimeout(async () => {
+    if (typeof renderAccounts === 'function') await renderAccounts();
+    if (typeof renderInvestmentsView === 'function') await renderInvestmentsView();
+    if (typeof renderContributionsList === 'function') await renderContributionsList();
+    if (typeof renderFixedExpensesInMonth === 'function') await renderFixedExpensesInMonth();
+    
+    // ESTA ES LA LÍNEA QUE FALTABA Y QUE QUITA EL "CARGANDO..."
+    if (typeof updateMonthlyPatrimonyDisplay === 'function') await updateMonthlyPatrimonyDisplay();
+  }, 50);
+}
 
     async function renderTable(type) {
       const transactions = await getTransactionsByMonth(currentMonth, type);
@@ -2800,26 +2919,25 @@
     // ============================================================================
     
     async function getMonthlyContributions(accountName) {
-      // Only count partner and external contributions for Santander Pareja account
+      // Solo contamos para la cuenta compartida
       if (accountName !== 'Santander Pareja') return 0;
       
+      // Forzamos que los datos estén actualizados
       const data = await getData();
-      if (!data.contributions) {
-        console.log('No contributions data found');
-        return 0;
-      }
+      if (!data.contributions || data.contributions.length === 0) return 0;
       
-      console.log('Calculating contributions for', accountName);
-      console.log('All contributions:', JSON.stringify(data.contributions));
+      // Creamos la llave del mes actual para comparar
+      const monthKey = `${MONTHS[currentMonth]} ${currentYear}`;
       
-      const total = data.contributions.reduce((sum, c) => {
-        const partner = parseFloat(c.partner) || 0;
-        const external = parseFloat(c.external) || 0;
-        console.log(`Month ${c.month}: partner=${partner}, external=${external}`);
-        return sum + partner + external;
-      }, 0);
+      // Buscamos la fila que coincida con el mes seleccionado
+      const monthData = data.contributions.find(c => 
+        c.month.trim().toLowerCase() === monthKey.trim().toLowerCase()
+      );
       
-      console.log('Total contributions:', total);
+      if (!monthData) return 0;
+      
+      // Sumamos Silvia (partner) y Otros (external)
+      const total = (parseFloat(monthData.partner) || 0) + (parseFloat(monthData.external) || 0);
       return total;
     }
 
@@ -3126,6 +3244,20 @@
 
     async function handleConfirmDelete(id) {
       await confirmDelete(id);
+    }
+
+    async function handleConfirmDeleteTransfer(id) {
+      if (confirm('¿Estás seguro de que quieres eliminar esta transferencia?')) {
+        await deleteTransfer(id);
+        await renderAccountsView();
+        await renderDashboard();
+        showToast('Transferencia eliminada', 'success');
+      }
+    }
+
+    function openEditTransferModal(id) {
+      // TODO: Implement transfer editing modal
+      showToast('Funcionalidad de editar transferencias próximamente', 'info');
     }
 
     let editingHoldingId = null;
@@ -3457,6 +3589,7 @@ async function showPersonalExpensesBreakdown() {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const view = btn.dataset.view;
+        currentView = view;
         
         // Update active nav
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -3558,44 +3691,54 @@ async function updateAccountBalance(accountName, initialBalance) {
   }
 }
 
-async function calculateAccountBalance(accountName) {
+// AHORA ACEPTA UN SEGUNDO PARÁMETRO: targetMonth
+async function calculateAccountBalance(accountName, targetMonth = null) {
   const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
+  
   if (!account) return 0;
   
-  const ingresos = data.transactions
-    .filter(t => t.type === 'ingresos' && t.account === accountName)
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  const initial = parseFloat(account.initialBalance || account.initial_balance || account.balance || 0);
   
-  const gastos = data.transactions
-    .filter(t => (t.type === 'gastos_personales' || t.type === 'gastos_compartidos') && t.account === accountName)
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-  
-  const inversiones = data.transactions
-    .filter(t => t.type === 'inversiones' && t.account === accountName)
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-  
-  const transfersReceived = (data.transfers || [])
-    .filter(t => t.to === accountName)
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-  
-  const transfersSent = (data.transfers || [])
-    .filter(t => t.from === accountName)
-    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-  
-  // Add partner and external contributions for shared account
-  const contributions = await getMonthlyContributions(accountName);
+  let validTransactions = data.transactions.filter(t => t.account === accountName);
+  let validTransfers = (data.transfers || []);
 
-  // For broker accounts, add current value of holdings
-  if (account.type === 'Broker' || account.type === 'Exchange Crypto') {
-    const holdingsValue = data.holdings
-      .filter(h => h.account === accountName)
-      .reduce((sum, h) => sum + parseFloat(h.currentValue || 0), 0);
+  // VIAJE EN EL TIEMPO: Si le pasamos un mes, filtramos el futuro
+  if (targetMonth !== null) {
+    validTransactions = validTransactions.filter(t => {
+      if (!t.date) return false;
+      const m = parseInt(t.date.split('-')[1]) - 1; // Leemos el mes exacto (0-11)
+      return m <= targetMonth; // Solo sumamos hasta el mes seleccionado inclusive
+    });
     
-    return holdingsValue; // Para cuentas broker, el balance ES el valor de las posiciones
+    validTransfers = validTransfers.filter(t => {
+      if (!t.date) return false;
+      const m = parseInt(t.date.split('-')[1]) - 1;
+      return m <= targetMonth;
+    });
   }
   
-  return account.initialBalance + ingresos - gastos - inversiones + transfersReceived - transfersSent + contributions;
+  const transTotal = validTransactions.reduce((sum, t) => {
+    const isIncome = t.type === 'ingreso' || t.type === 'ingresos';
+    return isIncome ? sum + parseFloat(t.amount || 0) : sum - parseFloat(t.amount || 0);
+  }, 0);
+  
+  const transferTotal = validTransfers.reduce((sum, t) => {
+    const toAcc = t.to_account || t.to;
+    const fromAcc = t.from_account || t.from;
+    if (toAcc === accountName) return sum + parseFloat(t.amount || 0);
+    if (fromAcc === accountName) return sum - parseFloat(t.amount || 0);
+    return sum;
+  }, 0);
+  
+  if (account.type === 'Broker' || account.type === 'Exchange Crypto') {
+    const holdingsValue = (data.holdings || [])
+      .filter(h => h.account === accountName)
+      .reduce((sum, h) => sum + parseFloat(h.currentValue || 0), 0);
+    return holdingsValue;
+  }
+  
+  return initial + transTotal + transferTotal;
 }
 
 function filterAccountMovements() {
@@ -3610,8 +3753,41 @@ async function renderAccountsView() {
   
   // Calculate total patrimonio
   const totalPatrimonio = ACCOUNTS.reduce((sum, acc) => sum + calculateAccountBalance(acc), 0);
-  document.getElementById('accounts-subtitle').textContent = 
-    `Patrimonio Total: ${formatCurrency(totalPatrimonio)}`;
+  // Generate detailed breakdown
+  const accountBreakdown = await Promise.all(
+    ACCOUNTS
+      .filter(acc => {
+        const account = data.accounts.find(a => a.name === acc);
+        return account && account.includeInPatrimony !== false;
+      })
+      .map(async acc => {
+        const balance = await calculateAccountBalance(acc);
+        return { name: acc, balance: balance };
+      })
+  );
+
+  // Nuevo diseño de desglose visual
+  const breakdownHTML = accountBreakdown
+    .filter(a => a.balance > 0)
+    .map(a => `
+      <div style="background: #f2f2f7; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid #e5e5ea;">
+        <span style="font-size: 11px; color: #8e8e93; font-weight: 600; text-transform: uppercase;">${a.name}</span>
+        <span style="font-size: 13px; color: #1c1c1e; font-weight: 700;">${formatCurrency(a.balance)}</span>
+      </div>
+    `).join('');
+
+  document.getElementById('accounts-subtitle').innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 10px;">
+      <div>
+        <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Patrimonio Total Actual</div>
+        <div style="font-size: 32px; font-weight: 800; color: var(--text-primary);">${formatCurrency(totalPatrimonio)}</div>
+      </div>
+      
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        ${breakdownHTML}
+      </div>
+    </div>
+  `;
   
   // Render KPIs
   const accountsKpis = document.getElementById('accounts-kpis');
@@ -3765,6 +3941,7 @@ async function renderAccountsView() {
           <td class="amount-cell">${formatCurrency(transfer.amount)}</td>
           <td>
             <div class="row-actions">
+              <button class="action-btn" onclick="event.stopPropagation(); openEditTransferModal('${transfer.id}')">Editar</button>
               <button class="action-btn delete" onclick="event.stopPropagation(); handleConfirmDeleteTransfer('${transfer.id}')">Eliminar</button>
             </div>
           </td>
@@ -3772,16 +3949,20 @@ async function renderAccountsView() {
       `).join('');
   }
   
-  // Populate account filter
+  // BUSCA ESTO:
   const accountFilter = document.getElementById('account-filter');
-  if (accountFilter && accountFilter.options.length === 1) {
-    ACCOUNTS.forEach(acc => {
-      const option = document.createElement('option');
-      option.value = acc;
-      option.textContent = acc;
-      accountFilter.appendChild(option);
-    });
-  }
+    if (accountFilter) {
+      // Limpia las opciones actuales excepto la primera ("Todas las cuentas")
+      accountFilter.innerHTML = '<option value="">Todas las cuentas</option>';
+      
+      // CAMBIO: Usa data.accounts en lugar de la variable ACCOUNTS
+      data.accounts.forEach(acc => {
+        const option = document.createElement('option');
+        option.value = acc.name; // Usamos el nombre de la DB
+        option.textContent = acc.name;
+        accountFilter.appendChild(option);
+      });
+    }
   
   // Render Movements Table
   const movementsTable = document.getElementById('account-movements-table');
@@ -3908,10 +4089,32 @@ async function saveTransferClick() {
 // CONTRIBUTION MODAL & FUNCTIONS
 // ============================================================================
 
-function openContributionModal() {
-  document.getElementById('contribution-type').value = 'partner';
+async function openContributionModal() {
+  const data = await getData();
+  
+  // Set default date
+  document.getElementById('contribution-date').value = new Date().toISOString().split('T')[0];
+  
+  // Reset form
+  document.getElementById('contribution-origin').value = 'my';
   document.getElementById('contribution-amount').value = '';
-  document.getElementById('contribution-description').value = '';
+  document.getElementById('contribution-notes').value = '';
+  
+  // Populate destination accounts (shared accounts)
+  const sharedAccounts = data.accounts.filter(a => 
+    a.name.toLowerCase().includes('compartida') || 
+    a.name.toLowerCase().includes('pareja') ||
+    a.name.toLowerCase().includes('shared')
+  );
+  
+  const destinationSelect = document.getElementById('contribution-destination');
+  destinationSelect.innerHTML = sharedAccounts
+    .map(acc => `<option value="${acc.name}">${acc.name}</option>`)
+    .join('');
+  
+  // Initial field update
+  updateContributionFields();
+  
   document.getElementById('contribution-modal').classList.add('active');
 }
 
@@ -3919,40 +4122,317 @@ function closeContributionModal() {
   document.getElementById('contribution-modal').classList.remove('active');
 }
 
-async function saveContribution() {
-  const type = document.getElementById('contribution-type').value;
-  const amount = parseFloat(document.getElementById('contribution-amount').value);
-  const description = document.getElementById('contribution-description').value;
+async function updateContributionFields() {
+  const origin = document.getElementById('contribution-origin').value;
+  const sourceField = document.getElementById('source-account-field');
+  const sourceSelect = document.getElementById('contribution-source');
   
-  if (!amount || amount <= 0) {
-    showToast('Por favor ingresa un importe válido', 'error');
+  if (origin === 'partner') {
+    // Partner: no source account needed
+    sourceField.style.display = 'none';
+    sourceSelect.removeAttribute('required');
+  } else {
+    // My or Other: show source account
+    sourceField.style.display = 'block';
+    sourceSelect.setAttribute('required', 'required');
+    
+    const data = await getData();
+    
+    if (origin === 'my') {
+      // My: only my accounts (exclude shared and brokers)
+      const myAccounts = data.accounts.filter(a => 
+        !a.name.toLowerCase().includes('compartida') &&
+        !a.name.toLowerCase().includes('pareja') &&
+        !a.name.toLowerCase().includes('shared') &&
+        a.type !== 'Broker' &&
+        a.type !== 'Exchange Crypto'
+      );
+      
+      sourceSelect.innerHTML = myAccounts
+        .map(acc => `<option value="${acc.name}">${acc.name}</option>`)
+        .join('');
+    } else {
+      // Other: all my accounts including shared
+      const allAccounts = data.accounts.filter(a => 
+        a.type !== 'Broker' &&
+        a.type !== 'Exchange Crypto'
+      );
+      
+      sourceSelect.innerHTML = allAccounts
+        .map(acc => `<option value="${acc.name}">${acc.name}</option>`)
+        .join('');
+    }
+  }
+}
+
+let bloqueandoAportacion = false;
+
+async function saveContribution() {
+  if (bloqueandoAportacion) return;
+
+  const elOrigin = document.getElementById('contribution-origin');
+  const elSource = document.getElementById('contribution-source');
+  const elDest = document.getElementById('contribution-destination');
+  const elAmount = document.getElementById('contribution-amount');
+  const elDate = document.getElementById('contribution-date');
+  const elNotes = document.getElementById('contribution-notes');
+
+  if (!elAmount?.value || !elDate?.value) {
+    showToast('Faltan datos obligatorios', 'error');
     return;
   }
-  
-  const monthKey = `${currentMonth}-2025`;
-  
+
+  bloqueandoAportacion = true;
+  const originType = elOrigin.value;
+  const amount = parseFloat(elAmount.value) || 0;
+  const dateVal = elDate.value;
+  const destinationAccount = elDest.value;
+  const notes = elNotes?.value || 'Aportación manual';
+
+  let fromAccountName = '';
+  let finalConcept = '';
+
+  if (originType === 'my') {
+    fromAccountName = elSource.value; 
+    finalConcept = notes; 
+  } else if (originType === 'other') {
+    fromAccountName = elSource.value; 
+    finalConcept = `[EXTERNA] ${notes}`; 
+  } else {
+    fromAccountName = 'Aportación Silvia'; // Evita errores de base de datos
+    finalConcept = `[PAREJA] ${notes}`;
+  }
+
+  // Cortar la fecha a mano para evitar la trampa horaria
+  const dateParts = dateVal.split('-');
+  const y = parseInt(dateParts[0]);
+  const m = parseInt(dateParts[1]) - 1;
+  const monthKey = `${m}-${y}`;
+
   try {
-    const { data: existing } = await supabaseClient
+    const { error: txError } = await supabaseClient
+      .from('transfers')
+      .insert([{
+        date: dateVal,
+        amount: amount,
+        from_account: fromAccountName,
+        to_account: destinationAccount,
+        concept: finalConcept
+      }]);
+
+    if (txError) throw txError;
+
+    // Actualizamos la tabla antigua por retrocompatibilidad
+    const { data: existingData } = await supabaseClient
       .from('contributions')
       .select('*')
-      .eq('month_key', monthKey)
-      .maybeSingle();
-    
-    let myTotal = 0;
-    let partnerTotal = 0;
-    let externalTotal = 0;
-    
-    if (existing) {
-      myTotal = parseFloat(existing.my) || 0;
-      partnerTotal = parseFloat(existing.partner) || 0;
-      externalTotal = parseFloat(existing.external) || 0;
+      .eq('month_key', monthKey);
+
+    let myVal = 0, partnerVal = 0, externalVal = 0, rowId = null;
+
+    if (existingData && existingData.length > 0) {
+      const row = existingData[0];
+      rowId = row.id;
+      myVal = parseFloat(row.my) || 0;
+      partnerVal = parseFloat(row.partner) || 0;
+      externalVal = parseFloat(row.external) || 0;
     }
+
+    if (originType === 'my') myVal += amount;
+    else if (originType === 'partner') partnerVal += amount;
+    else if (originType === 'other') externalVal += amount;
+
+    const payload = {
+      month_key: monthKey,
+      my: myVal,
+      partner: partnerVal,
+      external: externalVal
+    };
     
-    if (type === 'my') myTotal += amount;
-    if (type === 'partner') partnerTotal += amount;
-    if (type === 'external') externalTotal += amount;
+    if (rowId) payload.id = rowId;
+
+    const { error: contribError } = await supabaseClient
+      .from('contributions')
+      .upsert(payload, { onConflict: 'month_key' });
+
+    if (contribError) throw contribError;
+
+    dataCache = null; 
+    closeContributionModal();
+    showToast('Aportación guardada correctamente', 'success');
     
-    if (existing) {
+    await renderMonthlyView();
+
+  } catch (err) {
+    console.error("Error al guardar:", err);
+    showToast('Error de base de datos: ' + err.message, 'error');
+  } finally {
+    bloqueandoAportacion = false;
+  }
+}
+
+async function renderContributionsList() {
+  const data = await getData();
+  
+  const nombresCompartidos = data.accounts
+    .filter(acc => 
+      acc.type === 'Cuenta Compartida' || 
+      acc.name.toLowerCase().includes('pareja') ||
+      acc.name.toLowerCase().includes('compartida')
+    )
+    .map(acc => acc.name);
+
+  const contributionTransfers = (data.transfers || []).filter(t => {
+    if (!t.date) return false;
+    
+    const parts = t.date.split('-'); 
+    const y = parseInt(parts[0]);
+    const m = parseInt(parts[1]) - 1;
+    
+    const esMesCorrecto = (m === currentMonth && y === currentYear);
+    const esHaciaCompartida = nombresCompartidos.includes(t.to); // AQUÍ ESTABA EL ERROR (t.to, no t.to_account)
+
+    return esMesCorrecto && esHaciaCompartida;
+  });
+
+  const my = contributionTransfers
+    .filter(t => !t.concept.includes('[EXTERNA]') && !t.concept.includes('[PAREJA]'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    
+  const partner = contributionTransfers
+    .filter(t => t.concept.includes('[PAREJA]'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    
+  const external = contributionTransfers
+    .filter(t => t.concept.includes('[EXTERNA]'))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+  const container = document.getElementById('contributions-list');
+  if (!container) return;
+
+  let html = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px;">
+      <div style="background:rgba(59,130,246,0.05); padding:15px; border-radius:12px; border:1px solid rgba(59,130,246,0.2); text-align:center;">
+        <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px;">MIS APORTACIONES</div>
+        <div style="font-size:20px; font-weight:700; color:var(--primary);">${formatCurrency(my)}</div>
+      </div>
+      <div style="background:rgba(249,115,22,0.05); padding:15px; border-radius:12px; border:1px solid rgba(249,115,22,0.2); text-align:center;">
+        <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px;">SILVIA</div>
+        <div style="font-size:20px; font-weight:700; color:var(--orange);">${formatCurrency(partner)}</div>
+      </div>
+      <div style="background:rgba(34,197,94,0.05); padding:15px; border-radius:12px; border:1px solid rgba(34,197,94,0.2); text-align:center;">
+        <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px;">EXTERNAS</div>
+        <div style="font-size:20px; font-weight:700; color:var(--green);">${formatCurrency(external)}</div>
+      </div>
+    </div>
+    
+    <div style="font-weight:600; margin-bottom:12px; font-size:14px; display:flex; align-items:center; gap:8px;">
+      <span>📋</span> Historial detallado
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+  `;
+
+  if (contributionTransfers.length === 0) {
+    html += `<div style="text-align:center; padding:20px; color:gray; font-size:13px;">No hay movimientos este mes</div>`;
+  } else {
+    contributionTransfers.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(t => {
+      let icon, label, color;
+      const concept = t.concept || ''; 
+
+      if (concept.includes('[EXTERNA]')) {
+        icon = '🏛️';
+        label = t.from || 'Aportación Externa';
+        color = 'var(--green)';
+      } else if (concept.includes('[PAREJA]')) {
+        icon = '👥';
+        label = 'Aportación de Silvia';
+        color = 'var(--orange)';
+      } else {
+        icon = '💳';
+        label = t.from || 'Mi Aportación';
+        color = 'var(--primary)';
+      }
+
+      const cleanConcept = concept.replace('[EXTERNA]', '').replace('[PAREJA]', '').trim();
+
+      html += `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: ${color}15; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid ${color}30;">
+              ${icon}
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); line-height: 1.2;">${label}</div>
+              <div style="font-size: 11px; color: var(--text-tertiary);">${cleanConcept || 'Aportación'}</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 700; color: var(--text-primary); font-size: 14px;">${formatCurrency(t.amount)}</div>
+            <div style="font-size: 10px; color: var(--text-tertiary); text-transform: uppercase;">${new Date(t.date).toLocaleDateString('es-ES', {day:'2-digit', month:'short'})}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  const totalHeader = document.getElementById('contributions-total');
+  if (totalHeader) totalHeader.textContent = formatCurrency(my + partner + external);
+}
+
+async function openEditContributionModal(transferId) {
+  const data = await getData();
+  const transfer = data.transfers.find(t => t.id === transferId);
+  
+  if (!transfer) return;
+  
+  // TODO: Implement edit modal
+  showToast('Editar aportaciones próximamente', 'info');
+}
+
+async function deleteContribution(transferId) {
+  if (!confirm('¿Estás seguro de que quieres eliminar esta aportación?')) return;
+  
+  try {
+    const data = await getData();
+    const transfer = data.transfers.find(t => t.id === transferId);
+    
+    if (!transfer) return;
+    
+    // Delete the transfer
+    await supabaseClient.from('transfers').delete().eq('id', transferId);
+    
+    // Update contribution totals
+    const monthKey = `${new Date(transfer.date).getMonth()}-'${currentYear}`;
+    const contribution = data.contributions.find(c => c.month === monthKey);
+    
+    if (contribution) {
+      // Determine which type to subtract from
+      const sharedAccountNames = data.accounts
+        .filter(a => 
+          a.name.toLowerCase().includes('compartida') || 
+          a.name.toLowerCase().includes('pareja') ||
+          a.name.toLowerCase().includes('shared')
+        )
+        .map(a => a.name);
+      
+      let myTotal = parseFloat(contribution.my) || 0;
+      let partnerTotal = parseFloat(contribution.partner) || 0;
+      let externalTotal = parseFloat(contribution.external) || 0;
+      
+      if (transfer.from && !sharedAccountNames.includes(transfer.from)) {
+        // My contribution
+        myTotal = Math.max(0, myTotal - parseFloat(transfer.amount));
+      } else if (!transfer.from) {
+        // Partner contribution
+        partnerTotal = Math.max(0, partnerTotal - parseFloat(transfer.amount));
+      } else {
+        // External
+        externalTotal = Math.max(0, externalTotal - parseFloat(transfer.amount));
+      }
+      
       await supabaseClient
         .from('contributions')
         .update({
@@ -3961,112 +4441,41 @@ async function saveContribution() {
           external: externalTotal
         })
         .eq('month_key', monthKey);
-    } else {
-      await supabaseClient
-        .from('contributions')
-        .insert({
-          month_key: monthKey,
-          my: myTotal,
-          partner: partnerTotal,
-          external: externalTotal
-        });
-    }
-    
-    if (type === 'my') {
-      await supabaseClient.from('transfers').insert({
-        date: new Date(2025, currentMonth, new Date().getDate()).toISOString().split('T')[0],
-        from_account: 'Santander Gastos',
-        to_account: 'Santander Pareja',
-        amount: amount,
-        concept: description || 'Mi aportación mensual'
-      });
     }
     
     invalidateCache();
-    closeContributionModal();
     await renderMonthlyView();
     await renderAccountsView();
-    await renderDashboard();
-    showToast('Aportación guardada correctamente', 'success');
+    showToast('Aportación eliminada', 'success');
   } catch (error) {
-    console.error('Error saving contribution:', error);
-    showToast('Error al guardar aportación: ' + error.message, 'error');
+    console.error('Error deleting contribution:', error);
+    showToast('Error al eliminar aportación', 'error');
   }
 }
 
-async function renderContributionsList() {
-  const data = await getData();
-  const monthKey = `${currentMonth}-2025`;
-  const contribution = data.contributions.find(c => c.month === monthKey);
+async function resetMonthContributions() {
+  if (!confirm('¿Estás seguro de que quieres resetear todas las aportaciones de este mes? Esto NO se puede deshacer.')) return;
   
-  const container = document.getElementById('contributions-list');
-  
-  if (!contribution || (contribution.my === 0 && contribution.partner === 0 && contribution.external === 0)) {
-    container.innerHTML = `
-      <div style="text-align: center; padding: 32px; color: var(--text-tertiary);">
-        No hay aportaciones registradas este mes
-      </div>
-    `;
-    document.getElementById('contributions-total').textContent = '0,00 €';
-    return;
+  try {
+    const monthKey = `${currentMonth}-${currentYear}`;
+    
+    // Reset contribution totals
+    await supabaseClient
+      .from('contributions')
+      .update({
+        my: 0,
+        partner: 0,
+        external: 0
+      })
+      .eq('month_key', monthKey);
+    
+    invalidateCache();
+    await renderMonthlyView();
+    showToast('Aportaciones reseteadas. Puedes añadirlas de nuevo correctamente.', 'success');
+  } catch (error) {
+    console.error('Error resetting contributions:', error);
+    showToast('Error al resetear aportaciones', 'error');
   }
-  
-  const items = [];
-  
-  if (contribution.my > 0) {
-    items.push({
-      type: 'Mi aportación',
-      amount: contribution.my,
-      icon: '💳',
-      color: 'var(--primary)'
-    });
-  }
-  
-  if (contribution.partner > 0) {
-    items.push({
-      type: 'Aportación pareja',
-      amount: contribution.partner,
-      icon: '👥',
-      color: 'var(--orange)'
-    });
-  }
-  
-  if (contribution.external > 0) {
-    items.push({
-      type: 'Aportaciones externas',
-      amount: contribution.external,
-      icon: '🏛️',
-      color: 'var(--green)'
-    });
-  }
-  
-  container.innerHTML = items.map(item => `
-    <div style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-    ">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 24px;">${item.icon}</span>
-        <div>
-          <div style="font-weight: 600; color: var(--text-primary);">${item.type}</div>
-          <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 2px;">
-            ${item.type === 'Mi aportación' ? 'Registrado como transferencia' : 'Suma al saldo compartido'}
-          </div>
-        </div>
-      </div>
-      <div style="font-size: 20px; font-weight: 700; color: ${item.color};">
-        ${formatCurrency(item.amount)}
-      </div>
-    </div>
-  `).join('');
-  
-  const total = contribution.my + contribution.partner + contribution.external;
-  document.getElementById('contributions-total').textContent = formatCurrency(total);
 }
 
 async function openAccountModal(accountName) {
@@ -4074,11 +4483,32 @@ async function openAccountModal(accountName) {
   const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
   
-  document.getElementById('account-modal-title').textContent = `Editar ${accountName}`;
-  document.getElementById('account-name').value = accountName;
-  document.getElementById('account-initial-balance').value = account?.initialBalance || 0;
+  // 1. Buscamos los elementos en el HTML
+  const titleEl = document.getElementById('account-modal-title');
+  const nameEl = document.getElementById('account-name');
+  const balanceEl = document.getElementById('account-initial-balance');
   
-  document.getElementById('account-modal').classList.add('active');
+  // Ojo: Busca el id que le pusiste al selector en tu HTML (account-type o account-type-edit)
+  let typeEl = document.getElementById('account-type-edit');
+  if (!typeEl) {
+    typeEl = document.getElementById('account-type'); // Por si usaste el otro nombre
+  }
+  
+  // 2. Solo les damos valor SI los ha encontrado
+  if (titleEl) titleEl.textContent = `Editar ${accountName}`;
+  if (nameEl) nameEl.value = accountName;
+  
+  // Usamos initialBalance que es la variable real que guarda el saldo inicial
+  if (balanceEl) balanceEl.value = account?.initialBalance || 0; 
+  
+  // Si encontramos el selector de tipo y la cuenta tiene un tipo guardado, lo marcamos
+  if (typeEl && account?.type) {
+    typeEl.value = account.type;
+  }
+  
+  // 3. Abrimos el modal
+  const modal = document.getElementById('account-modal');
+  if (modal) modal.classList.add('active');
 }
 
 async function handleAccountClick(accountName) {
@@ -4092,16 +4522,30 @@ function closeAccountModal() {
 
 async function saveAccountClick() {
   const initialBalance = document.getElementById('account-initial-balance').value;
+  const type = document.getElementById('account-type-edit').value; // Capturamos el tipo
   
   if (!initialBalance) {
     showToast('Por favor introduce el saldo inicial', 'error');
     return;
   }
   
-  await updateAccountBalance(editingAccountName, parseFloat(initialBalance));
-  closeAccountModal();
-  renderAccountsView();
-  renderDashboard();
+  // Actualizamos en Supabase (balance y tipo)
+  const { error } = await supabaseClient
+    .from('accounts')
+    .update({ 
+      balance: parseFloat(initialBalance),
+      type: type 
+    })
+    .eq('name', editingAccountName);
+
+  if (error) {
+    showToast('Error al actualizar: ' + error.message, 'error');
+  } else {
+    showToast('Cuenta actualizada', 'success');
+    closeAccountModal();
+    // Forzamos recarga de datos para que el caché se limpie
+    await initializeApp(); 
+  }
 }
 
 // ============================================================================
@@ -4249,6 +4693,87 @@ async function toggleAccountInPatrimony(accountName) {
     showToast('Error al actualizar cuenta', 'error');
   }
 }
+
+async function handleToggleDisposable(accountName) {
+  try {
+    const data = await getData();
+    const account = data.accounts.find(a => a.name === accountName);
+    
+    if (!account) return;
+    
+    // 1. Invertimos el valor actual (si era true pasa a false, y viceversa)
+    const newValue = !(account.isDisposable === true || account.isDisposable === 'true');
+    
+    // 2. Actualizamos en Supabase
+    const { error } = await supabaseClient.from('accounts').update({
+      is_disposable: newValue
+    }).eq('name', accountName);
+    
+    if (error) throw error;
+    
+    // 3. Recargamos la caché y las vistas
+    invalidateCache();
+    await renderSettingsView();
+    await renderMonthlyView(); 
+    
+    // 4. Avisamos del éxito
+    showToast(newValue ? 
+      `${accountName} sumará al Dinero Disponible` : 
+      `${accountName} NO sumará al Dinero Disponible`, 
+      'success');
+      
+  } catch (error) {
+    console.error('Error toggling disposable:', error);
+    showToast('Error al actualizar cuenta', 'error');
+  }
+}
+
+async function handleToggleShared(accountName) {
+  try {
+    const data = await getData();
+    const account = data.accounts.find(a => a.name === accountName);
+    if (!account) return;
+    
+    // 1. Calculamos el nuevo valor
+    const currentValue = account.isShared === true || account.isShared === 'true' || account.is_shared === true;
+    const newValue = !currentValue;
+    
+    // 2. ACTUALIZACIÓN OPTIMISTA: Cambiamos el valor en la memoria local AL INSTANTE
+    // Así evitamos que al redibujar la tabla se desmarque visualmente
+    account.is_shared = newValue;
+    account.isShared = newValue;
+    
+    // 3. Redibujamos la tabla de inmediato con el nuevo valor visual
+    await renderSettingsView();
+    
+    // 4. Guardamos en Supabase por detrás
+    const { error } = await supabaseClient.from('accounts').update({
+      is_shared: newValue
+    }).eq('name', accountName);
+    
+    if (error) {
+      // Si la base de datos falla, revertimos el cambio visual y lanzamos error
+      account.is_shared = currentValue;
+      account.isShared = currentValue;
+      throw error;
+    }
+    
+    // 5. Actualizamos el resto de la app (caché y vista mensual)
+    invalidateCache(); 
+    if (typeof renderMonthlyView === 'function') await renderMonthlyView();
+    
+    showToast(newValue ? 
+      `${accountName} sumará al Saldo Compartido` : 
+      `${accountName} NO sumará al Saldo Compartido`, 
+      'success');
+      
+  } catch (error) {
+    console.error('Error toggling shared:', error);
+    showToast('Error al guardar. ¿Creaste la columna is_shared en Supabase?', 'error');
+    // Si hubo error, redibujamos para volver a la normalidad
+    await renderSettingsView(); 
+  }
+} 
 
 async function saveNewAccount() {
   const name = document.getElementById('new-account-name').value;
@@ -4475,38 +5000,59 @@ async function deleteCategory(type, categoryName) {
 async function renderSettingsView() {
   const data = await getData();
 
-  // Render accounts table
+  // 1. Render accounts table (Ahora con el nuevo checkbox)
   const accountsTable = document.getElementById('settings-accounts-table');
-  accountsTable.innerHTML = data.accounts.map(account => {
-    const includeInPatrimony = account.includeInPatrimony !== false; // default true
-    return `
-    <tr style="cursor: pointer;" onclick="handleOpenEditAccount('${account.name}')">
-      <td class="description-cell">${account.name}</td>
-      <td>${account.type || ACCOUNT_TYPES[account.name] || 'Cuenta'}</td>
-      <td>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 24px; height: 24px; border-radius: 6px; background: ${account.color || ACCOUNT_COLORS[account.name] || '#3B82F6'};"></div>
-        </div>
-      </td>
-      <td style="text-align: center;">
-        <input type="checkbox" ${includeInPatrimony ? 'checked' : ''} 
-               onclick="event.stopPropagation(); handleTogglePatrimony('${account.name}')"
-               style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--green);">
-      </td>
-      <td>
-        <div class="row-actions" style="opacity: 1;">
-          <button class="action-btn" onclick="event.stopPropagation(); handleOpenEditAccount('${account.name}')">Editar</button>
-          <button class="action-btn delete" onclick="event.stopPropagation(); deleteAccount('${account.name}')">Eliminar</button>
-        </div>
-      </td>
-    </tr>
-  `;
-  }).join('');
+  if (accountsTable) {
+    accountsTable.innerHTML = data.accounts.map(account => {
+      const includeInPatrimony = account.includeInPatrimony !== false; 
+      const isDisposable = account.isDisposable === true || account.isDisposable === 'true' || account.is_disposable === true;
+      // NUEVO: Leemos el valor de la nueva columna de Supabase
+      const isShared = account.isShared === true || account.isShared === 'true' || account.is_shared === true;
 
-  // Render fixed expenses
-  await renderFixedExpensesInSettings();
+      return `
+      <tr style="cursor: pointer;" onclick="handleOpenEditAccount('${account.name}')">
+        <td class="description-cell">${account.name}</td>
+        <td>${account.type || ACCOUNT_TYPES[account.name] || 'Cuenta'}</td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: ${account.color || ACCOUNT_COLORS[account.name] || '#3B82F6'};"></div>
+          </div>
+        </td>
+        <td style="text-align: center;">
+          <input type="checkbox" ${includeInPatrimony ? 'checked' : ''} 
+                 onclick="event.stopPropagation(); handleTogglePatrimony('${account.name}')"
+                 style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--green);"
+                 title="Suma al Patrimonio Total">
+        </td>
+        <td style="text-align: center;">
+          <input type="checkbox" ${isDisposable ? 'checked' : ''} 
+                 onclick="event.stopPropagation(); handleToggleDisposable('${account.name}')"
+                 style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--blue);"
+                 title="Suma al Dinero Disponible (Personal)">
+        </td>
+        <td style="text-align: center;">
+          <input type="checkbox" ${isShared ? 'checked' : ''} 
+                 onclick="event.stopPropagation(); handleToggleShared('${account.name}')"
+                 style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--orange);"
+                 title="Suma al Saldo Compartido (Pareja)">
+        </td>
+        <td>
+          <div class="row-actions" style="opacity: 1;">
+            <button class="action-btn" onclick="event.stopPropagation(); handleOpenEditAccount('${account.name}')">Editar</button>
+            <button class="action-btn delete" onclick="event.stopPropagation(); deleteAccount('${account.name}')">Eliminar</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    }).join('');
+  }
 
-  // Render categories
+  // 2. Render fixed expenses
+  if (typeof renderFixedExpensesInSettings === 'function') {
+    await renderFixedExpensesInSettings();
+  }
+
+  // 3. Render categories
   Object.keys(CATEGORIES).forEach(type => {
     const container = document.getElementById(`categories-${type}`);
     if (container) {
@@ -4687,7 +5233,7 @@ function deleteFixedExpense(id) {
 async function toggleFixedExpense(expenseId, month) {
   try {
     const data = await getData();
-    const monthKey = `${month}-2025`;
+    const monthKey = `${month}-${currentYear}`;
     
     const expense = (data.fixedExpenses || []).find(e => e.id === expenseId);
     if (!expense) return;
@@ -4707,7 +5253,7 @@ async function toggleFixedExpense(expenseId, month) {
         .from('transactions')
         .select('id')
         .eq('fixed_expense_id', expenseId)
-        .eq('date', `ilike`, `2025-${String(month + 1).padStart(2, '0')}%`);
+        .eq('date', `ilike`, `${currentYear}-${String(month + 1).padStart(2, '0')}%`);
       
       if (transactions && transactions.length > 0) {
         await supabaseClient
@@ -4732,7 +5278,7 @@ async function toggleFixedExpense(expenseId, month) {
         .insert({
           fixed_expense_id: expenseId,
           type: expense.type,
-          date: new Date(2025, month, new Date().getDate()).toISOString().split('T')[0],
+          date: new Date(currentYear, month, new Date().getDate()).toISOString().split('T')[0],
           description: expense.name,
           category: expense.category,
           account: expense.account,
@@ -4761,7 +5307,7 @@ async function renderFixedExpensesInMonth() {
     return months.includes(currentMonth);
   });
   
-  const monthKey = `${currentMonth}-2025`;
+  const monthKey = `${currentMonth}-${currentYear}`;
   const paidExpenses = (data.fixedExpensesPaid || {})[monthKey] || [];
   const container = document.getElementById('fixed-expenses-list');
   
@@ -4911,7 +5457,7 @@ async function getPatrimonyStartOfMonth(month) {
   // For other months, check if we have a saved snapshot
   if (!data.monthlyPatrimony) data.monthlyPatrimony = {};
   
-  const prevMonthKey = `${month - 1}-2025`;
+  const prevMonthKey = `${month - 1}-${currentYear}`;
   if (data.monthlyPatrimony[prevMonthKey] !== undefined) {
     return data.monthlyPatrimony[prevMonthKey];
   }
@@ -4975,7 +5521,7 @@ async function calculatePatrimonyEndOfMonth(month) {
   // Get contributions (partner + external) for shared account if included
   let contributions = 0;
   if (includedAccounts.includes('Santander Pareja')) {
-    const monthKey = `${month}-2025`;
+    const monthKey = `${month}-${currentYear}`;
     const monthContributions = (data.contributions || []).find(c => c.month === monthKey);
     if (monthContributions) {
       contributions = (parseFloat(monthContributions.partner) || 0) + 
@@ -4993,7 +5539,7 @@ function saveMonthlyPatrimonySnapshot(month) {
   const data = getData();
   if (!data.monthlyPatrimony) data.monthlyPatrimony = {};
   
-  const monthKey = `${month}-2025`;
+  const monthKey = `${month}-${currentYear}`;
   const endPatrimony = calculatePatrimonyEndOfMonth(month);
   
   data.monthlyPatrimony[monthKey] = endPatrimony;
@@ -5005,23 +5551,64 @@ function saveMonthlyPatrimonySnapshot(month) {
 /**
  * Update patrimony display in monthly view
  */
-async function updateMonthlyPatrimonyDisplay() {
-  const startPatrimony = await getPatrimonyStartOfMonth(currentMonth);
-  const endPatrimony = await calculatePatrimonyEndOfMonth(currentMonth);
-  const change = endPatrimony - startPatrimony;
-  const changePercent = startPatrimony > 0 ? ((change / startPatrimony) * 100) : 0;
+ async function updateMonthlyPatrimonyDisplay() {
+  const data = await getData();
   
-  document.getElementById('monthly-patrimonio').textContent = formatCurrency(endPatrimony);
-  document.getElementById('monthly-patrimonio-start').textContent = formatCurrency(startPatrimony);
+  const disposableAccounts = data.accounts.filter(acc => 
+    acc.isDisposable === true || acc.isDisposable === 'true' || acc.is_disposable === true
+  );
+
+  if (disposableAccounts.length === 0) {
+    const el = document.getElementById('monthly-disponible-total');
+    if (el) el.textContent = "0,00 € (Sin cuentas)";
+    return;
+  }
+
+  const breakdownData = await Promise.all(
+    disposableAccounts.map(async acc => {
+      // 1. Saldo al FINAL del mes seleccionado (usando la nueva función)
+      let balanceAtSelectedMonth = await calculateAccountBalance(acc.name, currentMonth);
+
+      // 2. Saldo al INICIO del mes (que es el saldo del mes anterior, o el inicial si es enero)
+      let startOfSelectedMonth = currentMonth > 0 
+        ? await calculateAccountBalance(acc.name, currentMonth - 1)
+        : parseFloat(acc.initialBalance || acc.initial_balance || 0);
+
+      return { 
+        name: acc.name, 
+        current: balanceAtSelectedMonth, 
+        start: startOfSelectedMonth 
+      };
+    })
+  );
+
+  const totalActual = breakdownData.reduce((sum, item) => sum + item.current, 0);
+  const totalInicio = breakdownData.reduce((sum, item) => sum + item.start, 0);
+
+  const elTotal = document.getElementById('monthly-disponible-total');
+  const elInicio = document.getElementById('monthly-disponible-inicio');
+  const elBreakdown = document.getElementById('monthly-disponible-breakdown');
+
+  if (elTotal) elTotal.textContent = formatCurrency(totalActual);
+  if (elInicio) elInicio.textContent = formatCurrency(totalInicio);
   
-  const changeText = change >= 0 ? '+' : '';
-  const changeColor = change >= 0 ? '#10B981' : '#EF4444';
-  document.getElementById('monthly-patrimonio-change').innerHTML = `
-    <span style="color: ${changeColor};">
-      ${changeText}${formatCurrency(Math.abs(change))} (${changeText}${changePercent.toFixed(2)}%)
-    </span>
-  `;
+  if (elBreakdown) {
+    elBreakdown.innerHTML = breakdownData.map(item => `
+      <div style="background: #f2f2f7; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid #e5e5ea;">
+        <span style="font-size: 10px; color: #8e8e93; font-weight: 700; text-transform: uppercase;">${item.name}</span>
+        <span style="font-size: 13px; color: #1c1c1e; font-weight: 700;">${formatCurrency(item.current)}</span>
+      </div>
+    `).join('');
+  }
+
+  const diff = totalActual - totalInicio;
+  const elDiff = document.getElementById('monthly-disponible-vs-inicio');
+  if (elDiff) {
+    elDiff.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    elDiff.textContent = `${diff >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diff))} este mes`;
+  }
 }
+
 document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) => {
   if (e.target.id === 'fixed-expense-modal') closeFixedExpenseModal();
 });
