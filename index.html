@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Control Financiero - App Completa</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="theme-color" content="#5048E5">
   <style>
     * {
       margin: 0;
@@ -1451,7 +1455,7 @@
                 <div class="profile-name">Jesús</div>
               </div>
     
-              <div class="profile-card" onclick="autoLogin('silviafernaandez26@gmail.com', 'sambita19')">
+              <div class="profile-card" onclick="autoLogin('silviafernaadez26@gmail.com', 'sambita19')">
                 <div class="profile-avatar" style="background: #EC4899;">Sil</div>
                 <div class="profile-name">Silvia</div>
               </div>
@@ -1472,6 +1476,8 @@
           <button class="nav-item nav-btn active" data-view="dashboard">📊 Dashboard</button>
           <button class="nav-item nav-btn" data-view="monthly">📅 Vista Mensual</button>
           <button class="nav-item nav-btn" data-view="accounts">💳 Mis Cuentas</button>
+          <button class="nav-item nav-btn" data-view="budgets">🎯 Presupuestos</button>
+          <button class="nav-item nav-btn" data-view="search">🔍 Buscador</button>
       
           <div class="nav-section-title">Patrimonio</div>
           <button class="nav-item nav-btn" data-view="inversiones">📈 Inversiones</button>
@@ -2003,11 +2009,93 @@
       </section>
     </div>
 
-  <!-- Settings View -->
-  <div id="settings-view" class="view">
-    <header class="header">
-      <h1 class="page-title">Configuración</h1>
-    </header>
+    <div id="budgets-view" class="view">
+      <header class="header">
+        <div>
+          <h1 class="page-title">Presupuestos</h1>
+          <p class="page-subtitle">Controla tus límites de gasto mensual por categoría</p>
+        </div>
+        <button class="btn-primary" onclick="openBudgetModal()">
+          + Nuevo Presupuesto
+        </button>
+      </header>
+  
+      <div id="budgets-list" style="display: grid; gap: 16px; margin-top: 24px;">
+        </div>
+    </div>
+
+    <div id="search-view" class="view">
+      <header class="header">
+        <div>
+          <h1 class="page-title">Buscador Global</h1>
+          <p class="page-subtitle">Encuentra cualquier movimiento en todo tu historial</p>
+        </div>
+      </header>
+
+      <div class="section" style="padding: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0; position: relative; display: flex; align-items: center;">
+          <span style="
+            position: absolute; 
+            left: 18px; 
+            font-size: 20px; 
+            z-index: 10; 
+            pointer-events: none; /* Esto permite que puedas hacer clic a través de la lupa */
+            line-height: 1;
+          ">🔍</span>
+          
+          <input type="text" class="form-input" id="global-search-input" 
+                 placeholder="Busca por nombre, categoría o cuenta..." 
+                 oninput="handleGlobalSearch()" 
+                 style="
+                  padding-left: 52px !important; /* Más espacio para que la letra nunca toque la lupa */
+                  height: 54px; 
+                  font-size: 16px;
+                  width: 100%;
+                  border-radius: 14px !important;
+                 ">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Importe</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="search-results-table">
+              <tr>
+                <td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:60px;">
+                  <div style="font-size: 40px; margin-bottom: 10px;">🔎</div>
+                  Escribe algo arriba para empezar a buscar...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+      
+  <div id="search-total-summary" style="display: none; margin-top: 16px; padding: 20px; background: var(--primary-light); border-radius: 12px; border: 1px solid var(--primary);">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-weight: 600; color: var(--primary); font-size: 14px; text-transform: uppercase;">Suma total de resultados:</span>
+      <span id="search-total-amount" style="font-size: 24px; font-weight: 800; color: var(--primary);">0,00 €</span>
+    </div>
+  </div>
+</div>
+  
+    <div id="settings-view" class="view">
+      <header class="header">
+        <h1 class="page-title">Configuración</h1>
+      </header>
 
     <!-- Accounts Management -->
     <section class="section">
@@ -2199,7 +2287,16 @@
             <label class="form-label">Importe (€)</label>
             <input type="number" step="0.01" class="form-input" id="txn-amount" required>
           </div>
-        </div>
+          
+          <div class="form-group">
+            <label class="form-label">📎 Adjuntar Ticket / Factura (Opcional)</label>
+            <input type="file" class="form-input" id="txn-file" accept="image/*,application/pdf" style="padding: 9px;">
+            <div id="file-info-msg"></div>
+            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+              Las fotos se comprimirán automáticamente para no gastar espacio.
+            </small>
+          </div>
+          </div>
         <div class="form-actions">
           <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
           <button type="button" class="btn-primary" onclick="saveTransactionClick()">Guardar</button>
@@ -2614,6 +2711,39 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="budget-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Nuevo Presupuesto</h3>
+        <button class="close-btn" onclick="closeBudgetModal()">&times;</button>
+      </div>
+      <form id="budget-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Tipo de Gasto</label>
+            <select class="form-select" id="budget-type" required onchange="updateBudgetCategories()">
+              <option value="gastos_personales">Gasto Personal</option>
+              <option value="gastos_compartidos">Gasto Compartido</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="budget-category" required>
+              </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Límite Mensual (€)</label>
+            <input type="number" step="1" class="form-input" id="budget-amount" placeholder="Ej: 200" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="closeBudgetModal()">Cancelar</button>
+          <button type="button" class="btn-primary" onclick="saveBudget()">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -2690,7 +2820,7 @@
       }
       
       try {
-        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes] = await Promise.all([
+        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes, budgetsRes] = await Promise.all([
           supabaseClient.from('accounts').select('*').order('name'),
           supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
           supabaseClient.from('holdings').select('*').order('name'),
@@ -2699,7 +2829,8 @@
           supabaseClient.from('fixed_expenses').select('*').order('name'),
           supabaseClient.from('fixed_expenses_paid').select('*'),
           supabaseClient.from('monthly_patrimony').select('*'),
-          supabaseClient.from('custom_categories').select('*')
+          supabaseClient.from('custom_categories').select('*'),
+          supabaseClient.from('budgets').select('*')
         ]);
 
         // 1. Filtrar Cuentas: Las mías o las compartidas
@@ -2715,6 +2846,7 @@
         const validTransfers = (transfersRes.data || []).filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
         const validFixedExpenses = (fixedExpensesRes.data || []).filter(f => validAccountNames.includes(f.account));
         const validCategories = (customCategoriesRes.data || []).filter(c => c.user_id === currentUser.id);
+        const validBudgets = (budgetsRes.data || []).filter(b => b.user_id === currentUser.id); // <-- AÑADE ESTA LÍNEA
 
         const data = {
           accounts: validAccounts.map(a => ({ 
@@ -2722,12 +2854,13 @@
             initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), 
             includeInPatrimony: a.include_in_patrimony, isDisposable: a.is_disposable, isShared: a.is_shared
           })),
-          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id })),
+          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url })),
           holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
           transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
           fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
-          fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {}
+          fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {},
+          budgets: validBudgets
         };
 
         // ... (Tu código sigue igual a partir de aquí hacia abajo)
@@ -2763,6 +2896,7 @@
           category: transaction.category,
           account: transaction.account,
           amount: transaction.amount,
+          file_url: transaction.file_url,
           fixed_expense_id: transaction.fixedExpenseId || null
         }).select();
         
@@ -2785,7 +2919,8 @@
           description: updates.description,
           category: updates.category,
           account: updates.account,
-          amount: updates.amount
+          amount: updates.amount,
+          file_url: updates.file_url // <-- AÑADE ESTA LÍNEA
         }).eq('id', id);
         
         if (error) throw error;
@@ -3168,62 +3303,82 @@
   }, 50);
 }
 
-    async function renderTable(type) {
-      const transactions = await getTransactionsByMonth(currentMonth, type);
-      const tableId = `${type.replace(/_/g, '-')}-table`;
-      const container = document.getElementById(tableId);
-      
-      if (!container) return;
+async function renderTable(type) {
+  const transactions = await getTransactionsByMonth(currentMonth, type);
+  const tableId = `${type.replace(/_/g, '-')}-table`;
+  const container = document.getElementById(tableId);
+  
+  if (!container) return;
 
-      // 1. Limpiar tabla si no hay datos
-      if (transactions.length === 0) {
-        container.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:20px;">No hay registros este mes.</td></tr>';
-        const oldBtn = document.getElementById(`btn-expand-list-${type}`);
-        if (oldBtn) oldBtn.remove();
-        return;
-      }
+  if (transactions.length === 0) {
+    container.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:20px;">No hay registros este mes.</td></tr>';
+    const oldBtn = document.getElementById(`btn-expand-list-${type}`);
+    if (oldBtn) oldBtn.remove();
+    return;
+  }
 
-      // 2. Renderizar filas (ocultando a partir de la 8ª)
-      container.innerHTML = transactions.map((t, index) => {
-        const isHidden = index >= 7;
-        return `
-          <tr class="${isHidden ? 'hidden-row' : ''}" style="${isHidden ? 'display: none;' : ''}">
-            <td class="date-cell">${new Date(t.date).toLocaleDateString()}</td>
-            <td class="description-cell">${t.description}</td>
-            <td><span class="category-badge">${t.category || 'Sin categoría'}</span></td>
-            <td><span style="font-size: 12px; color: var(--text-secondary)">${t.account_name || t.account || '-'}</span></td>
-            <td class="amount-cell ${parseFloat(t.amount) < 0 ? 'amount-negative' : 'amount-positive'}">
-              ${formatCurrency(t.amount)}
-            </td>
-            <td class="row-actions">
-              <button class="action-btn" onclick="handleEditTransaction('${t.id}')">Editar</button>
-              <button class="action-btn delete" onclick="handleConfirmDelete('${t.id}')">Eliminar</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+  container.innerHTML = transactions.map((t, index) => {
+    const isHidden = index >= 7;
+    const hasFile = t.file_url && t.file_url !== ""; 
 
-      // 3. Gestión del Botón "Mostrar todos"
-      let expandBtn = document.getElementById(`btn-expand-list-${type}`);
-      
-      if (transactions.length > 7) {
-        if (!expandBtn) {
-          expandBtn = document.createElement('button');
-          expandBtn.id = `btn-expand-list-${type}`;
-          expandBtn.style.cssText = "width:100%; margin: 12px 0; padding: 10px; background: rgba(0,122,255,0.08); color: #007AFF; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: block;";
-          
-          // IMPORTANTE: Usamos una función anónima limpia
-          expandBtn.onclick = function() { window.toggleList(type); };
-          
-          // Lo insertamos justo después del div de la tabla
-          container.closest('.table-container').after(expandBtn);
-        }
-        expandBtn.textContent = `Mostrar todos los registros (${transactions.length})`;
-        expandBtn.style.display = 'block';
-      } else {
-        if (expandBtn) expandBtn.remove();
-      }
+    return `
+      <tr class="${isHidden ? 'hidden-row' : ''}" style="${isHidden ? 'display: none;' : ''}">
+        <td class="date-cell">${new Date(t.date).toLocaleDateString()}</td>
+        <td class="description-cell">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span>${t.description}</span>
+              ${hasFile ? `
+                <a href="${t.file_url}" target="_blank" title="Ver documento adjunto" 
+                   style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 26px;
+                    height: 26px;
+                    background: var(--primary-light);
+                    color: var(--primary);
+                    border-radius: 6px;
+                    text-decoration: none;
+                    font-size: 14px;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                   "
+                   onmouseover="this.style.background='var(--primary)'; this.style.color='white'; this.style.transform='scale(1.1)';"
+                   onmouseout="this.style.background='var(--primary-light)'; this.style.color='var(--primary)'; this.style.transform='scale(1)';"
+                >
+                   📎
+                </a>` : ''}
+            </div>
+        </td>
+        <td><span class="category-badge">${t.category || 'Sin categoría'}</span></td>
+        <td><span style="font-size: 12px; color: var(--text-secondary)">${t.account_name || t.account || '-'}</span></td>
+        <td class="amount-cell ${parseFloat(t.amount) < 0 ? 'amount-negative' : 'amount-positive'}">
+          ${formatCurrency(t.amount)}
+        </td>
+        <td class="row-actions">
+          <button class="action-btn" onclick="handleEditTransaction('${t.id}')">Editar</button>
+          <button class="action-btn delete" onclick="handleConfirmDelete('${t.id}')">Eliminar</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // ... (el resto de la función del botón "Mostrar más" se mantiene igual)
+  let expandBtn = document.getElementById(`btn-expand-list-${type}`);
+  if (transactions.length > 7) {
+    if (!expandBtn) {
+      expandBtn = document.createElement('button');
+      expandBtn.id = `btn-expand-list-${type}`;
+      expandBtn.style.cssText = "width:100%; margin: 12px 0; padding: 10px; background: rgba(0,122,255,0.08); color: #007AFF; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: block;";
+      expandBtn.onclick = function() { window.toggleList(type); };
+      container.closest('.table-container').after(expandBtn);
     }
+    expandBtn.textContent = `Mostrar todos los registros (${transactions.length})`;
+    expandBtn.style.display = 'block';
+  } else {
+    if (expandBtn) expandBtn.remove();
+  }
+}
 
     function changeMonth(monthIndex) {
       currentMonth = monthIndex;
@@ -3434,22 +3589,43 @@
         inversiones: 'Editar Inversión'
       };
 
+      // Rellenar campos básicos
       document.getElementById('modal-title').textContent = titles[txn.type];
       document.getElementById('txn-date').value = txn.date;
       document.getElementById('txn-description').value = txn.description;
       document.getElementById('txn-amount').value = txn.amount;
 
-      // Populate categories
+      // Rellenar categorías según el tipo
       const categorySelect = document.getElementById('txn-category');
       categorySelect.innerHTML = CATEGORIES[txn.type]
         .map(cat => `<option value="${cat}" ${cat === txn.category ? 'selected' : ''}>${cat}</option>`)
         .join('');
 
-      // Populate accounts
+      // Rellenar cuentas
       const accountSelect = document.getElementById('txn-account');
       accountSelect.innerHTML = ACCOUNTS
         .map(acc => `<option value="${acc}" ${acc === txn.account ? 'selected' : ''}>${acc}</option>`)
         .join('');
+
+      // --- GESTIÓN DE ARCHIVOS ---
+      const fileInput = document.getElementById('txn-file');
+      const infoAdjunto = document.getElementById('file-info-msg');
+
+      if (fileInput) fileInput.value = ""; // Limpiar el selector de archivos siempre
+
+      if (infoAdjunto) {
+        if (txn.file_url) {
+          infoAdjunto.innerHTML = `
+            <div style="margin-top: 8px; padding: 8px; background: var(--primary-light); border-radius: 8px; font-size: 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+              <span>📎 Archivo actual:</span>
+              <a href="${txn.file_url}" target="_blank" style="font-weight: 600; color: var(--primary); text-decoration: underline;">Ver documento</a>
+            </div>
+            <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 4px;">* Si seleccionas uno nuevo, se reemplazará al guardar.</div>
+          `;
+        } else {
+          infoAdjunto.innerHTML = `<div style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">Sin archivo adjunto.</div>`;
+        }
+      }
 
       document.getElementById('transaction-modal').classList.add('active');
     }
@@ -3510,28 +3686,42 @@
     }
 
     async function saveTransactionClick() {
-      // Validate required fields
       const date = document.getElementById('txn-date').value;
       const description = document.getElementById('txn-description').value;
       const amount = document.getElementById('txn-amount').value;
+      const fileInput = document.getElementById('txn-file');
+      const file = fileInput ? fileInput.files[0] : null;
 
       if (!date || !description || !amount) {
-        showToast('Por favor completa todos los campos requeridos', 'error');
+        showToast('Por favor completa los campos requeridos', 'error');
         return;
       }
 
       try {
+        showToast('Guardando...', 'info');
+        let fileUrl = null;
+
+        // 1. Lógica de archivos: subir nuevo o mantener antiguo
+        if (file && file.size > 0) {
+          fileUrl = await uploadFile(file);
+        } else if (editingId) {
+          const data = await getData();
+          const originalTxn = data.transactions.find(t => t.id === editingId);
+          fileUrl = originalTxn ? originalTxn.file_url : null;
+        }
+
+        // 2. Construir el objeto con file_url
         const transaction = {
           type: currentType,
           date: date,
           description: description,
           category: document.getElementById('txn-category').value,
           account: document.getElementById('txn-account').value,
-          amount: parseFloat(amount)
+          amount: parseFloat(amount),
+          file_url: fileUrl // <--- CRUCIAL
         };
 
-        console.log('Saving transaction:', transaction);
-
+        // 3. Guardar
         if (editingId) {
           await updateTransaction(editingId, transaction);
         } else {
@@ -3539,13 +3729,13 @@
         }
         
         closeModal();
-        await getData(); // AÑADÍ ESTA LÍNEA
-        renderMonthlyView();
-        renderDashboard();
-        showToast('Transacción guardada correctamente', 'success'); // ← Opcional pero útil
+        invalidateCache();
+        await renderMonthlyView();
+        await renderDashboard();
+        showToast('Guardado con éxito ✓', 'success');
       } catch (error) {
-        console.error('Error saving transaction:', error);
-        showToast('Error al guardar la transacción: ' + error.message, 'error');
+        console.error('Error:', error);
+        showToast('Error al guardar: ' + error.message, 'error');
       }
     }
 
@@ -3922,6 +4112,8 @@ async function showPersonalExpensesBreakdown() {
         if (view === 'accounts') await renderAccountsView();
         if (view === 'settings') await renderSettingsView();
         if (view === 'accounts') await renderAccountsView();
+        if (view === 'budgets') await renderBudgetsView();
+        if (view === 'search') await renderSearchView();
       });
     });
 
@@ -3944,6 +4136,8 @@ async function showPersonalExpensesBreakdown() {
       if (viewName === 'inversiones') renderInvestmentsView();
       if (viewName === 'accounts') renderAccountsView();
       if (viewName === 'settings') renderSettingsView();
+      if (viewName === 'budgets') renderBudgetsView();
+      if (viewName === 'search') renderSearchView();
     }
 
     // Close modals on overlay click
@@ -6135,6 +6329,73 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
       }
     };
 
+    // Función para subir archivos a Supabase Storage
+    // Versión mejorada con COMPRESIÓN automática
+    async function uploadFile(file) {
+  let fileToUpload = file;
+
+  // Si es una imagen (JPG, PNG, etc), la comprimimos antes de enviarla
+  if (file.type.startsWith('image/')) {
+    try {
+      showToast('Optimizando imagen...', 'info');
+      fileToUpload = await compressImage(file);
+      console.log('Imagen optimizada. Tamaño original:', (file.size/1024).toFixed(2), 'KB. Nuevo tamaño:', (fileToUpload.size/1024).toFixed(2), 'KB');
+    } catch (e) {
+      console.warn("Error comprimiendo, se subirá original", e);
+    }
+  }
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+  const filePath = `${currentUser.id}/${fileName}`;
+
+  const { data, error } = await supabaseClient.storage
+    .from('receipts')
+    .upload(filePath, fileToUpload);
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabaseClient.storage
+    .from('receipts')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+}
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Si la imagen es más grande de 1200px, la encogemos
+        const MAX_WIDTH = 1200;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Calidad 0.6 (60%). Ideal para tickets sin perder legibilidad.
+        canvas.toBlob((blob) => {
+          resolve(blob);
+        }, 'image/jpeg', 0.6);
+      };
+    };
+    reader.onerror = (e) => reject(e);
+  });
+}
+
 // ============================================================================
 // SISTEMA DE USUARIOS Y AUTENTICACIÓN
 // ============================================================================
@@ -6262,6 +6523,227 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     updateSidebarUserUI(currentUser.email);
   }
 });
+
+// ============================================================================
+// LÓGICA DE PRESUPUESTOS
+// ============================================================================
+
+function openBudgetModal() {
+  document.getElementById('budget-form').reset();
+  updateBudgetCategories();
+  document.getElementById('budget-modal').classList.add('active');
+}
+
+function closeBudgetModal() {
+  document.getElementById('budget-modal').classList.remove('active');
+}
+
+function updateBudgetCategories() {
+  const type = document.getElementById('budget-type').value;
+  const categorySelect = document.getElementById('budget-category');
+  categorySelect.innerHTML = CATEGORIES[type]
+    .map(cat => `<option value="${cat}">${cat}</option>`)
+    .join('');
+}
+
+async function saveBudget() {
+  const type = document.getElementById('budget-type').value;
+  const category = document.getElementById('budget-category').value;
+  const amount = parseFloat(document.getElementById('budget-amount').value);
+
+  if (!amount || amount <= 0) {
+    showToast('Introduce un límite válido', 'error');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient.from('budgets').insert({
+      user_id: currentUser.id,
+      type: type,
+      category: category,
+      amount: amount
+    });
+
+    if (error) throw error;
+
+    invalidateCache();
+    closeBudgetModal();
+    await renderBudgetsView();
+    showToast('Presupuesto creado con éxito', 'success');
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('Error al guardar en Supabase', 'error');
+  }
+}
+
+async function deleteBudget(id) {
+  if (!confirm('¿Seguro que quieres eliminar este presupuesto?')) return;
+  try {
+    await supabaseClient.from('budgets').delete().eq('id', id);
+    invalidateCache();
+    await renderBudgetsView();
+    showToast('Presupuesto eliminado', 'success');
+  } catch (error) {
+    showToast('Error al eliminar', 'error');
+  }
+}
+
+async function renderBudgetsView() {
+  const data = await getData();
+  const budgets = data.budgets || [];
+  const container = document.getElementById('budgets-list');
+
+  if (!container) return;
+
+  if (budgets.length === 0) {
+    container.innerHTML = `
+      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: 16px; padding: 64px 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+        <h3 style="font-size: 20px; color: var(--text-primary); margin-bottom: 8px;">Aún no hay presupuestos</h3>
+        <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">
+          Establece límites de gasto (ej. Supermercado, Ocio) y visualiza tu progreso mes a mes.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  const currentMonthTxns = data.transactions.filter(t => new Date(t.date).getMonth() === currentMonth);
+
+  container.innerHTML = budgets.map(b => {
+    const spent = currentMonthTxns
+      .filter(t => t.type === b.type && t.category === b.category)
+      .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount || 0)), 0);
+
+    const percent = Math.min((spent / b.amount) * 100, 100);
+    let color = 'var(--green)';
+    if (percent >= 100) color = 'var(--red)';
+    else if (percent >= 80) color = 'var(--orange)';
+
+    const typeLabel = b.type === 'gastos_personales' ? '👤 Personal' : '👥 Compartido';
+
+    return `
+      <div style="background: var(--bg-surface); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 4px;">${typeLabel}</div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">${b.category}</div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 18px; font-weight: 800; color: ${color};">${formatCurrency(spent)}</span>
+            <span style="font-size: 14px; color: var(--text-tertiary); font-weight: 500;"> / ${formatCurrency(b.amount)}</span>
+          </div>
+        </div>
+        
+        <div style="width: 100%; height: 10px; background: var(--bg-body); border-radius: 6px; overflow: hidden; margin-bottom: 16px;">
+          <div style="width: ${percent}%; height: 100%; background: ${color}; border-radius: 6px; transition: width 0.5s ease;"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+          <span style="color: var(--text-secondary); font-weight: 500;">${percent.toFixed(1)}% consumido</span>
+          <button class="action-btn delete" onclick="deleteBudget('${b.id}')">Eliminar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================================
+// LÓGICA DEL BUSCADOR GLOBAL
+// ============================================================================
+
+async function renderSearchView() {
+  const input = document.getElementById('global-search-input');
+  if (input) input.value = '';
+  document.getElementById('search-results-table').innerHTML = `
+    <tr>
+      <td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:60px;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🔎</div>
+        Escribe algo arriba para empezar a buscar...
+      </td>
+    </tr>`;
+}
+
+async function handleGlobalSearch() {
+  const query = document.getElementById('global-search-input').value.toLowerCase().trim();
+  const resultsTable = document.getElementById('search-results-table');
+  const summaryContainer = document.getElementById('search-total-summary');
+  
+  // 1. Si la búsqueda es muy corta, limpiamos todo
+  if (query.length < 2) {
+    resultsTable.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:40px;">Escribe al menos 2 caracteres...</td></tr>';
+    if (summaryContainer) summaryContainer.style.display = 'none';
+    return;
+  }
+
+  const data = await getData();
+  
+  // 2. Buscamos en todas las transacciones
+  const results = data.transactions.filter(t => 
+    (t.description || "").toLowerCase().includes(query) || 
+    (t.category || "").toLowerCase().includes(query) ||
+    (t.account || "").toLowerCase().includes(query)
+  );
+
+  // 3. Si no hay resultados
+  if (results.length === 0) {
+    resultsTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:40px;">No hay resultados para "${query}"</td></tr>`;
+    if (summaryContainer) summaryContainer.style.display = 'none';
+    return;
+  }
+
+  // 4. Calculamos la suma total (Ingresos - Gastos)
+  const totalSum = results.reduce((acc, t) => {
+    return t.type === 'ingresos' ? acc + t.amount : acc - t.amount;
+  }, 0);
+
+  // 5. Dibujamos las filas (con el diseño que tú has puesto)
+  resultsTable.innerHTML = results.map(t => {
+    const hasFile = t.file_url && t.file_url !== "";
+    const isIncome = t.type === 'ingresos';
+    
+    return `
+      <tr>
+        <td class="date-cell">${new Date(t.date).toLocaleDateString()}</td>
+        <td class="description-cell">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span>${t.description}</span>
+              ${hasFile ? `
+                <a href="${t.file_url}" target="_blank" style="background:var(--primary-light); color:var(--primary); padding:4px 8px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">📎</a>
+              ` : ''}
+            </div>
+        </td>
+        <td><span class="category-badge">${t.category || 'Sin categoría'}</span></td>
+        <td><span style="font-size: 11px; color: var(--text-secondary)">${t.account}</span></td>
+        <td class="amount-cell ${isIncome ? 'amount-positive' : 'amount-negative'}">
+          ${formatCurrency(t.amount)}
+        </td>
+        <td class="row-actions">
+          <button class="action-btn" onclick="handleEditTransaction('${t.id}')">Editar</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // 6. Mostramos el resumen con el contador y la suma total
+  if (summaryContainer) {
+    summaryContainer.style.display = 'block';
+    summaryContainer.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-weight: 600; color: var(--primary); font-size: 14px; text-transform: uppercase;">Resultados encontrados:</span>
+          <span style="display: block; font-size: 12px; color: var(--text-secondary);">${results.length} movimientos</span>
+        </div>
+        <div style="text-align: right;">
+          <span style="display: block; font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; font-weight: 700;">Suma Total</span>
+          <span id="search-total-amount" style="font-size: 24px; font-weight: 800; color: ${totalSum >= 0 ? 'var(--green)' : 'var(--red)'};">
+            ${formatCurrency(totalSum)}
+          </span>
+        </div>
+      </div>
+    `;
+  }
+}
 
 // ============================================================================
 // INICIO DE LA APLICACIÓN
