@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Control Financiero - App Completa</title>
-  <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
-  <meta name="theme-color" content="#5048E5">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
   <style>
     * {
       margin: 0;
@@ -182,6 +183,37 @@
       letter-spacing: -0.5px;
     }
 
+    /* Contenedor para los botones de acción inferiores */
+    .sidebar-actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding-left: 12px;
+    }
+
+    /* Botón de icono minimalista */
+    .icon-only-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px; /* Bordes ligeramente redondeados tipo Apple */
+        background: var(--bg-body);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+
+    .icon-only-btn:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
     /* Títulos de sección del menú */
     .nav-section-title {
       font-size: 11px;
@@ -294,8 +326,8 @@
     }
 
     .kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius);
     padding: 24px;
     box-shadow: var(--shadow-sm);
@@ -339,24 +371,37 @@
       opacity: 0.6;
     }
 
-    /* Tarjetas y Secciones (Estilo SaaS Flat) */
+    /* Efecto Cristal (Glassmorphism) para tarjetas y secciones */
     .kpi-card, .section {
-      background: var(--bg-surface) !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 12px !important;
-      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.02) !important; /* Sombra casi invisible */
-      padding: 24px;
-      margin-bottom: 24px;
-      transition: all 0.2s ease !important;
+    background: rgba(255, 255, 255, 0.7) !important; /* Fondo semitransparente */
+    backdrop-filter: blur(12px) !important;          /* El desenfoque clave */
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Borde brillante */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07) !important;
+    border-radius: 16px !important;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease !important;
     }
 
-    /* Hover súper sutil, sin saltos exagerados */
     .kpi-card:hover, .section:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
-      border-color: #D1D5DB !important;
+    transform: translateY(-4px) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: var(--primary) !important;
+    }
+    
+    /* Forzamos que las tarjetas de patrimonio y disponibles también sean de cristal */
+    div[style*="background: var(--bg-secondary)"] {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 20px !important;
+    }
+
+    body.dark-mode div[style*="background: var(--bg-secondary)"] {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
     /* Efecto de "clic" en botones */
@@ -1435,6 +1480,153 @@
       color: var(--text-primary);
     }
 
+    /* Colores para el Modo Oscuro */
+    body.dark-mode {
+    --bg-body: #0F172A;
+    --bg-surface: #1E293B;
+    --bg-secondary: #1E293B; /* <-- ESTA ES LA QUE FALTABA */
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-tertiary: #64748B;
+    --border-color: #334155;
+    --border-light: #334155;   /* <-- Y ESTA PARA LOS BORDES */
+    --primary-light: rgba(80, 72, 229, 0.15);
+    --bg-primary: #0F172A;
+    }
+
+    /* Forzamos que cualquier div con fondo blanco cambie en modo oscuro */
+    body.dark-mode div[style*="background: var(--bg-secondary)"],
+    body.dark-mode div[style*="background: white"],
+    body.dark-mode div[style*="background: rgb(255, 255, 255)"] {
+        background-color: var(--bg-surface) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    /* Ajuste para que los textos dentro de esas tarjetas se vean bien */
+    body.dark-mode div[style*="color: black"] {
+        color: white !important;
+    }
+
+    /* Ajuste para el modo oscuro */
+    body.dark-mode .icon-only-btn {
+        background: #1e293b;
+    }
+
+    /* Ajuste del efecto cristal para el MODO OSCURO */
+    body.dark-mode .kpi-card, 
+    body.dark-mode .section {
+        background: rgba(30, 41, 59, 0.7) !important; /* Azul oscuro traslúcido */
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+
+    body.dark-mode .kpi-card:hover, 
+    body.dark-mode .section:hover {
+        background: rgba(30, 41, 59, 0.85) !important;
+    }
+
+    /* Estilo del Botón Interruptor Circular */
+    .theme-switch-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--bg-body);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0 auto 16px 12px; /* Alineado con los iconos del menú */
+    }
+
+    .theme-switch-btn:hover {
+        transform: rotate(15deg) scale(1.1);
+        border-color: var(--primary);
+        box-shadow: 0 0 15px rgba(80, 72, 229, 0.2);
+    }
+
+    /* Ajustes generales Dark Mode */
+    body.dark-mode .kpi-card, 
+    body.dark-mode .section, 
+    body.dark-mode .sidebar,
+    body.dark-mode .modal {
+        background-color: var(--bg-surface) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    body.dark-mode input, 
+    body.dark-mode select,
+    body.dark-mode .month-selector {
+        background-color: #0F172A !important;
+        color: white !important;
+        border-color: var(--border-color) !important;
+    }
+
+    /* Contenedor universal para estados vacíos */
+    .empty-state-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.03); /* Muy sutil */
+        border: 2px dashed var(--border-color);
+        border-radius: 24px;
+        margin: 20px 0;
+    }
+
+    .empty-state-icon {
+        font-size: 54px;
+        margin-bottom: 16px;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    }
+
+    .empty-state-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        max-width: 320px;
+        line-height: 1.5;
+    }
+
+    /* Animación de brillo para el Skeleton */
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .skeleton {
+        background: linear-gradient(90deg, 
+            var(--bg-body) 25%, 
+            var(--border-color) 50%, 
+            var(--bg-body) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 8px;
+        display: inline-block;
+        color: transparent !important; /* Esconde el texto mientras carga */
+        min-width: 80px;
+        height: 1em;
+    }
+
+    body.dark-mode .skeleton {
+        background: linear-gradient(90deg, 
+            #1e293b 25%, 
+            #334155 50%, 
+            #1e293b 75%);
+        background-size: 200% 100%;
+    }
+
   </style>
 </head>
 <body>
@@ -1481,27 +1673,33 @@
       
           <div class="nav-section-title">Patrimonio</div>
           <button class="nav-item nav-btn" data-view="inversiones">📈 Inversiones</button>
-      
+
           <div style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 16px;">
-      
-            <button class="nav-item nav-btn" data-view="settings">
-              <span style="font-size: 16px; width: 20px;">⚙️</span> Configuración
+            
+          <div class="sidebar-actions">
+            <button class="icon-only-btn" id="theme-toggle" onclick="toggleDarkMode()" title="Cambiar modo de color">
+              <span id="dark-mode-icon">🌙</span>
             </button>
-      
-            <div id="user-profile-btn" onclick="openAuthModal()" style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onmouseover="this.style.background='var(--bg-body)'" onmouseout="this.style.background='transparent'">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
-                <span id="sidebar-initials">?</span>
-              </div>
-              <div style="display: flex; flex-direction: column;">
-                <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2;" id="sidebar-name">Inicia Sesión</span>
-                <span style="font-size: 11px; color: var(--text-tertiary);" id="sidebar-email">Click aquí</span>
-              </div>
-            </div>
-      
+            
+            <button class="icon-only-btn" onclick="switchView('settings')" title="Configuración">
+              <span>⚙️</span>
+            </button>
           </div>
-        </aside>
       
-        <main class="main-content">
+          <div id="user-profile-btn" onclick="openAuthModal()" style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onmouseover="this.style.background='var(--bg-body)'" onmouseout="this.style.background='transparent'">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
+              <span id="sidebar-initials">?</span>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2;" id="sidebar-name">Inicia Sesión</span>
+              <span style="font-size: 11px; color: var(--text-tertiary);" id="sidebar-email">Click aquí</span>
+            </div>
+          </div>
+    
+        </div>
+      </aside>
+    
+      <main class="main-content">
 
     <!-- Dashboard View -->
     <div id="dashboard-view" class="view active">
@@ -2753,6 +2951,8 @@
   <!-- Load SortableJS from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <script>
     // ============================================================================
     // SUPABASE CONFIGURATION
@@ -3022,16 +3222,16 @@
       const data = await getData();
       const currentMonthIndex = new Date().getMonth();
       
-      // Calculate totals
+      // 1. Cálculos de totales (se mantienen igual)
       const normalAccounts = data.accounts.filter(a => 
         a.name !== 'Santander Pareja' && 
         a.type !== 'Broker' && 
         a.type !== 'Exchange Crypto' &&
-        a.includeInPatrimony !== false  // Solo incluir si está marcado
+        a.includeInPatrimony !== false
       );
       const brokerAccounts = data.accounts.filter(a => 
         (a.type === 'Broker' || a.type === 'Exchange Crypto') &&
-        a.includeInPatrimony !== false  // Solo incluir si está marcado
+        a.includeInPatrimony !== false
       );
       
       const normalTotal = await Promise.all(
@@ -3043,17 +3243,18 @@
       ).then(balances => balances.reduce((sum, b) => sum + b, 0));
       
       const sharedBalance = await calculateAccountBalance('Santander Pareja');
-      const totalPatrimony = normalTotal + brokerTotal; //Solo personal, sin la compartida
+      const totalPatrimony = normalTotal + brokerTotal;
+
+      // 2. ACTUALIZACIÓN CON ANIMACIÓN (Sustituye a los .textContent antiguos)
+      animateValue('dashboard-total-patrimony', 0, totalPatrimony, 1200); // 1.2 segundos
+      animateValue('dashboard-normal-total', 0, normalTotal, 1000);
+      animateValue('dashboard-investments-total', 0, brokerTotal, 1000);
+      animateValue('dashboard-shared-total', 0, sharedBalance, 1000);
       
-      // Update patrimony card
-      document.getElementById('dashboard-total-patrimony').textContent = formatCurrency(totalPatrimony);
-      document.getElementById('dashboard-normal-total').textContent = formatCurrency(normalTotal);
-      document.getElementById('dashboard-investments-total').textContent = formatCurrency(brokerTotal);
-      document.getElementById('dashboard-shared-total').textContent = formatCurrency(sharedBalance);
-      
-      // Month evolution
+      // Mes actual
       document.getElementById('dashboard-current-month').textContent = MONTHS[currentMonthIndex];
       
+      // 3. Cálculos del mes y KPIs animados
       const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
       const monthExpenses = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
@@ -3064,13 +3265,16 @@
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
       const monthSavings = monthIncome - monthExpenses - monthInvestments;
       
-      document.getElementById('dashboard-month-income').textContent = formatCurrency(monthIncome);
-      document.getElementById('dashboard-month-expenses').textContent = formatCurrency(monthExpenses);
-      document.getElementById('dashboard-month-investments').textContent = formatCurrency(monthInvestments);
-      document.getElementById('dashboard-month-savings').textContent = formatCurrency(monthSavings);
-      document.getElementById('dashboard-month-savings').style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
+      animateValue('dashboard-month-income', 0, monthIncome, 800);
+      animateValue('dashboard-month-expenses', 0, monthExpenses, 800);
+      animateValue('dashboard-month-investments', 0, monthInvestments, 800);
       
-      // Render charts (¡Adiós renderWallet!)
+      // Para los ahorros, animamos y luego aplicamos el color
+      const savingsEl = document.getElementById('dashboard-month-savings');
+      animateValue('dashboard-month-savings', 0, monthSavings, 800);
+      savingsEl.style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
+      
+      // 4. Render de gráficos
       renderPatrimonyChart();
       renderDistributionChart(normalTotal, brokerTotal, sharedBalance);
       renderEvolutionChart('personal');
@@ -3311,11 +3515,20 @@ async function renderTable(type) {
   if (!container) return;
 
   if (transactions.length === 0) {
-    container.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:20px;">No hay registros este mes.</td></tr>';
-    const oldBtn = document.getElementById(`btn-expand-list-${type}`);
-    if (oldBtn) oldBtn.remove();
-    return;
-  }
+  container.innerHTML = `
+    <tr>
+      <td colspan="6">
+        <div class="empty-state-card" style="padding: 40px 20px;">
+          <div class="empty-state-icon" style="font-size: 40px;">🍃</div>
+          <div class="empty-state-title">Mes despejado</div>
+          <div class="empty-state-text">Aún no hay movimientos de tipo ${type.replace('_', ' ')} este mes.</div>
+        </div>
+      </td>
+    </tr>`;
+  const oldBtn = document.getElementById(`btn-expand-list-${type}`);
+  if (oldBtn) oldBtn.remove();
+  return;
+}
 
   container.innerHTML = transactions.map((t, index) => {
     const isHidden = index >= 7;
@@ -5799,7 +6012,18 @@ async function toggleFixedExpense(expenseId, month) {
           amount: expense.amount
         });
       
-      showToast(`✓ ${expense.name} pagado - ${expense.amount}€ descontado de ${expense.account}`, 'success');
+      showToast(`✓ ${expense.name} pagado`, 'success');
+
+      // --- LÓGICA DE CELEBRACIÓN (CONFETI) ---
+      // Invalidate y pedimos datos frescos para ver si era el último
+      invalidateCache();
+      const freshData = await getData();
+      const totalMes = freshData.fixedExpenses.filter(e => (e.months || []).includes(currentMonth)).length;
+      const pagadosMes = (freshData.fixedExpensesPaid[monthKey] || []).length;
+
+      if (pagadosMes === totalMes && totalMes > 0) {
+        setTimeout(launchCelebration, 300); // Lanzamos la fiesta
+      }
     }
     
     invalidateCache();
@@ -6596,17 +6820,16 @@ async function renderBudgetsView() {
   if (!container) return;
 
   if (budgets.length === 0) {
-    container.innerHTML = `
-      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: 16px; padding: 64px 24px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
-        <h3 style="font-size: 20px; color: var(--text-primary); margin-bottom: 8px;">Aún no hay presupuestos</h3>
-        <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">
-          Establece límites de gasto (ej. Supermercado, Ocio) y visualiza tu progreso mes a mes.
-        </p>
-      </div>
-    `;
-    return;
-  }
+  container.innerHTML = `
+    <div class="empty-state-card">
+      <div class="empty-state-icon">🎯</div>
+      <div class="empty-state-title">Define tus objetivos</div>
+      <div class="empty-state-text">Crea tu primer presupuesto para controlar que no se te escape el dinero en ninguna categoría.</div>
+      <button class="btn-primary" onclick="openBudgetModal()" style="margin-top: 20px;">+ Crear Presupuesto</button>
+    </div>
+  `;
+  return;
+}
 
   const currentMonthTxns = data.transactions.filter(t => new Date(t.date).getMonth() === currentMonth);
 
@@ -6657,11 +6880,14 @@ async function renderSearchView() {
   if (input) input.value = '';
   document.getElementById('search-results-table').innerHTML = `
     <tr>
-      <td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:60px;">
-        <div style="font-size: 40px; margin-bottom: 10px;">🔎</div>
-        Escribe algo arriba para empezar a buscar...
+      <td colspan="6">
+        <div class="empty-state-card">
+          <div class="empty-state-icon">🔎</div>
+          <div class="empty-state-title">¿Qué buscas hoy?</div>
+          <div class="empty-state-text">Encuentra cualquier gasto por nombre, categoría o cuenta en todo tu historial.</div>
+        </div>
       </td>
-    </tr>`;
+    </tr>`;   
 }
 
 async function handleGlobalSearch() {
@@ -6687,9 +6913,18 @@ async function handleGlobalSearch() {
 
   // 3. Si no hay resultados
   if (results.length === 0) {
-    resultsTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:40px;">No hay resultados para "${query}"</td></tr>`;
-    if (summaryContainer) summaryContainer.style.display = 'none';
-    return;
+    resultsTable.innerHTML = `
+    <tr>
+      <td colspan="6">
+        <div class="empty-state-card" style="border-color: var(--red); background: rgba(242, 100, 100, 0.02);">
+          <div class="empty-state-icon">🧊</div>
+          <div class="empty-state-title">Sin rastro de "${query}"</div>
+          <div class="empty-state-text">No hemos encontrado ningún movimiento con ese nombre. Prueba con algo más genérico.</div>
+        </div>
+      </td>
+    </tr>`;
+  if (summaryContainer) summaryContainer.style.display = 'none';
+  return;
   }
 
   // 4. Calculamos la suma total (Ingresos - Gastos)
@@ -6743,6 +6978,92 @@ async function handleGlobalSearch() {
       </div>
     `;
   }
+}
+
+// ============================================================================
+// MODO OSCURO
+// ============================================================================
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  const icon = document.getElementById('dark-mode-icon');
+  
+  // Guardamos la preferencia
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  
+  // Cambiamos solo el emoji
+  icon.textContent = isDark ? '☀️' : '🌙';
+  
+  // Refrescamos gráficos si estamos en el dashboard
+  if (currentView === 'dashboard') renderDashboard();
+}
+
+// Al cargar la página
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark-mode');
+  const icon = document.getElementById('dark-mode-icon');
+  if (icon) icon.textContent = '☀️';
+}
+
+// ============================================================================
+// MICRO-INTERACCIONES (Punto 1)
+// ============================================================================
+
+/**
+ * Anima un valor numérico de forma fluida
+ * @param {string} id - ID del elemento HTML
+ * @param {number} start - Valor inicial (ej: 0)
+ * @param {number} end - Valor final
+ * @param {number} duration - Duración en ms
+ */
+ function animateValue(id, start, end, duration) {
+    const obj = document.getElementById(id);
+    if (!obj) return;
+    
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        
+        // Calculamos el valor actual en el progreso de la animación
+        const current = progress * (end - start) + start;
+        
+        // Usamos tu función formatCurrency para que mantenga el símbolo € y los decimales
+        obj.textContent = formatCurrency(current);
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+function launchCelebration() {
+  const duration = 3 * 1000;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    // Lanzamos confeti desde la izquierda
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+      colors: ['#5048E5', '#10B981', '#F59E0B']
+    });
+    // Lanzamos confeti desde la derecha
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+      colors: ['#5048E5', '#10B981', '#F59E0B']
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
 }
 
 // ============================================================================
