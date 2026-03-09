@@ -397,40 +397,78 @@
 
     /* Selector de Meses Estilo SaaS */
     .month-selector {
-      display: inline-flex;
-      background: var(--bg-body);
-      padding: 4px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 24px;
-      overflow-x: auto;
-      max-width: 100%;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        display: flex;
+        width: 100%; 
+        background: rgba(0, 0, 0, 0.05);
+        padding: 3px;
+        border-radius: 12px;
+        gap: 2px;
+        margin-bottom: 32px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
+    .month-selector::-webkit-scrollbar {
+        display: none; /* Ocultar scroll en Chrome/Safari */
+    }
+
+    /* Botones flexibles que se encogen para caber siempre */
     .month-btn {
-      background: transparent;
-      border: none;
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 10px 0;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        min-width: 0;
+        position: relative; /* ¡ESTA LÍNEA ES VITAL! */
     }
 
     .month-btn:hover {
-      color: var(--text-primary);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.4);
     }
 
-    /* La pastilla blanca que indica el mes seleccionado */
+    /* Mes activo: La "pastilla" blanca que resalta */
     .month-btn.active {
-      background: var(--bg-surface);
-      color: var(--text-primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-      border: 1px solid rgba(0,0,0,0.02);
+        background: var(--bg-surface) !important;
+        color: var(--primary) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* El punto verde de "Mes Actual" */
+    .month-btn.real-today::after {
+        content: '';
+        position: absolute;
+        bottom: 3px; /* Un pelín más abajo */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 5px; /* Un poco más grande */
+        height: 5px;
+        background-color: #10B981; /* Verde Primetrack */
+        border-radius: 50%;
+        /* Añadimos un pequeño resplandor para que se vea mejor */
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.8);
+        pointer-events: none;
+    }
+
+    /* Si el mes actual es también el seleccionado, el punto se vuelve blanco para que se vea */
+    .month-btn.active.real-today::after {
+        background-color: var(--primary);
+        box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* Ajuste para Modo Oscuro */
+    body.dark-mode .month-selector {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .month-btn.active {
+        background: #2D3748 !important;
+        color: #10B981 !important;
     }
 
     /* Section */
@@ -746,93 +784,109 @@
       display: block;
     }
 
-    /* Account Cards */
-    .account-card {
-        background: var(--bg-surface) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 12px !important;
-      padding: 24px;
-      transition: all 0.2s ease !important;
-      cursor: pointer;
-      position: relative;
-      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.02) !important;
-      overflow: hidden; /* Evita que la línea de color se salga de las esquinas */
+    /* --- VISTA DE CUENTAS: INTEGRACIÓN TOTAL --- */
+
+    /* Contenedor de cada bloque (Columna) */
+    .account-group-container {
+        margin-bottom: 48px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.3); /* Fondo muy sutil para delimitar el grupo */
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
-    /* La línea de color superior del banco */
-    .account-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px; /* Un poco más gruesa e intensa */
-      background: var(--account-color);
+    .group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 0 8px;
     }
 
-    /* Efecto al pasar el ratón */
-    .account-card:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
-      border-color: #D1D5DB !important;
+    .group-title {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .account-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
+    .group-sum {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 4px 12px;
+        border-radius: 20px;
     }
 
-    .account-card-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 4px;
+    /* Tarjeta de Cuenta: Estilo Glassmorphism Dashboard */
+    .account-card-integrated {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        border-radius: 18px !important;
+        padding: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 150px;
     }
 
-    .account-card-type {
-      font-size: 12px;
-      color: var(--text-secondary);
+    .account-card-integrated:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06) !important;
     }
 
-    .account-card-badge {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--bg-primary);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 500;
+    .card-top-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
     }
 
-    .account-card-balance {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
+    .card-acc-type {
+        font-size: 9px;
+        font-weight: 800;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .account-card-change {
-      font-size: 13px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .card-acc-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-top: 2px;
     }
 
-    .account-card-change.positive {
-      color: var(--green);
-      font-weight: 600;
-      text-shadow: 0 0 10px rgba(52, 199, 89, 0.2); /* Resplandor sutil */
+    .card-acc-balance {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -1px;
+        margin: 12px 0;
     }
 
-    .account-card-change.negative {
-      color: var(--red);
-      font-weight: 600;
-      text-shadow: 0 0 10px rgba(255, 59, 48, 0.2);
+    .card-acc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .card-diff {
+        font-size: 12px;
+        font-weight: 700;
     }
 
     /* Específico para las filas de la tabla */
@@ -1547,133 +1601,6 @@
         background-size: 200% 100%;
     }
 
-    /* ============================================================================
-   OPTIMIZACIÓN MÓVIL: LIQUID GLASS iOS STYLE
-   ============================================================================ */
-      @media (max-width: 768px) {
-        /* 1. REORGANIZACIÓN TOTAL */
-        body {
-            flex-direction: column !important;
-            overflow-y: auto !important;
-            height: auto !important;
-        }
-
-        /* 2. BARRA INFERIOR LIQUID GLASS (Menú) */
-        .sidebar {
-            width: calc(100% - 24px) !important;
-            height: 70px !important;
-            position: fixed !important;
-            bottom: 15px !important;
-            left: 12px !important;
-            flex-direction: row !important;
-            padding: 0 5px !important;
-            background: rgba(255, 255, 255, 0.5) !important; /* Más traslúcido */
-            backdrop-filter: blur(25px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            border-radius: 25px !important;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
-            justify-content: space-around !important;
-            z-index: 3000 !important;
-        }
-
-        /* Ocultamos lo que no cabe en la barra de iconos */
-        .sidebar-logo, .nav-section-title, .sidebar-actions, #user-profile-btn {
-            display: none !important;
-        }
-
-        .nav-item {
-            flex-direction: column !important;
-            gap: 2px !important;
-            font-size: 9px !important; /* Texto muy pequeño estilo iOS */
-            padding: 12px 0 !important;
-            margin: 0 !important;
-            flex: 1 !important;
-            background: transparent !important;
-            color: var(--text-secondary) !important;
-        }
-
-        .nav-item.active {
-            color: var(--primary) !important;
-            font-weight: 700;
-        }
-
-        /* 3. CONTENIDO PRINCIPAL (Espaciado para que el menú no tape nada) */
-        .main-content {
-            padding: 20px 16px 120px 16px !important; 
-            overflow: visible !important;
-            height: auto !important;
-        }
-
-        /* 4. ELIMINAR EL "AMONTONAMIENTO" DE TABLAS */
-        table, thead, tbody, th, td, tr {
-            display: block !important;
-            width: 100% !important;
-        }
-
-        thead { display: none !important; } /* Adiós a las cabeceras horizontales */
-
-        tr {
-            background: var(--bg-surface) !important;
-            margin-bottom: 20px !important;
-            padding: 20px !important;
-            border-radius: 20px !important;
-            border: 1px solid var(--border-color) !important;
-            position: relative !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
-        }
-
-        td {
-            display: flex !important;
-            justify-content: space-between; /* Texto a la izquierda, valor a la derecha */
-            align-items: center;
-            padding: 10px 0 !important;
-            border-bottom: 1px solid rgba(0,0,0,0.03) !important;
-            font-size: 14px !important;
-            color: var(--text-primary);
-        }
-
-        /* Estilo especial para la DESCRIPCIÓN (Título de la tarjeta) */
-        .description-cell {
-            display: block !important;
-            font-size: 16px !important;
-            font-weight: 800 !important;
-            color: var(--primary) !important;
-            border-bottom: 2px solid var(--primary-light) !important;
-            margin-bottom: 12px !important;
-            padding-bottom: 8px !important;
-        }
-
-        /* Estilo para el IMPORTE (Destacado) */
-        .amount-cell {
-            border-bottom: none !important;
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            justify-content: flex-end !important;
-            padding-top: 15px !important;
-        }
-
-        /* Acciones (Botones editar/eliminar) */
-        .row-actions {
-            border-bottom: none !important;
-            padding-top: 15px !important;
-            justify-content: center !important;
-            gap: 20px !important;
-        }
-
-        /* 5. AJUSTES FINALES PARA MÓVIL */
-        .kpi-grid {
-            grid-template-columns: 1fr !important;
-            gap: 12px !important;
-        }
-
-        .section {
-            padding: 16px !important;
-            margin-bottom: 20px !important;
-            border-radius: 20px !important;
-        }
-    }
-
     /* Contenedor del grupo por fecha */
     .timeline-container {
     display: flex;
@@ -1721,82 +1648,308 @@
     }
 
     .tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: help;
-    margin-left: 6px;
-    color: var(--text-tertiary);
-}
+        position: relative;
+        display: inline-block;
+        cursor: help;
+        margin-left: 6px;
+        color: var(--text-tertiary);
+    }
 
-.tooltip .tooltip-text {
-    visibility: hidden;
-    width: 200px;
-    background-color: #181C32;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 10px;
-    position: absolute;
-    z-index: 1000;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 11px;
-    line-height: 1.4;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
+    .tooltip .tooltip-text {
+        visibility: hidden;
+        width: 200px;
+        background-color: #181C32;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 11px;
+        line-height: 1.4;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
 
-.tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
+    .tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
 
-.hidden-transaction {
-    display: none;
-}
+    .hidden-transaction {
+        display: none;
+    }
 
-/* Destacado para tarjetas con adjunto */
-/* 1. La fila: ahora mucho más sutil */
-.transaction-card.has-attachment {
-    border-left: 3px solid var(--primary); /* Franja más fina */
-    background: rgba(16, 185, 129, 0.03); /* Un toque de color casi invisible */
-}
+    /* Destacado para tarjetas con adjunto */
+    /* 1. La fila: ahora mucho más sutil */
+    .transaction-card.has-attachment {
+        border-left: 3px solid var(--primary); /* Franja más fina */
+        background: rgba(16, 185, 129, 0.03); /* Un toque de color casi invisible */
+    }
 
-/* 2. El botón del clip: ahora con fondo claro para que el icono destaque */
-.attachment-button {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: var(--bg-body); /* Fondo gris muy clarito */
-    color: var(--primary); /* El clip ahora es el que tiene el color */
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    /* 2. El botón del clip: ahora con fondo claro para que el icono destaque */
+    .attachment-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--bg-body); /* Fondo gris muy clarito */
+        color: var(--primary); /* El clip ahora es el que tiene el color */
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 16px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-/* Animación más elegante y menos "saltarina" */
-.attachment-button:hover {
-    background: var(--primary-light);
-    border-color: var(--primary);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1);
-}
+    /* Animación más elegante y menos "saltarina" */
+    .attachment-button:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1);
+    }
 
-/* Ajuste del icono de "no hay archivo" para que no distraiga */
-.no-attachment-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    opacity: 0.15;
+    /* Ajuste del icono de "no hay archivo" para que no distraiga */
+    .no-attachment-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        opacity: 0.15;
+    }
+
+    /* Ajuste específico para las tarjetas en la vista mensual */
+    .monthly-disponible-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+    }
+
+    /* Reutilizamos el estilo pero lo hacemos un pelín más compacto para esta vista */
+    .card-mini-integrated {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 110px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    /* --- VISTA DE PRESUPUESTOS: DISEÑO CRISTAL --- */
+
+    .budget-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+    }
+
+    .budget-card-integrated {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .budget-card-integrated:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-color: var(--primary) !important;
+    }
+
+    /* Barra de progreso minimalista */
+    .progress-container-saas {
+        width: 100%;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        margin: 16px 0;
+        overflow: hidden;
+    }
+
+    .progress-bar-saas {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .budget-badge-type {
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    /* ============================================================================
+   OPTIMIZACIÓN MÓVIL TOTAL: iOS & ANDROID PREMIUM STYLE
+   ============================================================================ */
+@media (max-width: 768px) {
+    /* 1. ESTRUCTURA Y FONDO */
+    body {
+        flex-direction: column !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+    }
+
+    .main-content {
+        padding: 16px 12px 100px 12px !important; /* Espacio para el menú inferior */
+        width: 100% !important;
+    }
+
+    /* 2. BARRA DE NAVEGACIÓN INFERIOR (ESTILO APPLE) */
+    .sidebar {
+        width: 100% !important;
+        height: 75px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        flex-direction: row !important;
+        padding: 0 8px !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-top: 1px solid var(--border-color) !important;
+        border-right: none !important;
+        border-radius: 0 !important;
+        justify-content: space-around !important;
+        z-index: 5000 !important;
+    }
+
+    .sidebar-logo, .nav-section-title, .sidebar-actions, #user-profile-btn {
+        display: none !important; /* Ocultar elementos innecesarios en móvil */
+    }
+
+    .nav-item {
+        flex-direction: column !important;
+        gap: 4px !important;
+        font-size: 10px !important;
+        padding: 12px 0 !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+
+    /* 3. DASHBOARD Y KPIs: FUERZA A 1 COLUMNA */
+    div[style*="grid-template-columns: repeat(3, 1fr)"],
+    div[style*="grid-template-columns: 1fr 1fr"],
+    .kpi-grid {
+        grid-template-columns: 1fr !important; /* Todo en una columna vertical */
+        gap: 12px !important;
+    }
+
+    .kpi-card {
+        padding: 20px !important;
+        min-height: auto !important;
+    }
+
+    /* 4. VISTA DE CUENTAS: AJUSTE DE GRUPOS */
+    .account-group-container {
+        padding: 12px !important;
+        margin-bottom: 24px !important;
+    }
+
+    .accounts-grid-grouped, .budget-grid, .monthly-disponible-grid {
+        grid-template-columns: 1fr !important; /* Evita que las tarjetas choquen */
+        gap: 12px !important;
+    }
+
+    /* 5. VISTA MENSUAL: CABECERA INTEGRADA */
+    div[style*="padding: 32px"] {
+        padding: 20px !important; /* Reducir rellenos excesivos */
+    }
+
+    #monthly-disponible-total {
+        font-size: 30px !important; /* Escalar número grande */
+    }
+
+    /* 6. SELECTOR DE MESES: HACERLO MÁS ALTO PARA EL DEDO */
+    .month-selector {
+        padding: 4px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .month-btn {
+        padding: 12px 0 !important;
+        font-size: 10px !important;
+    }
+
+    /* 7. TABLAS A TARJETAS (MOVIMIENTOS) */
+    table, thead, tbody, th, td, tr {
+        display: block !important;
+    }
+
+    thead { display: none !important; }
+
+    tr {
+        background: var(--bg-surface) !important;
+        margin-bottom: 12px !important;
+        padding: 16px !important;
+        border-radius: 16px !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    td {
+        display: flex !important;
+        justify-content: space-between !important;
+        padding: 8px 0 !important;
+        border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+    }
+
+    td:last-child { border-bottom: none !important; }
+
+    .description-cell {
+        font-size: 15px !important;
+        color: var(--primary) !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid var(--primary-light) !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .amount-cell {
+        font-size: 16px !important;
+        font-weight: 800 !important;
+    }
+
+    /* 8. MODALES EN MÓVIL */
+    .modal-overlay .modal {
+        width: 95% !important;
+        max-width: none !important;
+        padding: 16px !important;
+        max-height: 90vh !important;
+    }
+
+    .form-row {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
 }
 
   </style>
@@ -1836,11 +1989,26 @@
           </div>
       
           <div class="nav-section-title">Principal</div>
-          <button class="nav-item nav-btn active" data-view="dashboard">📊 Dashboard</button>
-          <button class="nav-item nav-btn" data-view="monthly">📅 Vista Mensual</button>
-          <button class="nav-item nav-btn" data-view="accounts">💳 Mis Cuentas</button>
-          <button class="nav-item nav-btn" data-view="budgets">🎯 Presupuestos</button>
-          <button class="nav-item nav-btn" data-view="search">🔍 Buscador</button>
+          <button class="nav-item nav-btn active" data-view="dashboard">
+            <span style="font-size: 20px;">📊</span>
+            <span>Resumen</span>
+          </button>
+          <button class="nav-item nav-btn" data-view="monthly">
+            <span style="font-size: 20px;">📅</span>
+            <span>Mes</span>
+          </button>
+          <button class="nav-item nav-btn" data-view="accounts">
+            <span style="font-size: 20px;">💳</span>
+            <span>Cuentas</span>
+          </button>
+          <button class="nav-item nav-btn" data-view="budgets">
+            <span style="font-size: 20px;">🎯</span>
+            <span>Metas</span>
+          </button>
+          <button class="nav-item nav-btn" data-view="search">
+            <span style="font-size: 20px;">🔍</span>
+            <span>Buscar</span>
+          </button>
       
           <div class="nav-section-title">Patrimonio</div>
           <button class="nav-item nav-btn" data-view="inversiones">📈 Inversiones</button>
@@ -1988,7 +2156,7 @@
         <!-- Evolución Anual -->
         <div class="section">
             <div class="section-header">
-              <h2 class="section-title">Evolución del Patrimonio 2026</h2>
+              <h2 class="section-title">Evolución de Inversiones 2026</h2>
             </div>
             <div style="height: 250px; position: relative;">
               <canvas id="patrimony-chart"></canvas>
@@ -2021,20 +2189,21 @@
       </div>
 
       <!-- Patrimonio Total del Mes -->
-      <div style="background: var(--bg-secondary); border: 1px solid var(--border-light); padding: 32px; border-radius: 20px; margin-bottom: 32px;">
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div class="section" style="padding: 32px; margin-bottom: 32px;">
+        <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.05);">
             <div>
-              <div style="font-size: 13px; color: #8E8E93; font-weight: 600; text-transform: uppercase;">💰 Dinero Disponible</div>
-              <div style="font-size: 32px; font-weight: 800; color: black;" id="monthly-disponible-total">Cargando...</div>
-              <div style="font-size: 13px; margin-top: 4px;" id="monthly-disponible-vs-inicio"></div>
+              <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">💰 Liquidez Total</div>
+              <div style="font-size: 38px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;" id="monthly-disponible-total">0,00 €</div>
+              <div style="font-size: 13px; font-weight: 600; margin-top: 6px;" id="monthly-disponible-vs-inicio"></div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 12px; color: #8E8E93; font-weight: 600; text-transform: uppercase;">Inicio del mes</div>
-              <div style="font-size: 20px; font-weight: 700; color: black; margin-top: 4px;" id="monthly-disponible-inicio">0,00 €</div>
+              <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Saldo al inicio</div>
+              <div style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-top: 4px;" id="monthly-disponible-inicio">0,00 €</div>
             </div>
           </div>
-          <div id="monthly-disponible-breakdown" style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 16px; border-top: 1px solid #F2F2F7;"></div>
+          
+          <div id="monthly-disponible-breakdown" class="monthly-disponible-grid"></div>
         </div>
       </div>
 
@@ -2214,27 +2383,10 @@
       <!-- Balance por Cuenta -->
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title">
-            <span>💸</span>
-            Flujo por Cuenta (Año Completo)
-          </h2>
+          <h2 class="section-title"><span>💸</span> Flujo por Cuenta (Año Completo)</h2>
         </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Cuenta</th>
-                <th style="text-align: right;">Ingresos</th>
-                <th style="text-align: right;">Gastos</th>
-                <th style="text-align: right;">Inversiones</th>
-                <th style="text-align: right;">Flujo Neto</th>
-              </tr>
-            </thead>
-            <tbody id="account-flow-table">
-              <!-- Flows generated dynamically -->
-            </tbody>
-          </table>
-        </div>
+        <div id="account-flow-table" class="timeline-container">
+          </div>
       </section>
 
       <!-- Transferencias -->
@@ -3707,86 +3859,91 @@
       });
     }   
 
-    async function renderMonthlyView() {
-  const data = await getData();
-  
-  const monthSelector = document.getElementById('month-selector');
-  if (monthSelector) {
-    monthSelector.innerHTML = MONTHS.map((month, index) => `
-      <button class="month-btn ${index === currentMonth ? 'active' : ''}" 
-              onclick="changeMonth(${index})">
-        ${month}
-      </button>
-    `).join('');
-  }
-
-  const titleEl = document.getElementById('current-month-title');
-  if (titleEl) {
-    titleEl.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
-  }
-
-  // 1. Cálculo de transacciones del mes
-  const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  
-  // 2. SALDO COMPARTIDO (Controlado por el botón de Configuración)
-  const cuentasCompartidas = data.accounts.filter(acc => 
-    acc.isShared === true || acc.isShared === 'true' || acc.is_shared === true
-  );
-  
-  let sharedBalanceTotal = 0;
-  for (const acc of cuentasCompartidas) {
-    // ¡AQUÍ ESTÁ LA MAGIA! Le pasamos 'currentMonth'
-    sharedBalanceTotal += await calculateAccountBalance(acc.name, currentMonth);
-  }
-
-  // 3. ACTUALIZAR LAS 3 TARJETAS SUPERIORES
-  const monthlyKpis = document.getElementById('monthly-kpis');
-  if (monthlyKpis) {
-    monthlyKpis.innerHTML = `
-      <div class="kpi-card">
-        <div class="kpi-label">Ingresos</div>
-        <div class="kpi-value" style="color:var(--green)">${formatCurrency(ingresos)}</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Gastos Pers.</div>
-        <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
-      </div>
-      <div class="kpi-card" style="border: 1px solid var(--orange); background: rgba(245,158,11,0.05);">
-        <div class="kpi-label">👥 Saldo Compartido</div>
-        <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
-      </div>
-    `;
-  }
-
-  // 4. Totales de las tablas
-  const setTotal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatCurrency(val); };
-  setTotal('ingresos-total', ingresos);
-  setTotal('gastos-personales-total', gastosPersonales);
-  setTotal('gastos-compartidos-total', gastosCompartidos);
-  setTotal('inversiones-total', inversiones);
-
-  await renderTable('ingresos');
-  await renderTable('gastos_personales');
-  await renderTable('gastos_compartidos');
-  await renderTable('inversiones');
-  
-  // 5. RENDERIZADO FINAL (Aquí solucionamos el "Cargando...")
-  setTimeout(async () => {
-    if (typeof renderAccounts === 'function') await renderAccounts();
-    if (typeof renderInvestmentsView === 'function') await renderInvestmentsView();
-    if (typeof renderContributionsList === 'function') await renderContributionsList();
-    if (typeof renderFixedExpensesInMonth === 'function') await renderFixedExpensesInMonth();
+  async function renderMonthlyView() {
+    const data = await getData();
     
-    // ESTA ES LA LÍNEA QUE FALTABA Y QUE QUITA EL "CARGANDO..."
-    if (typeof updateMonthlyPatrimonyDisplay === 'function') await updateMonthlyPatrimonyDisplay();
-  }, 50);
+    // 1. GENERADOR DEL SELECTOR CON INDICADOR DE "HOY"
+    const monthSelector = document.getElementById('month-selector');
+    if (monthSelector) {
+      const realTodayMonth = new Date().getMonth(); // Mes real (0-11)
+
+      monthSelector.innerHTML = MONTHS.map((month, index) => {
+        const shortMonth = month.substring(0, 3); 
+        const isActive = index === currentMonth;
+        const isRealToday = index === realTodayMonth;
+
+        return `
+          <button class="month-btn ${isActive ? 'active' : ''} ${isRealToday ? 'real-today' : ''}" 
+                  onclick="changeMonth(${index})">
+            ${shortMonth}
+          </button>
+        `;
+      }).join('');
+    }
+
+    const titleEl = document.getElementById('current-month-title');
+    if (titleEl) {
+      titleEl.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+    }
+
+    // 2. CÁLCULO DE TRANSACCIONES DEL MES
+    const ingresos = (await getTransactionsByMonth(currentMonth, 'ingresos'))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const gastosPersonales = (await getTransactionsByMonth(currentMonth, 'gastos_personales'))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const gastosCompartidos = (await getTransactionsByMonth(currentMonth, 'gastos_compartidos'))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    const inversiones = (await getTransactionsByMonth(currentMonth, 'inversiones'))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    
+    // 3. SALDO COMPARTIDO
+    const cuentasCompartidas = data.accounts.filter(acc => 
+      acc.isShared === true || acc.isShared === 'true' || acc.is_shared === true
+    );
+    
+    let sharedBalanceTotal = 0;
+    for (const acc of cuentasCompartidas) {
+      sharedBalanceTotal += await calculateAccountBalance(acc.name, currentMonth);
+    }
+
+    // 4. ACTUALIZAR KPIs
+    const monthlyKpis = document.getElementById('monthly-kpis');
+    if (monthlyKpis) {
+      monthlyKpis.innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label">Ingresos</div>
+          <div class="kpi-value" style="color:var(--green)">${formatCurrency(ingresos)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Gastos Pers.</div>
+          <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
+        </div>
+        <div class="kpi-card" style="border: 1px solid var(--orange); background: rgba(245,158,11,0.05);">
+          <div class="kpi-label">👥 Saldo Compartido</div>
+          <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
+        </div>
+      `;
+    }
+
+    // 5. RENDERIZADO DE TABLAS Y COMPONENTES
+    const setTotal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatCurrency(val); };
+    setTotal('ingresos-total', ingresos);
+    setTotal('gastos-personales-total', gastosPersonales);
+    setTotal('gastos-compartidos-total', gastosCompartidos);
+    setTotal('inversiones-total', inversiones);
+
+    await renderTable('ingresos');
+    await renderTable('gastos_personales');
+    await renderTable('gastos_compartidos');
+    await renderTable('inversiones');
+    
+    setTimeout(async () => {
+      if (typeof renderAccounts === 'function') await renderAccounts();
+      if (typeof renderInvestmentsView === 'function') await renderInvestmentsView();
+      if (typeof renderContributionsList === 'function') await renderContributionsList();
+      if (typeof renderFixedExpensesInMonth === 'function') await renderFixedExpensesInMonth();
+      if (typeof updateMonthlyPatrimonyDisplay === 'function') await updateMonthlyPatrimonyDisplay();
+    }, 50);
 }
 
 async function renderTable(type) {
@@ -4791,258 +4948,123 @@ async function renderAccountsView() {
   const data = await getData();
   const filterAccount = document.getElementById('account-filter')?.value || '';
   
-  // Calculate total patrimonio
-  const totalPatrimonio = ACCOUNTS.reduce((sum, acc) => sum + calculateAccountBalance(acc), 0);
-  // Generate detailed breakdown
-  const accountBreakdown = await Promise.all(
-    ACCOUNTS
-      .filter(acc => {
-        const account = data.accounts.find(a => a.name === acc);
-        return account && account.includeInPatrimony !== false;
-      })
-      .map(async acc => {
-        const balance = await calculateAccountBalance(acc);
-        return { name: acc, balance: balance };
-      })
+  // 1. CÁLCULO DE SALDOS (Sync con Dashboard)
+  const accountEntries = await Promise.all(
+    data.accounts.map(async (acc) => {
+      const balance = await calculateAccountBalance(acc.name);
+      return { ...acc, currentBalance: balance };
+    })
   );
 
-  // Nuevo diseño de desglose visual
-  const breakdownHTML = accountBreakdown
-    .filter(a => a.balance > 0)
-    .map(a => `
-      <div style="background: #f2f2f7; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid #e5e5ea;">
-        <span style="font-size: 11px; color: #8e8e93; font-weight: 600; text-transform: uppercase;">${a.name}</span>
-        <span style="font-size: 13px; color: #1c1c1e; font-weight: 700;">${formatCurrency(a.balance)}</span>
-      </div>
-    `).join('');
+  const totalPersonal = accountEntries
+    .filter(acc => acc.includeInPatrimony !== false && !(acc.isShared === true || acc.is_shared === true))
+    .reduce((sum, acc) => sum + acc.currentBalance, 0);
 
-  document.getElementById('accounts-subtitle').innerHTML = `
-    <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 10px;">
-      <div>
-        <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Patrimonio Total Actual</div>
-        <div style="font-size: 32px; font-weight: 800; color: var(--text-primary);">${formatCurrency(totalPatrimonio)}</div>
+  const sharedTotal = accountEntries
+    .filter(acc => acc.isShared === true || acc.is_shared === true)
+    .reduce((sum, acc) => sum + acc.currentBalance, 0);
+
+  // 2. ACTUALIZAR CABECERA (Estilo limpio)
+  const subtitleEl = document.getElementById('accounts-subtitle');
+  if (subtitleEl) {
+    subtitleEl.innerHTML = `
+      <div style="margin-top: 12px;">
+        <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Patrimonio Personal Neto</div>
+        <div style="font-size: 42px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;">${formatCurrency(totalPersonal)}</div>
       </div>
-      
-      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-        ${breakdownHTML}
-      </div>
-    </div>
-  `;
-  
-  // Render KPIs
+    `;
+  }
+
   const accountsKpis = document.getElementById('accounts-kpis');
+  if (accountsKpis) {
+    accountsKpis.innerHTML = `
+      <div class="kpi-card" style="border-left: 4px solid var(--primary);"><div class="kpi-label">👤 Mi Patrimonio</div><div class="kpi-value">${formatCurrency(totalPersonal)}</div></div>
+      <div class="kpi-card" style="border-left: 4px solid var(--orange);"><div class="kpi-label">👥 Saldo Compartido</div><div class="kpi-value">${formatCurrency(sharedTotal)}</div></div>
+    `;
+  }
 
-  // Calculate balances
-  const balancesForKPI = await Promise.all(
-    ACCOUNTS.map(accountName => calculateAccountBalance(accountName))
-  );
+  // 3. GENERAR GRUPOS
+  const groups = [
+    { title: 'Cuentas Personales', icon: '👤', items: accountEntries.filter(a => !a.isShared && a.type !== 'Broker' && a.type !== 'Exchange Crypto') },
+    { title: 'Inversiones', icon: '📈', items: accountEntries.filter(a => !a.isShared && (a.type === 'Broker' || a.type === 'Exchange Crypto')) },
+    { title: 'Cuentas Compartidas', icon: '🏠', items: accountEntries.filter(a => a.isShared) }
+  ];
 
-  // Separate personal accounts from shared
-  const personalAccounts = ACCOUNTS.filter(acc => acc !== 'Santander Pareja');
-  const personalBalances = await Promise.all(
-    personalAccounts.map(accountName => calculateAccountBalance(accountName))
-  );
-
-  // Separate normal accounts from broker/crypto
-    const normalAccounts = data.accounts.filter(a => 
-      a.name !== 'Santander Pareja' && 
-      a.type !== 'Broker' && 
-      a.type !== 'Exchange Crypto' &&
-      a.includeInPatrimony !== false
-    );
-    const brokerAccounts = data.accounts.filter(a => 
-      (a.type === 'Broker' || a.type === 'Exchange Crypto') &&
-      a.includeInPatrimony !== false
-    );
-
-  const normalTotal = await Promise.all(
-    normalAccounts.map(a => calculateAccountBalance(a.name))
-  ).then(balances => balances.reduce((sum, b) => sum + b, 0));
-
-  const brokerTotal = await Promise.all(
-    brokerAccounts.map(a => calculateAccountBalance(a.name))
-  ).then(balances => balances.reduce((sum, b) => sum + b, 0));
-
-  const personalTotal = normalTotal + brokerTotal;
-  const normalPercent = personalTotal > 0 ? (normalTotal / personalTotal * 100) : 0;
-  const brokerPercent = personalTotal > 0 ? (brokerTotal / personalTotal * 100) : 0;
-
-  // Shared account balance
-  const sharedBalance = await calculateAccountBalance('Santander Pareja');
-
-  accountsKpis.innerHTML = `
-    <div class="kpi-card" style="grid-column: span 2;">
-      <div class="kpi-header">
-        <span class="kpi-label">💰 Total Personal</span>
-      </div>
-      <div class="kpi-value">${formatCurrency(personalTotal)}</div>
-      <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
-        <div style="flex: 1;">
-          <div style="color: var(--text-tertiary); margin-bottom: 4px;">Cuentas Normales</div>
-          <div style="font-weight: 600;">${formatCurrency(normalTotal)} <span style="color: var(--text-tertiary);">(${normalPercent.toFixed(1)}%)</span></div>
-        </div>
-        <div style="flex: 1;">
-          <div style="color: var(--text-tertiary); margin-bottom: 4px;">Inversiones</div>
-          <div style="font-weight: 600;">${formatCurrency(brokerTotal)} <span style="color: var(--text-tertiary);">(${brokerPercent.toFixed(1)}%)</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <span class="kpi-label">🏠 Cuenta Compartida</span>
-      </div>
-      <div class="kpi-value">${formatCurrency(sharedBalance)}</div>
-    </div>
-  `;
-  
-  // Render Account Cards
   const cardsGrid = document.getElementById('accounts-cards-grid');
-
-  // Calculate all balances first
-  const balances = await Promise.all(
-    ACCOUNTS.map(accountName => calculateAccountBalance(accountName))
-  );
-
-  cardsGrid.innerHTML = ACCOUNTS.map((accountName, index) => {
-    const balance = balances[index];
-    const account = data.accounts.find(a => a.name === accountName);
-    const change = balance - (account?.initialBalance || 0);
-    
-    return `
-      <div class="account-card" style="--account-color: ${ACCOUNT_COLORS[accountName]}" 
-           onclick="handleAccountClick('${accountName}')">
-        <div class="account-card-header">
-          <div>
-            <div class="account-card-name">${accountName}</div>
-            <div class="account-card-type">${ACCOUNT_TYPES[accountName]}</div>
-          </div>
-          <span class="account-card-badge">Cuenta</span>
-        </div>
-        <div class="account-card-balance">${formatCurrency(balance)}</div>
-        <div class="account-card-change ${change >= 0 ? 'positive' : 'negative'}">
-          <span>${change >= 0 ? '↑' : '↓'}</span>
-          <span>${formatCurrency(Math.abs(change))} vs inicial</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-  
-  // Render Flow Table
-  const flowTable = document.getElementById('account-flow-table');
-  flowTable.innerHTML = ACCOUNTS.map(accountName => {
-    const ingresos = data.transactions
-      .filter(t => t.type === 'ingresos' && t.account === accountName)
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
-    const gastos = data.transactions
-      .filter(t => (t.type === 'gastos_personales' || t.type === 'gastos_compartidos') && t.account === accountName)
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
-    const inversiones = data.transactions
-      .filter(t => t.type === 'inversiones' && t.account === accountName)
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
-    const flujoNeto = ingresos - gastos - inversiones;
-    
-    return `
-      <tr>
-        <td class="description-cell">${accountName}</td>
-        <td class="amount-cell" style="color: var(--green)">${formatCurrency(ingresos)}</td>
-        <td class="amount-cell" style="color: var(--red)">${formatCurrency(gastos)}</td>
-        <td class="amount-cell" style="color: var(--purple)">${formatCurrency(inversiones)}</td>
-        <td class="amount-cell" style="color: ${flujoNeto >= 0 ? 'var(--green)' : 'var(--red)'}">
-          ${formatCurrency(flujoNeto)}
-        </td>
-      </tr>
-    `;
-  }).join('');
-  
-  // Render Transfers Table
-  const transfersTable = document.getElementById('transfers-table');
-  const allTransfers = data.transfers || [];
-  
-  if (allTransfers.length === 0) {
-    transfersTable.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
-          No hay transferencias registradas
-        </td>
-      </tr>
-    `;
-  } else {
-    transfersTable.innerHTML = allTransfers
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .map(transfer => `
-        <tr>
-          <td class="date-cell">${formatDate(transfer.date)}</td>
-          <td class="description-cell">${transfer.from}</td>
-          <td class="description-cell">${transfer.to}</td>
-          <td style="color: var(--text-secondary); font-size: 14px;">${transfer.concept || '-'}</td>
-          <td class="amount-cell">${formatCurrency(transfer.amount)}</td>
-          <td>
-            <div class="row-actions">
-              <button class="action-btn" onclick="event.stopPropagation(); openEditTransferModal('${transfer.id}')">Editar</button>
-              <button class="action-btn delete" onclick="event.stopPropagation(); handleConfirmDeleteTransfer('${transfer.id}')">Eliminar</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-  }
-  
-  // BUSCA ESTO:
-  const accountFilter = document.getElementById('account-filter');
-    if (accountFilter) {
-      // Limpia las opciones actuales excepto la primera ("Todas las cuentas")
-      accountFilter.innerHTML = '<option value="">Todas las cuentas</option>';
+  if (cardsGrid) {
+    cardsGrid.innerHTML = groups.map(group => {
+      if (group.items.length === 0) return '';
+      const groupTotal = group.items.reduce((s, i) => s + i.currentBalance, 0);
       
-      // CAMBIO: Usa data.accounts en lugar de la variable ACCOUNTS
-      data.accounts.forEach(acc => {
-        const option = document.createElement('option');
-        option.value = acc.name; // Usamos el nombre de la DB
-        option.textContent = acc.name;
-        accountFilter.appendChild(option);
-      });
+      return `
+        <div class="account-group-container">
+          <div class="group-header">
+            <span class="group-title"><span>${group.icon}</span> ${group.title}</span>
+            <span class="group-sum">${formatCurrency(groupTotal)}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            ${group.items.map(acc => {
+              const diff = acc.currentBalance - (acc.initialBalance || 0);
+              return `
+                <div class="account-card-integrated" onclick="handleAccountClick('${acc.name}')">
+                  <div class="card-top-info">
+                    <div>
+                      <div class="card-acc-type">${acc.type}</div>
+                      <div class="card-acc-name">${acc.name}</div>
+                    </div>
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${acc.color || '#CCC'}; box-shadow: 0 0 8px ${acc.color || '#CCC'}"></div>
+                  </div>
+                  
+                  <div class="card-acc-balance">${formatCurrency(acc.currentBalance)}</div>
+                  
+                  <div class="card-acc-footer">
+                    <div class="card-diff" style="color: ${diff >= 0 ? 'var(--green)' : 'var(--red)'}">
+                      ${diff >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diff))}
+                    </div>
+                    <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 700;">VS INICIAL</div>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // 4. TABLAS INFERIORES (Mantenemos la lógica que funcionaba)
+  await renderAccountTables(data, accountEntries, filterAccount);
+}
+
+// Función auxiliar unificada para las tablas
+async function renderAccountTables(data, accountEntries, filterAccount) {
+    const flowEl = document.getElementById('account-flow-table');
+    if (flowEl) {
+        flowEl.innerHTML = accountEntries.map(acc => {
+            const txs = data.transactions.filter(t => t.account === acc.name);
+            const ing = txs.filter(t => t.type === 'ingresos').reduce((s,t) => s + (t.amount || 0), 0);
+            const gas = txs.filter(t => t.type.includes('gastos')).reduce((s,t) => s + (t.amount || 0), 0);
+            const inv = txs.filter(t => t.type === 'inversiones').reduce((s,t) => s + (t.amount || 0), 0);
+            const neto = ing - gas - inv;
+            return `<div class="transaction-card" style="margin-bottom:8px; border-left:3px solid ${neto>=0?'var(--green)':'var(--red)'}">
+                <div style="flex:1"><strong>${acc.name}</strong><br><small>+${formatCurrency(ing)} | -${formatCurrency(gas)}</small></div>
+                <div style="font-weight:800; color:${neto>=0?'var(--green)':'var(--red)'}">${formatCurrency(neto)}</div>
+            </div>`;
+        }).join('');
     }
-  
-  // Render Movements Table
-  const movementsTable = document.getElementById('account-movements-table');
-  let movements = data.transactions;
-  
-  if (filterAccount) {
-    movements = movements.filter(t => t.account === filterAccount);
-  }
-  
-  if (movements.length === 0) {
-    movementsTable.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
-          No hay movimientos${filterAccount ? ' para esta cuenta' : ''}
-        </td>
-      </tr>
-    `;
-  } else {
-    const typeLabels = {
-      'ingresos': '💰 Ingreso',
-      'gastos_personales': '💳 Gasto Personal',
-      'gastos_compartidos': '🏠 Gasto Compartido',
-      'inversiones': '📈 Inversión'
-    };
-    
-    movementsTable.innerHTML = movements
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 50) // Limit to 50 most recent
-      .map(txn => `
-        <tr>
-          <td class="date-cell">${formatDate(txn.date)}</td>
-          <td class="description-cell">${txn.description}</td>
-          <td><span class="category-badge">${typeLabels[txn.type]}</span></td>
-          <td><span class="category-badge">${txn.category}</span></td>
-          <td class="amount-cell" style="color: ${txn.type === 'ingresos' ? 'var(--green)' : 'var(--red)'}">
-            ${txn.type === 'ingresos' ? '+' : '-'}${formatCurrency(txn.amount)}
-          </td>
-        </tr>
-      `).join('');
-  }
+
+    const transEl = document.getElementById('transfers-table');
+    if (transEl) {
+        const trs = (data.transfers || []).sort((a,b) => new Date(b.date) - new Date(a.date));
+        transEl.innerHTML = trs.length === 0 ? '<tr><td colspan="6" style="text-align:center; padding:20px;">Sin transferencias</td></tr>' :
+            trs.map(t => `<tr><td>${formatDate(t.date)}</td><td>${t.from}</td><td>${t.to}</td><td>${t.concept || '-'}</td><td>${formatCurrency(t.amount)}</td><td><button class="action-btn delete" onclick="handleConfirmDeleteTransfer('${t.id}')">Eliminar</button></td></tr>`).join('');
+    }
+
+    const movEl = document.getElementById('account-movements-table');
+    if (movEl) {
+        let movs = data.transactions;
+        if (filterAccount) movs = movs.filter(t => t.account === filterAccount);
+        movEl.innerHTML = movs.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding:20px;">Sin movimientos</td></tr>' :
+            movs.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0,30).map(m => `<tr><td>${formatDate(m.date)}</td><td>${m.description}</td><td>${m.category}</td><td>${m.account}</td><td style="color:${m.type==='ingresos'?'var(--green)':'var(--red)'}">${formatCurrency(m.amount)}</td></tr>`).join('');
+    }
 }
 
 // Modal Handlers
@@ -6567,26 +6589,30 @@ function saveMonthlyPatrimonySnapshot(month) {
     acc.isDisposable === true || acc.isDisposable === 'true' || acc.is_disposable === true
   );
 
+  const elBreakdown = document.getElementById('monthly-disponible-breakdown');
+  if (!elBreakdown) return;
+
   if (disposableAccounts.length === 0) {
-    const el = document.getElementById('monthly-disponible-total');
-    if (el) el.textContent = "0,00 € (Sin cuentas)";
+    elBreakdown.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-tertiary);">No hay cuentas configuradas como "Disponible".</div>`;
     return;
   }
 
   const breakdownData = await Promise.all(
     disposableAccounts.map(async acc => {
-      // 1. Saldo al FINAL del mes seleccionado (usando la nueva función)
+      // Saldo al final del mes actual
       let balanceAtSelectedMonth = await calculateAccountBalance(acc.name, currentMonth);
 
-      // 2. Saldo al INICIO del mes (que es el saldo del mes anterior, o el inicial si es enero)
+      // Saldo al inicio (mes anterior)
       let startOfSelectedMonth = currentMonth > 0 
         ? await calculateAccountBalance(acc.name, currentMonth - 1)
-        : parseFloat(acc.initialBalance || acc.initial_balance || 0);
+        : parseFloat(acc.initialBalance || 0);
 
       return { 
         name: acc.name, 
         current: balanceAtSelectedMonth, 
-        start: startOfSelectedMonth 
+        start: startOfSelectedMonth,
+        color: acc.color,
+        type: acc.type
       };
     })
   );
@@ -6594,27 +6620,39 @@ function saveMonthlyPatrimonySnapshot(month) {
   const totalActual = breakdownData.reduce((sum, item) => sum + item.current, 0);
   const totalInicio = breakdownData.reduce((sum, item) => sum + item.start, 0);
 
-  const elTotal = document.getElementById('monthly-disponible-total');
-  const elInicio = document.getElementById('monthly-disponible-inicio');
-  const elBreakdown = document.getElementById('monthly-disponible-breakdown');
+  // Actualizar números grandes
+  document.getElementById('monthly-disponible-total').textContent = formatCurrency(totalActual);
+  document.getElementById('monthly-disponible-inicio').textContent = formatCurrency(totalInicio);
 
-  if (elTotal) elTotal.textContent = formatCurrency(totalActual);
-  if (elInicio) elInicio.textContent = formatCurrency(totalInicio);
-  
-  if (elBreakdown) {
-    elBreakdown.innerHTML = breakdownData.map(item => `
-      <div style="background: #f2f2f7; padding: 6px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid #e5e5ea;">
-        <span style="font-size: 10px; color: #8e8e93; font-weight: 700; text-transform: uppercase;">${item.name}</span>
-        <span style="font-size: 13px; color: #1c1c1e; font-weight: 700;">${formatCurrency(item.current)}</span>
+  // Renderizar tarjetas mini
+  elBreakdown.innerHTML = breakdownData.map(item => {
+    const diff = item.current - item.start;
+    return `
+      <div class="card-mini-integrated">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">${item.type}</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">${item.name}</div>
+          </div>
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: ${item.color || '#CCC'}; box-shadow: 0 0 6px ${item.color || '#CCC'}"></div>
+        </div>
+        
+        <div style="margin: 10px 0;">
+          <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">${formatCurrency(item.current)}</div>
+        </div>
+
+        <div style="font-size: 11px; font-weight: 700; color: ${diff >= 0 ? 'var(--green)' : 'var(--red)'}">
+          ${diff >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diff))}
+        </div>
       </div>
-    `).join('');
-  }
+    `;
+  }).join('');
 
-  const diff = totalActual - totalInicio;
+  const diffTotal = totalActual - totalInicio;
   const elDiff = document.getElementById('monthly-disponible-vs-inicio');
   if (elDiff) {
-    elDiff.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
-    elDiff.textContent = `${diff >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diff))} este mes`;
+    elDiff.style.color = diffTotal >= 0 ? 'var(--green)' : 'var(--red)';
+    elDiff.textContent = `${diffTotal >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diffTotal))} acumulado este mes`;
   }
 }
 
@@ -7131,18 +7169,21 @@ async function renderBudgetsView() {
   if (!container) return;
 
   if (budgets.length === 0) {
-  container.innerHTML = `
-    <div class="empty-state-card">
-      <div class="empty-state-icon">🎯</div>
-      <div class="empty-state-title">Define tus objetivos</div>
-      <div class="empty-state-text">Crea tu primer presupuesto para controlar que no se te escape el dinero en ninguna categoría.</div>
-      <button class="btn-primary" onclick="openBudgetModal()" style="margin-top: 20px;">+ Crear Presupuesto</button>
-    </div>
-  `;
-  return;
-}
+    container.innerHTML = `
+      <div class="empty-state-card">
+        <div class="empty-state-icon">🎯</div>
+        <div class="empty-state-title">Define tus límites</div>
+        <div class="empty-state-text">Crea presupuestos por categoría para mantener tus gastos bajo control este mes.</div>
+        <button class="btn-primary" onclick="openBudgetModal()" style="margin-top: 20px;">+ Crear Presupuesto</button>
+      </div>`;
+    return;
+  }
 
+  // Filtrar transacciones del mes actual para comparar con el presupuesto
   const currentMonthTxns = data.transactions.filter(t => new Date(t.date).getMonth() === currentMonth);
+
+  // Cambiamos el contenedor a un grid
+  container.className = "budget-grid";
 
   container.innerHTML = budgets.map(b => {
     const spent = currentMonthTxns
@@ -7150,32 +7191,41 @@ async function renderBudgetsView() {
       .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount || 0)), 0);
 
     const percent = Math.min((spent / b.amount) * 100, 100);
-    let color = 'var(--green)';
-    if (percent >= 100) color = 'var(--red)';
-    else if (percent >= 80) color = 'var(--orange)';
+    const remaining = Math.max(0, b.amount - spent);
+    
+    // Colores dinámicos según el consumo
+    let statusColor = 'var(--green)';
+    if (percent >= 100) statusColor = 'var(--red)';
+    else if (percent >= 80) statusColor = 'var(--orange)';
 
-    const typeLabel = b.type === 'gastos_personales' ? '👤 Personal' : '👥 Compartido';
+    const isPersonal = b.type === 'gastos_personales';
 
     return `
-      <div style="background: var(--bg-surface); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+      <div class="budget-card-integrated">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
-            <div style="font-size: 12px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 4px;">${typeLabel}</div>
-            <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">${b.category}</div>
+            <span class="budget-badge-type" style="background: ${isPersonal ? 'var(--primary-light)' : 'var(--orange-bg)'}; color: ${isPersonal ? 'var(--primary)' : 'var(--orange)'}">
+              ${isPersonal ? '👤 Personal' : '🏠 Compartido'}
+            </span>
+            <div style="font-size: 18px; font-weight: 800; color: var(--text-primary);">${b.category}</div>
           </div>
-          <div style="text-align: right;">
-            <span style="font-size: 18px; font-weight: 800; color: ${color};">${formatCurrency(spent)}</span>
-            <span style="font-size: 14px; color: var(--text-tertiary); font-weight: 500;"> / ${formatCurrency(b.amount)}</span>
-          </div>
-        </div>
-        
-        <div style="width: 100%; height: 10px; background: var(--bg-body); border-radius: 6px; overflow: hidden; margin-bottom: 16px;">
-          <div style="width: ${percent}%; height: 100%; background: ${color}; border-radius: 6px; transition: width 0.5s ease;"></div>
+          <button class="action-btn delete" onclick="deleteBudget('${b.id}')" style="opacity: 0.5;">✕</button>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-          <span style="color: var(--text-secondary); font-weight: 500;">${percent.toFixed(1)}% consumido</span>
-          <button class="action-btn delete" onclick="deleteBudget('${b.id}')">Eliminar</button>
+        <div style="margin-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px;">
+            <div style="font-size: 22px; font-weight: 900; color: var(--text-primary);">${formatCurrency(spent)}</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 600;">Objetivo: ${formatCurrency(b.amount)}</div>
+          </div>
+          
+          <div class="progress-container-saas">
+            <div class="progress-bar-saas" style="width: ${percent}%; background: ${statusColor}; box-shadow: 0 0 10px ${statusColor}44;"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700;">
+            <span style="color: ${statusColor}">${percent.toFixed(1)}% consumido</span>
+            <span style="color: var(--text-secondary);">${remaining > 0 ? 'Te quedan ' + formatCurrency(remaining) : 'Límite superado'}</span>
+          </div>
         </div>
       </div>
     `;
