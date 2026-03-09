@@ -1818,8 +1818,46 @@
     }
 
     .main-content {
-        padding: 16px 12px 100px 12px !important; /* Espacio para el menú inferior */
-        width: 100% !important;
+        /* Aseguramos que el contenido pueda crecer hacia abajo */
+        overflow-y: visible !important; 
+        overflow-x: hidden !important;
+        height: auto !important;
+        /* IMPORTANTE: Espacio extra al final para que el menú no tape el contenido */
+        padding-bottom: 120px !important; 
+        display: block !important;
+    }
+
+    /* --- FIX BOTONES DE AÑADIR DESCUADRADOS --- */
+    .section-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important; /* Evita que el botón baje */
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .section-title {
+        font-size: 14px !important; /* Reducimos un poco el texto en móvil */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Si el título es muy largo, pone "..." */
+        flex-shrink: 1;
+    }
+
+    /* El botón de añadir en móvil */
+    .section-header .btn-primary, 
+    .section-header button {
+        flex-shrink: 0; /* Evita que el botón se aplaste */
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Forzar que ningún contenedor se salga del ancho de pantalla */
+    .section, .kpi-grid, .budget-grid, .account-group-container {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* 2. BARRA DE NAVEGACIÓN INFERIOR (ESTILO APPLE) */
