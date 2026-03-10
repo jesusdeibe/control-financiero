@@ -2258,6 +2258,13 @@
         <div id="alerts-list"></div>
       </div>
 
+      <div id="dashboard-upcoming-expenses" style="margin-bottom: 24px; display: none;">
+        <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
+            📅 Próximos Recibos (7 días vista)
+        </div>
+        <div id="upcoming-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;"></div>
+      </div>
+
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; align-items: stretch;">
   
         <div class="kpi-card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; border-left: 4px solid var(--primary);">
@@ -3393,9 +3400,15 @@
               <!-- Options generated dynamically -->
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Importe (€)</label>
-            <input type="number" step="0.01" class="form-input" id="fixed-expense-amount" required>
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label class="form-label">Importe (€)</label>
+                <input type="number" step="0.01" class="form-input" id="fixed-expense-amount" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Día Cobro</label>
+                <input type="number" id="fixed-expense-day" class="form-input" min="1" max="31" placeholder="1-31">
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Meses en los que aplica</label>
@@ -3615,7 +3628,7 @@
           holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
           transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
-          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
+          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months, day: f.day })),
           fixedExpensesPaid: {}, 
           monthlyPatrimony: {}, 
           customCategories: {},
@@ -3915,6 +3928,7 @@
       await checkBudgetAlerts();   // Alertas de presupuestos
       await checkLiquidityAlerts(); // NUEVAS: Alertas de liquidez
       await renderSavingGoals();
+      await renderUpcomingExpenses(); // <-- NUEVA LLAMADA
     }
 
     async function renderInvestmentSparkline() {
@@ -5140,32 +5154,30 @@ async function updateAccountBalance(accountName, initialBalance) {
   }
 }
 
-// AHORA ACEPTA UN SEGUNDO PARÁMETRO: targetMonth
 async function calculateAccountBalance(accountName, targetMonth = null) {
   const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
-  
   if (!account) return 0;
   
-  const initial = parseFloat(account.initialBalance || account.initial_balance || account.balance || 0);
-  
+  const initial = parseFloat(account.initialBalance || account.initial_balance || 0);
   let validTransactions = data.transactions.filter(t => t.account === accountName);
   let validTransfers = (data.transfers || []);
 
-  // VIAJE EN EL TIEMPO: Si le pasamos un mes, filtramos el futuro
   if (targetMonth !== null) {
     validTransactions = validTransactions.filter(t => {
-      if (!t.date) return false;
-      const m = parseInt(t.date.split('-')[1]) - 1; // Leemos el mes exacto (0-11)
-      return m <= targetMonth; // Solo sumamos hasta el mes seleccionado inclusive
+      const d = new Date(t.date);
+      // Permitimos cualquier año anterior, pero si es el año actual, limitamos por mes
+      if (d.getFullYear() < currentYear) return true;
+      return d.getFullYear() === currentYear && d.getMonth() <= targetMonth;
     });
     
     validTransfers = validTransfers.filter(t => {
-      if (!t.date) return false;
-      const m = parseInt(t.date.split('-')[1]) - 1;
-      return m <= targetMonth;
+      const d = new Date(t.date);
+      if (d.getFullYear() < currentYear) return true;
+      return d.getFullYear() === currentYear && d.getMonth() <= targetMonth;
     });
   }
+  // ... resto del cálculo de sumas igual ...
   
   const transTotal = validTransactions.reduce((sum, t) => {
     const isIncome = t.type === 'ingreso' || t.type === 'ingresos';
@@ -5180,11 +5192,11 @@ async function calculateAccountBalance(accountName, targetMonth = null) {
     return sum;
   }, 0);
   
+  // Si es un Broker, devolvemos el valor actual de sus posiciones
   if (account.type === 'Broker' || account.type === 'Exchange Crypto') {
-    const holdingsValue = (data.holdings || [])
+    return (data.holdings || [])
       .filter(h => h.account === accountName)
       .reduce((sum, h) => sum + parseFloat(h.currentValue || 0), 0);
-    return holdingsValue;
   }
   
   return initial + transTotal + transferTotal;
@@ -6374,17 +6386,27 @@ function openAddFixedExpenseModal() {
   document.getElementById('fixed-expense-modal').classList.add('active');
 }
 
-function openEditFixedExpenseModal(id) {
-  const data = getData();
+async function openEditFixedExpenseModal(id) {
+  // Añadimos await para que espere a tener los datos reales
+  const data = await getData();
   const expense = (data.fixedExpenses || []).find(e => e.id === id);
-  if (!expense) return;
+  
+  if (!expense) {
+      showToast('No se encontró el gasto para editar', 'error');
+      return;
+  }
   
   editingFixedExpenseId = id;
   document.getElementById('fixed-expense-modal-title').textContent = 'Editar Gasto Fijo';
   
-  document.getElementById('fixed-expense-name').value = expense.name;
-  document.getElementById('fixed-expense-type').value = expense.type;
-  document.getElementById('fixed-expense-amount').value = expense.amount;
+  // Rellenamos los campos básicos
+  document.getElementById('fixed-expense-name').value = expense.name || '';
+  document.getElementById('fixed-expense-type').value = expense.type || 'gastos_personales';
+  document.getElementById('fixed-expense-amount').value = expense.amount || 0;
+  
+  // NUEVO: Rellenamos el día de cobro si existe
+  const dayInput = document.getElementById('fixed-expense-day');
+  if (dayInput) dayInput.value = expense.day || '';
   
   updateFixedExpenseCategories();
   document.getElementById('fixed-expense-category').value = expense.category;
@@ -6392,7 +6414,7 @@ function openEditFixedExpenseModal(id) {
   populateFixedExpenseAccounts();
   document.getElementById('fixed-expense-account').value = expense.account;
   
-  // Set months checkboxes
+  // Marcamos los meses correspondientes
   const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
   document.querySelectorAll('.month-checkbox').forEach(cb => {
     cb.checked = months.includes(parseInt(cb.value));
@@ -6431,61 +6453,86 @@ function populateFixedExpenseAccounts() {
 // ============================================================================
 
 async function saveFixedExpense() {
+  // 1. Capturamos los valores del formulario
   const name = document.getElementById('fixed-expense-name').value.trim();
   const type = document.getElementById('fixed-expense-type').value;
   const category = document.getElementById('fixed-expense-category').value;
   const account = document.getElementById('fixed-expense-account').value;
   const amount = parseFloat(document.getElementById('fixed-expense-amount').value);
   
-  // Get selected months
+  // NUEVO: Capturamos el día de cobro
+  const dayInput = document.getElementById('fixed-expense-day');
+  const day = dayInput && dayInput.value ? parseInt(dayInput.value) : null;
+  
+  // Obtenemos los meses seleccionados
   const months = Array.from(document.querySelectorAll('.month-checkbox:checked'))
     .map(cb => parseInt(cb.value));
   
-  if (!name || !amount) {
-    showToast('Por favor completa todos los campos', 'error');
+  // 2. Validaciones básicas
+  if (!name || isNaN(amount)) {
+    showToast('Por favor completa los campos obligatorios (Nombre e Importe)', 'error');
     return;
   }
   
   if (months.length === 0) {
-    showToast('Selecciona al menos un mes', 'error');
+    showToast('Selecciona al menos un mes para este gasto', 'error');
+    return;
+  }
+
+  // Validación del día (opcional, entre 1 y 31)
+  if (day !== null && (day < 1 || day > 31)) {
+    showToast('El día de cobro debe estar entre 1 y 31', 'error');
     return;
   }
   
   try {
+    showToast('Guardando cambios...', 'info');
+
+    // Preparamos el objeto con los datos comunes
+    const expenseData = {
+      user_id: currentUser.id,
+      name: name,
+      type: type,
+      category: category,
+      account: account,
+      amount: amount,
+      months: months,
+      day: day // <-- NUEVA COLUMNA
+    };
+
     if (editingFixedExpenseId) {
-      // Update existing
-      const { error } = await supabaseClient.from('fixed_expenses').update({
-        user_id: currentUser.id, // <-- LÍNEA NUEVA
-        name,
-        type,
-        category,
-        account,
-        amount,
-        months
-      }).eq('id', editingFixedExpenseId);
+      // MODO EDICIÓN: Actualizamos el registro existente en Supabase
+      const { error } = await supabaseClient
+        .from('fixed_expenses')
+        .update(expenseData)
+        .eq('id', editingFixedExpenseId);
       
       if (error) throw error;
+      showToast('Gasto fijo actualizado correctamente ✓', 'success');
     } else {
-      // Insert new
-      const { error } = await supabaseClient.from('fixed_expenses').insert({
-        user_id: currentUser.id, // <-- LÍNEA NUEVA
-        name,
-        type,
-        category,
-        account,
-        amount,
-        months
-      });
+      // MODO NUEVO: Insertamos un nuevo registro en Supabase
+      const { error } = await supabaseClient
+        .from('fixed_expenses')
+        .insert([expenseData]);
       
       if (error) throw error;
+      showToast('Nuevo gasto fijo creado ✓', 'success');
     }
     
-    invalidateCache();
+    // 3. Finalización y Refresco de UI
+    invalidateCache(); // Limpiamos la caché para forzar la recarga de datos
     closeFixedExpenseModal();
-    await renderSettingsView();
-    showToast('Gasto fijo guardado correctamente', 'success');
+    
+    // Refrescamos la vista de configuración
+    await renderSettingsView(); 
+    
+    // Si estamos en la vista mensual, la refrescamos para ver el nuevo Timeline
+    if (document.getElementById('monthly-view').classList.contains('active')) {
+      await renderFixedExpensesInMonth();
+    }
+
   } catch (error) {
-    console.error('Error saving fixed expense:', error);
+    console.error('Error al guardar el gasto fijo:', error);
     showToast('Error al guardar: ' + error.message, 'error');
   }
 }
@@ -6537,19 +6584,20 @@ async function toggleFixedExpense(expenseId, month) {
     const isPaid = (data.fixedExpensesPaid[monthKey] || []).includes(expenseId);
     
     if (isPaid) {
-      // Uncheck: Remove from paid list and delete transaction
+      // 1. DESMARCAR: Eliminar de la lista de pagados y borrar la transacción asociada
       await supabaseClient
         .from('fixed_expenses_paid')
         .delete()
         .eq('month_key', monthKey)
         .eq('fixed_expense_id', expenseId);
       
-      // Find and delete the associated transaction
+      // Corregido: Usamos .ilike() correctamente para encontrar la transacción del mes
+      const monthPrefix = `${currentYear}-${String(month + 1).padStart(2, '0')}%`;
       const { data: transactions } = await supabaseClient
         .from('transactions')
         .select('id')
         .eq('fixed_expense_id', expenseId)
-        .eq('date', `ilike`, `${currentYear}-${String(month + 1).padStart(2, '0')}%`);
+        .ilike('date', monthPrefix);
       
       if (transactions && transactions.length > 0) {
         await supabaseClient
@@ -6560,7 +6608,7 @@ async function toggleFixedExpense(expenseId, month) {
       
       showToast('Gasto desmarcado y transacción eliminada', 'info');
     } else {
-      // Check: Add to paid list
+      // 2. MARCAR: Añadir a pagados y crear la transacción
       await supabaseClient
         .from('fixed_expenses_paid')
         .insert({
@@ -6568,13 +6616,17 @@ async function toggleFixedExpense(expenseId, month) {
           fixed_expense_id: expenseId
         });
       
-      // Create transaction
+      // CAMBIO: Usamos el día configurado en el gasto fijo (o 1 por defecto)
+      const dayToUse = expense.day || 1;
+      const scheduledDate = new Date(currentYear, month, dayToUse).toISOString().split('T')[0];
+
       await supabaseClient
         .from('transactions')
         .insert({
+          user_id: currentUser.id,
           fixed_expense_id: expenseId,
           type: expense.type,
-          date: new Date(currentYear, month, new Date().getDate()).toISOString().split('T')[0],
+          date: scheduledDate,
           description: expense.name,
           category: expense.category,
           account: expense.account,
@@ -6584,17 +6636,17 @@ async function toggleFixedExpense(expenseId, month) {
       showToast(`✓ ${expense.name} pagado`, 'success');
 
       // --- LÓGICA DE CELEBRACIÓN (CONFETI) ---
-      // Invalidate y pedimos datos frescos para ver si era el último
       invalidateCache();
       const freshData = await getData();
       const totalMes = freshData.fixedExpenses.filter(e => (e.months || []).includes(currentMonth)).length;
       const pagadosMes = (freshData.fixedExpensesPaid[monthKey] || []).length;
 
       if (pagadosMes === totalMes && totalMes > 0) {
-        setTimeout(launchCelebration, 300); // Lanzamos la fiesta
+        setTimeout(launchCelebration, 300);
       }
     }
     
+    // Refrescar todas las vistas afectadas
     invalidateCache();
     await renderMonthlyView();
     await renderDashboard();
@@ -6609,7 +6661,6 @@ async function renderFixedExpensesInMonth() {
   const data = await getData();
   const allFixedExpenses = data.fixedExpenses || [];
   
-  // Filtramos los gastos que corresponden a este mes
   const fixedExpenses = allFixedExpenses.filter(expense => {
     const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
     return months.includes(currentMonth);
@@ -6621,30 +6672,32 @@ async function renderFixedExpensesInMonth() {
   
   if (!container) return;
   if (fixedExpenses.length === 0) {
-    container.innerHTML = `<div style="text-align: center; padding: 32px; color: var(--text-tertiary);">No hay gastos fijos configurados para este mes.</div>`;
+    container.innerHTML = `<div style="text-align: center; padding: 32px; color: var(--text-tertiary);">No hay gastos fijos para este mes.</div>`;
     return;
   }
 
-  // 1. CÁLCULO DE PROGRESO GLOBAL
+  // Identificamos si estamos viendo el mes y año REAL actual
+  const today = new Date();
+  const isCurrentMonthView = (currentMonth === today.getMonth() && currentYear === today.getFullYear());
+  const todayDate = today.getDate();
+
   const totalCount = fixedExpenses.length;
   const paidCount = fixedExpenses.filter(exp => paidExpenses.includes(exp.id)).length;
   const progressPercent = (paidCount / totalCount) * 100;
   const globalTotalAmount = fixedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-  // Cabecera con barra de progreso
   let html = `
     <div style="margin-bottom: 24px; background: var(--bg-surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Progreso de pagos: ${paidCount} de ${totalCount}</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Progreso: ${paidCount} de ${totalCount}</div>
             <div style="font-size: 12px; font-weight: 700; color: var(--primary);">${progressPercent.toFixed(0)}%</div>
         </div>
-        <div class="fixed-expenses-progress-container" style="margin: 8px 0;">
-            <div class="fixed-expenses-progress-bar" style="width: ${progressPercent}%"></div>
+        <div class="fixed-expenses-progress-container" style="margin: 8px 0; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;">
+            <div class="fixed-expenses-progress-bar" style="width: ${progressPercent}%; height: 100%; background: var(--primary); transition: width 0.6s ease;"></div>
         </div>
     </div>
   `;
 
-  // 2. AGRUPACIÓN POR CUENTA
   const expensesByAccount = {};
   fixedExpenses.forEach(expense => {
     if (!expensesByAccount[expense.account]) expensesByAccount[expense.account] = [];
@@ -6654,77 +6707,94 @@ async function renderFixedExpensesInMonth() {
   html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">`;
 
   for (const [account, expenses] of Object.entries(expensesByAccount)) {
-    const isShared = account.toLowerCase().includes('pareja') || account.toLowerCase().includes('compartida');
-    
-    // Cálculos de saldo y pendientes
-    const currentBalance = await calculateAccountBalance(account);
-    const pendingAmount = expenses
-        .filter(exp => !paidExpenses.includes(exp.id))
-        .reduce((sum, exp) => sum + exp.amount, 0);
+    expenses.sort((a, b) => (a.day || 99) - (b.day || 99));
 
-    const hasEnoughMoney = currentBalance >= pendingAmount;
+    const isShared = account.toLowerCase().includes('pareja') || account.toLowerCase().includes('compartida');
+    const currentBalance = await calculateAccountBalance(account);
+    const pendingAmount = expenses.filter(exp => !paidExpenses.includes(exp.id)).reduce((sum, exp) => sum + exp.amount, 0);
 
     html += `
-      <div style="background: rgba(255,255,255,0.6); border-radius: 20px; padding: 20px; border: 1px solid ${!hasEnoughMoney && pendingAmount > 0 ? 'rgba(242, 100, 100, 0.4)' : 'var(--border-color)'}; position: relative; display: flex; flex-direction: column; gap: 16px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div style="background: rgba(255,255,255,0.6); border-radius: 20px; padding: 20px; border: 1px solid var(--border-color); position: relative;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
             <div>
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                    <span style="font-size: 14px;">${isShared ? '👥' : '👤'}</span>
-                    <span style="font-size: 15px; font-weight: 700; color: var(--text-primary);">${account}</span>
-                </div>
-                <div style="font-size: 12px; font-weight: 500; color: ${!hasEnoughMoney && pendingAmount > 0 ? 'var(--red)' : 'var(--text-secondary)'};">
-                    Saldo: ${formatCurrency(currentBalance)}
-                </div>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: 15px;">${isShared ? '👥' : '👤'} ${account}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Saldo: ${formatCurrency(currentBalance)}</div>
             </div>
-            
             <div style="text-align: right;">
-                <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Pendiente</div>
-                <div style="
-                    background: ${pendingAmount > 0 ? 'var(--red-bg)' : 'var(--green-bg)'}; 
-                    color: ${pendingAmount > 0 ? 'var(--red)' : 'var(--green)'}; 
-                    padding: 4px 10px; 
-                    border-radius: 8px; 
-                    font-size: 13px; 
-                    font-weight: 800;
-                    display: inline-block;
-                ">
+                <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Pendiente</div>
+                <div style="background: ${pendingAmount > 0 ? 'var(--red-bg)' : 'var(--green-bg)'}; color: ${pendingAmount > 0 ? 'var(--red)' : 'var(--green)'}; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 800;">
                     ${formatCurrency(pendingAmount)}
                 </div>
             </div>
         </div>
 
-        ${!hasEnoughMoney && pendingAmount > 0 ? `
-            <div style="background: var(--red-bg); color: var(--red); padding: 10px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(242, 100, 100, 0.1);">
-                <span>⚠️</span> Falta ${formatCurrency(pendingAmount - currentBalance)} para cubrir recibos
-            </div>
-        ` : ''}
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          ${(() => {
+            let todayMarkerRendered = false;
+            let timelineHtml = '';
 
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          ${expenses.map(exp => {
-            const isPaid = paidExpenses.includes(exp.id);
-            return `
-              <div class="fixed-expense-item ${isPaid ? 'paid' : ''}" style="padding: 10px 12px; background: white; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.02);">
-                <input type="checkbox" class="fixed-expense-checkbox" ${isPaid ? 'checked' : ''} 
-                       onchange="toggleFixedExpense('${exp.id}', ${currentMonth})"
-                       style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
-                <div style="flex: 1; min-width: 0;">
-                  <div class="fixed-expense-name" style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${exp.name}</div>
-                  <div style="font-size: 10px; color: var(--text-tertiary);">${exp.category}</div>
+            expenses.forEach((exp, idx) => {
+              const isPaid = paidExpenses.includes(exp.id);
+              const isLast = idx === expenses.length - 1;
+              const expDay = exp.day || 0;
+
+              // INSERTAR LÍNEA DE "HOY" CRONOLÓGICAMENTE
+              if (isCurrentMonthView && !todayMarkerRendered && expDay >= todayDate) {
+                timelineHtml += `
+                  <div style="display: flex; align-items: center; gap: 10px; margin: 5px 0 15px 0; position: relative; z-index: 3;">
+                    <div style="width: 30px; display: flex; justify-content: center; flex-shrink: 0;">
+                        <div style="width: 8px; height: 8px; background: var(--red); border-radius: 50%; box-shadow: 0 0 8px var(--red);"></div>
+                    </div>
+                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--red), transparent);"></div>
+                    <div style="font-size: 9px; font-weight: 800; color: var(--red); text-transform: uppercase; letter-spacing: 1px; padding-right: 10px;">Hoy</div>
+                  </div>
+                `;
+                todayMarkerRendered = true;
+              }
+
+              const dayBg = isPaid ? 'var(--bg-body)' : 'var(--primary)';
+              const dayColor = isPaid ? 'var(--text-tertiary)' : 'white';
+              const dayBorder = isPaid ? 'var(--border-color)' : 'var(--primary)';
+              const dayGlow = isPaid ? 'none' : '0 0 12px rgba(16, 185, 129, 0.3)';
+
+              timelineHtml += `
+                <div style="display: flex; gap: 15px; position: relative; padding-bottom: ${isLast ? '0' : '15px'};">
+                  ${!isLast ? `<div style="position: absolute; left: 14px; top: 28px; width: 2px; height: calc(100% - 15px); background: var(--border-color);"></div>` : ''}
+                  
+                  <div style="width: 30px; height: 30px; border-radius: 50%; background: ${dayBg}; color: ${dayColor}; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 2px solid ${dayBorder}; box-shadow: ${dayGlow}; flex-shrink: 0; z-index: 2;">
+                      ${exp.day || '??'}
+                  </div>
+
+                  <div class="fixed-expense-item ${isPaid ? 'paid' : ''}" style="flex: 1; padding: 10px; background: white; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid ${isPaid ? 'rgba(0,0,0,0.02)' : 'rgba(16, 185, 129, 0.1)'};">
+                      <input type="checkbox" class="fixed-expense-checkbox" ${isPaid ? 'checked' : ''} onchange="toggleFixedExpense('${exp.id}', ${currentMonth})">
+                      <div style="flex: 1; min-width: 0;">
+                          <div class="fixed-expense-name" style="font-size: 13px; font-weight: 600;">${exp.name}</div>
+                          <div style="font-size: 10px; color: var(--text-tertiary);">${exp.category}</div>
+                      </div>
+                      <div class="fixed-expense-amount" style="font-size: 13px; font-weight: 700;">${formatCurrency(exp.amount)}</div>
+                  </div>
+                </div>`;
+            });
+
+            // Si llegamos al final y el marcador no se puso (porque todos los gastos eran antes de hoy)
+            if (isCurrentMonthView && !todayMarkerRendered) {
+              timelineHtml += `
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                  <div style="width: 30px; display: flex; justify-content: center;"><div style="width: 8px; height: 8px; background: var(--red); border-radius: 50%;"></div></div>
+                  <div style="flex: 1; height: 1px; background: var(--red); opacity: 0.3;"></div>
+                  <div style="font-size: 9px; font-weight: 800; color: var(--red);">HOY</div>
                 </div>
-                <div class="fixed-expense-amount" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">${formatCurrency(exp.amount)}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
+              `;
+            }
 
+            return timelineHtml;
+          })()}
+        </div>
+      </div>`;
+  }
   html += `</div>`;
   container.innerHTML = html;
 
-  // Actualizar totales globales del pie
   const counterEl = document.getElementById('fixed-expenses-counter');
   const totalEl = document.getElementById('fixed-expenses-total');
   if (counterEl) counterEl.textContent = `${paidCount} de ${totalCount} pagados`;
@@ -6761,6 +6831,9 @@ async function renderFixedExpensesInSettings() {
     return `
       <tr>
         <td class="description-cell">${expense.name}</td>
+        <td style="text-align: center; font-weight: 700; color: var(--primary);">
+        ${expense.day ? 'Día ' + expense.day : '-'}
+        </td>
         <td>${typeLabel}</td>
         <td>${expense.category}</td>
         <td>${expense.account}</td>
@@ -6898,6 +6971,7 @@ function saveMonthlyPatrimonySnapshot(month) {
  async function updateMonthlyPatrimonyDisplay() {
   const data = await getData();
   
+  // Filtro mejorado: detecta tanto booleanos como strings 'true' y evita errores con null
   const disposableAccounts = data.accounts.filter(acc => 
     acc.isDisposable === true || acc.isDisposable === 'true' || acc.is_disposable === true
   );
@@ -6905,10 +6979,18 @@ function saveMonthlyPatrimonySnapshot(month) {
   const elBreakdown = document.getElementById('monthly-disponible-breakdown');
   if (!elBreakdown) return;
 
+  // Si no hay cuentas marcadas, avisamos en lugar de solo mostrar 0
   if (disposableAccounts.length === 0) {
-    elBreakdown.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-tertiary);">No hay cuentas configuradas como "Disponible".</div>`;
+    elBreakdown.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: rgba(0,0,0,0.02); border-radius: 16px; border: 1px dashed var(--border-color);">
+        <div style="font-size: 24px; margin-bottom: 8px;">💳</div>
+        <div style="font-size: 13px; color: var(--text-secondary);">No hay cuentas marcadas como "Disponible".</div>
+        <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">Actívalas en Configuración > Gestionar Cuentas.</div>
+      </div>`;
+    document.getElementById('monthly-disponible-total').textContent = formatCurrency(0);
     return;
   }
+  // ... resto de la función igual ...
 
   const breakdownData = await Promise.all(
     disposableAccounts.map(async acc => {
@@ -8238,6 +8320,100 @@ async function checkLiquidityAlerts() {
     if (liquidityAlertsHTML) {
         list.innerHTML += liquidityAlertsHTML;
         container.style.display = 'block';
+    }
+}
+
+// ALERTA 12: Próximos recibos (7 días vista)
+async function renderUpcomingExpenses() {
+    const data = await getData();
+    const container = document.getElementById('dashboard-upcoming-expenses');
+    const list = document.getElementById('upcoming-list');
+    if (!container || !list) return;
+
+    const now = new Date();
+    const today = now.getDate();
+    const currentMonthIdx = now.getMonth();
+    const nextMonthIdx = (currentMonthIdx + 1) % 12;
+    const currentYear = now.getFullYear();
+    const nextMonthYear = currentMonthIdx === 11 ? currentYear + 1 : currentYear;
+
+    const monthKeyCurrent = `${currentMonthIdx}-${currentYear}`;
+    const paidCurrent = (data.fixedExpensesPaid || {})[monthKeyCurrent] || [];
+
+    let upcoming = [];
+
+    data.fixedExpenses.forEach(exp => {
+        const day = exp.day || 1;
+        if (exp.months.includes(currentMonthIdx)) {
+            if (day >= today && !paidCurrent.includes(exp.id)) {
+                upcoming.push({ ...exp, nextDate: new Date(currentYear, currentMonthIdx, day), isNextMonth: false });
+            }
+        }
+        if (exp.months.includes(nextMonthIdx)) {
+            upcoming.push({ ...exp, nextDate: new Date(nextMonthYear, nextMonthIdx, day), isNextMonth: true });
+        }
+    });
+
+    upcoming.sort((a, b) => a.nextDate - b.nextDate);
+    const top3 = upcoming.slice(0, 3);
+
+    if (top3.length > 0) {
+        let html = '';
+        for (const exp of top3) {
+            const balance = await calculateAccountBalance(exp.account);
+            const isInsufficient = balance < exp.amount;
+            
+            const diffDays = Math.ceil((exp.nextDate - now) / (1000 * 60 * 60 * 24));
+            let timeLabel = diffDays === 0 ? 'Hoy' : (diffDays === 1 ? 'Mañana' : `En ${diffDays} d.`);
+            
+            // --- LÓGICA DE COLOR POR TIPO DE CUENTA ---
+            const isShared = exp.account.toLowerCase().includes('pareja') || exp.account.toLowerCase().includes('compartida');
+            const accountColor = isShared ? 'var(--orange)' : 'var(--primary)';
+            const accountBg = isShared ? 'var(--orange-bg)' : 'var(--primary-light)';
+            
+            const statusColor = isInsufficient ? 'var(--red)' : (exp.isNextMonth ? 'var(--text-tertiary)' : 'var(--primary)');
+            const statusBg = isInsufficient ? 'rgba(242, 100, 100, 0.08)' : 'var(--bg-surface)';
+
+            html += `
+                <div class="transaction-card" style="margin-bottom: 0; background: ${statusBg}; border-left: 4px solid ${statusColor}; border-radius: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 10px; background: ${isInsufficient ? 'var(--red-bg)' : 'var(--bg-body)'}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: ${isInsufficient ? 'var(--red)' : 'var(--text-secondary)'};">
+                            ${exp.day || '1'}
+                        </div>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">${exp.name}</div>
+                            
+                            <div style="
+                                display: inline-flex; 
+                                align-items: center; 
+                                gap: 4px; 
+                                font-size: 9px; 
+                                font-weight: 800; 
+                                text-transform: uppercase; 
+                                padding: 2px 8px; 
+                                border-radius: 6px; 
+                                margin-top: 4px;
+                                background: ${accountBg}; 
+                                color: ${accountColor};
+                                letter-spacing: 0.5px;
+                            ">
+                                ${isShared ? '👥' : '👤'} ${exp.account}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; font-weight: 800; color: ${isInsufficient ? 'var(--red)' : 'var(--text-primary)'};">${formatCurrency(exp.amount)}</div>
+                        <div style="font-size: 9px; font-weight: 700; color: ${isInsufficient ? 'var(--red)' : 'var(--text-tertiary)'}; text-transform: uppercase;">
+                            ${isInsufficient ? '⚠️ Falta saldo' : timeLabel}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        list.innerHTML = html;
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
     }
 }
 
