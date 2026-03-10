@@ -478,6 +478,10 @@
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 24px;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
     }
 
     .section-header {
@@ -527,7 +531,11 @@
 
     /* Table */
     .table-container {
-      overflow-x: auto;
+      width: 100% !important;
+      overflow-x: auto !important; /* Mantenemos el scroll horizontal por si la pantalla es muy estrecha */
+      overflow-y: visible !important; /* Prohibimos el scroll vertical interno */
+      height: auto !important;
+      max-height: none !important;
     }
 
     /* Tablas Estilo SaaS */
@@ -1806,52 +1814,207 @@
         display: inline-block;
     }
 
+  /* ============================================================================
+   Sistema de Alertas de Presupuesto (Dashboard)
+   ============================================================================ */
+
+    .budget-alert-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 16px;
+        border: 1px solid rgba(242, 100, 100, 0.2);
+        margin-bottom: 12px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .alert-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .alert-info { flex: 1; }
+    .alert-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .alert-desc { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+  /* ============================================================================
+   Sistema de Alertas de Presupuesto (Dashboard)
+   ============================================================================ */
+
+   .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .goal-card-vertical {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 240px;
+    }
+
+    .vertical-progress-container {
+        width: 12px;
+        height: 100px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        margin: 12px 0;
+    }
+
+    .vertical-progress-bar {
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        border-radius: 20px;
+        background: linear-gradient(to top, var(--primary), #34D399);
+        transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* --- ELIMINAR SCROLL EN TABLAS DE INVERSIÓN (Corregido ID) --- */
+    #inversiones-view .table-container {
+        max-height: none !important; 
+        height: auto !important;     
+        overflow-y: visible !important; 
+        overflow-x: auto !important;    
+    }
+
+    #inversiones-view .section {
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Ajuste de los Sparklines para que no deformen la fila */
+    .sparkline-container {
+        width: 100px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Alineación vertical para que los botones y sparklines se vean bien */
+    #holdings-table td, #investment-history-table td {
+        vertical-align: middle !important;
+    }
+
+    /* --- MEJORA SECCIÓN GASTOS FIJOS --- */
+.fixed-expenses-progress-container {
+    width: 100%;
+    height: 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 20px;
+    margin: 15px 0 25px 0;
+    overflow: hidden;
+}
+
+.fixed-expenses-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #34D399);
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fixed-expense-item {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+/* Efecto cuando ya está pagado */
+.fixed-expense-item.paid {
+    background: rgba(16, 185, 129, 0.03) !important;
+    border-color: rgba(16, 185, 129, 0.1) !important;
+    opacity: 0.8;
+}
+
+.fixed-expense-item.paid .fixed-expense-name {
+    text-decoration: line-through;
+    color: var(--text-tertiary);
+}
+
+.fixed-expense-item.paid .fixed-expense-amount {
+    color: var(--text-tertiary);
+}
+
+/* Animación de entrada al marcar */
+@keyframes checkPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.fixed-expense-item.just-paid {
+    animation: checkPop 0.4s ease;
+}
+
     /* ============================================================================
    OPTIMIZACIÓN MÓVIL TOTAL: iOS & ANDROID PREMIUM STYLE
    ============================================================================ */
 @media (max-width: 768px) {
     /* 1. ESTRUCTURA Y FONDO */
-    body {
-        flex-direction: column !important;
-        overflow-x: hidden !important;
-        height: auto !important;
+    html, body {
+        overflow-x: hidden !important; /* Bloquea el desplazamiento a los lados */
+        width: 100% !important;
+        height: auto !important; /* Permite que el contenido crezca */
+        min-height: 100vh !important;
     }
 
     .main-content {
-        /* Aseguramos que el contenido pueda crecer hacia abajo */
-        overflow-y: visible !important; 
+        padding: 16px 12px 120px 12px !important; 
+        width: 100% !important;
+        overflow-y: visible !important; /* Permite scroll vertical infinito */
         overflow-x: hidden !important;
-        height: auto !important;
-        /* IMPORTANTE: Espacio extra al final para que el menú no tape el contenido */
-        padding-bottom: 120px !important; 
         display: block !important;
+        height: auto !important;
     }
 
     /* --- FIX BOTONES DE AÑADIR DESCUADRADOS --- */
     .section-header {
         display: flex !important;
+        flex-direction: row !important; /* Siempre en línea */
         justify-content: space-between !important;
         align-items: center !important;
-        flex-wrap: nowrap !important; /* Evita que el botón baje */
-        gap: 10px;
-        margin-bottom: 15px;
+        flex-wrap: nowrap !important; /* Prohíbe saltar de línea */
+        gap: 8px !important;
     }
 
     .section-title {
-        font-size: 14px !important; /* Reducimos un poco el texto en móvil */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Si el título es muy largo, pone "..." */
-        flex-shrink: 1;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Pone "..." si no cabe el texto */
+        flex-shrink: 1 !important;
     }
 
-    /* El botón de añadir en móvil */
-    .section-header .btn-primary, 
-    .section-header button {
-        flex-shrink: 0; /* Evita que el botón se aplaste */
-        padding: 8px 12px !important;
+    /* El botón de añadir */
+    .section-header .add-btn, 
+    .section-header .btn-primary {
+        flex-shrink: 0 !important; /* El botón nunca se encoge ni se deforma */
+        padding: 6px 12px !important;
         font-size: 12px !important;
-        white-space: nowrap !important;
     }
 
     /* Forzar que ningún contenedor se salga del ancho de pantalla */
@@ -1955,9 +2118,10 @@
 
     td {
         display: flex !important;
-        justify-content: space-between !important;
-        padding: 8px 0 !important;
+        justify-content: space-between !important; /* Etiqueta a la izquierda, valor a la derecha */
+        padding: 10px 0 !important;
         border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+        text-align: left !important;
     }
 
     td:last-child { border-bottom: none !important; }
@@ -2041,7 +2205,7 @@
           </button>
           <button class="nav-item nav-btn" data-view="budgets">
             <span style="font-size: 20px;">🎯</span>
-            <span>Metas</span>
+            <span>Presupuestos y Metas</span>
           </button>
           <button class="nav-item nav-btn" data-view="search">
             <span style="font-size: 20px;">🔍</span>
@@ -2086,6 +2250,13 @@
           <p class="page-subtitle">Tu resumen financiero</p>
         </div>
       </header>
+
+      <div id="dashboard-budget-alerts" style="margin-bottom: 24px; display: none;">
+        <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
+            ⚠️ Avisos de Control
+        </div>
+        <div id="alerts-list"></div>
+      </div>
 
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; align-items: stretch;">
   
@@ -2514,9 +2685,8 @@
             <thead>
               <tr>
                 <th>Activo</th>
-                <th>Tipo</th>
                 <th>Cuenta</th>
-                <th style="text-align: right;">Capital Invertido</th>
+                <th>Tendencia</th> <th style="text-align: right;">Capital Invertido</th>
                 <th style="text-align: right;">Valor Actual</th>
                 <th style="text-align: right;">G/P</th>
                 <th style="text-align: right;">Rentabilidad</th>
@@ -2561,16 +2731,26 @@
     <div id="budgets-view" class="view">
       <header class="header">
         <div>
-          <h1 class="page-title">Presupuestos</h1>
-          <p class="page-subtitle">Controla tus límites de gasto mensual por categoría</p>
+          <h1 class="page-title">Metas y Control</h1>
+          <p class="page-subtitle">Gestiona tus límites mensuales y tus proyectos de ahorro</p>
         </div>
-        <button class="btn-primary" onclick="openBudgetModal()">
-          + Nuevo Presupuesto
-        </button>
       </header>
-  
-      <div id="budgets-list" style="display: grid; gap: 16px; margin-top: 24px;">
+    
+      <section class="section" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 48px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
+          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">🎯 Mis Proyectos de Ahorro</div>
+          <button class="add-btn" onclick="openGoalModal()">+ Nuevo Proyecto</button>
         </div>
+        <div id="goals-list-container" class="goals-grid"></div>
+      </section>
+    
+      <section>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
+          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">📉 Presupuestos por Categoría</div>
+          <button class="add-btn" onclick="openBudgetModal()">+ Nuevo Límite</button>
+        </div>
+        <div id="budgets-list" class="budget-grid"></div>
+      </section>
     </div>
 
     <div id="search-view" class="view">
@@ -3378,11 +3558,22 @@
     async function getData() {
       if (dataCache) return dataCache;
       if (!currentUser) {
-        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
+        return { 
+          accounts: [], transactions: [], holdings: [], transfers: [], 
+          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
+          monthlyPatrimony: {}, customCategories: {}, budgets: [], 
+          holdingsHistory: [], savingGoals: [] 
+        };
       }
       
       try {
-        const [accountsRes, transactionsRes, holdingsRes, transfersRes, contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, monthlyPatrimonyRes, customCategoriesRes, budgetsRes, holdingsHistoryRes] = await Promise.all([
+        // 1. AÑADIMOS 'saving_goals' A LA CONSULTA MULTIPLE
+        const [
+          accountsRes, transactionsRes, holdingsRes, transfersRes, 
+          contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, 
+          monthlyPatrimonyRes, customCategoriesRes, budgetsRes, 
+          holdingsHistoryRes, savingGoalsRes
+        ] = await Promise.all([
           supabaseClient.from('accounts').select('*').order('name'),
           supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
           supabaseClient.from('holdings').select('*').order('name'),
@@ -3394,23 +3585,26 @@
           supabaseClient.from('custom_categories').select('*'),
           supabaseClient.from('budgets').select('*'),
           supabaseClient.from('holdings_history').select('*').order('date', { ascending: true }),
+          supabaseClient.from('saving_goals').select('*') // <-- NUEVA TABLA
         ]);
 
-        // 1. Filtrar Cuentas: Las mías o las compartidas
+        // 2. FILTRADO DE SEGURIDAD (Cuentas propias o compartidas)
         const validAccounts = (accountsRes.data || []).filter(a => 
           a.user_id === currentUser.id || a.is_shared === true || a.is_shared === 'true' || a.isShared === true
         );
         
         const validAccountNames = validAccounts.map(a => a.name);
 
-        // 2. Filtrar Movimientos: Solo los de las cuentas válidas
+        // 3. FILTRADO DE MOVIMIENTOS Y METAS
         const validTransactions = (transactionsRes.data || []).filter(t => validAccountNames.includes(t.account));
         const validHoldings = (holdingsRes.data || []).filter(h => validAccountNames.includes(h.account));
         const validTransfers = (transfersRes.data || []).filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
         const validFixedExpenses = (fixedExpensesRes.data || []).filter(f => validAccountNames.includes(f.account));
         const validCategories = (customCategoriesRes.data || []).filter(c => c.user_id === currentUser.id);
-        const validBudgets = (budgetsRes.data || []).filter(b => b.user_id === currentUser.id); // <-- AÑADE ESTA LÍNEA
+        const validBudgets = (budgetsRes.data || []).filter(b => b.user_id === currentUser.id);
+        const validSavingGoals = (savingGoalsRes.data || []).filter(g => g.user_id === currentUser.id); // <-- FILTRO METAS
 
+        // 4. CONSTRUCCIÓN DEL OBJETO DE DATOS
         const data = {
           accounts: validAccounts.map(a => ({ 
             id: a.id, name: a.name, type: a.type, color: a.color, 
@@ -3422,30 +3616,52 @@
           transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
           fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months })),
-          fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {},
-          budgets: validBudgets, holdingsHistory: holdingsHistoryRes.data || []
+          fixedExpensesPaid: {}, 
+          monthlyPatrimony: {}, 
+          customCategories: {},
+          budgets: validBudgets, 
+          holdingsHistory: holdingsHistoryRes.data || [],
+          savingGoals: validSavingGoals // <-- INYECTAR METAS EN CACHÉ
         };
 
-        // ... (Tu código sigue igual a partir de aquí hacia abajo)
+        // 5. MAPEO DE TABLAS AUXILIARES
+        (fixedExpensesPaidRes.data || []).forEach(item => { 
+          if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; 
+          data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); 
+        });
 
-        (fixedExpensesPaidRes.data || []).forEach(item => { if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); });
-        (monthlyPatrimonyRes.data || []).forEach(item => { data.monthlyPatrimony[item.month_key] = parseFloat(item.value); });
+        (monthlyPatrimonyRes.data || []).forEach(item => { 
+          data.monthlyPatrimony[item.month_key] = parseFloat(item.value); 
+        });
 
-        // Load custom categories
+        // Cargar categorías personalizadas
         (customCategoriesRes.data || []).forEach(item => {
           if (item.categories && CATEGORIES[item.type]) {
             CATEGORIES[item.type] = item.categories;
           }
         });
 
-        if (data.accounts.length > 0) { ACCOUNTS.length = 0; data.accounts.forEach(acc => { ACCOUNTS.push(acc.name); ACCOUNT_COLORS[acc.name] = acc.color; ACCOUNT_TYPES[acc.name] = acc.type; }); }
+        // Actualizar globales
+        if (data.accounts.length > 0) { 
+          ACCOUNTS.length = 0; 
+          data.accounts.forEach(acc => { 
+            ACCOUNTS.push(acc.name); 
+            ACCOUNT_COLORS[acc.name] = acc.color; 
+            ACCOUNT_TYPES[acc.name] = acc.type; 
+          }); 
+        }
 
         dataCache = data;
         return data;
       } catch (error) {
         console.error('Error loading data:', error);
         showToast('Error al cargar datos', 'error');
-        return { accounts: [], transactions: [], holdings: [], transfers: [], contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, monthlyPatrimony: {}, customCategories: {} };
+        return { 
+          accounts: [], transactions: [], holdings: [], transfers: [], 
+          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
+          monthlyPatrimony: {}, customCategories: {}, budgets: [], 
+          holdingsHistory: [], savingGoals: [] 
+        };
       }
     }
 
@@ -3691,6 +3907,14 @@
       renderDistributionChart(normalTotal, brokerTotal, sharedTotal); // Fix: usando sharedTotal
       renderEvolutionChart('personal');
       await renderInvestmentSparkline();
+      
+      // Limpiamos la lista de alertas antes de checkear de nuevo
+      const alertsList = document.getElementById('alerts-list');
+      if (alertsList) alertsList.innerHTML = ''; 
+
+      await checkBudgetAlerts();   // Alertas de presupuestos
+      await checkLiquidityAlerts(); // NUEVAS: Alertas de liquidez
+      await renderSavingGoals();
     }
 
     async function renderInvestmentSparkline() {
@@ -3841,61 +4065,36 @@
   });
 }
 
-    function renderDistributionChart(normal, investments, shared) {
-      const ctx = document.getElementById('distribution-chart');
-      
-      if (window.distributionChart) {
-        window.distributionChart.destroy();
-      }
-      
-      window.distributionChart = new Chart(ctx, {
+function renderDistributionChart(normal, investments, shared) {
+    const ctx = document.getElementById('distribution-chart');
+    if (window.distributionChart) window.distributionChart.destroy();
+    
+    window.distributionChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Cuentas Normales', 'Inversiones', 'Cuenta Compartida'],
-          datasets: [{
-            data: [normal, investments, shared],
-            backgroundColor: [
-              '#5048E5', /* Azul primario */
-              '#10B981', /* Verde SaaS */
-              '#F59E0B'  /* Naranja */
-            ],
-            borderWidth: 0,
-            hoverOffset: 4
-          }]
+            labels: ['Cuentas', 'Inversiones', 'Compartida'],
+            datasets: [{
+                data: [normal, investments, shared],
+                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B'],
+                hoverOffset: 10,
+                borderWidth: 4,
+                borderColor: 'white', // Crea un espacio entre secciones
+                borderRadius: 10      // Bordes redondeados en las secciones
+            }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '80%', /* Hace el anillo muy fino y elegante */
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                usePointStyle: true, /* Puntos redondos en la leyenda */
-                padding: 20,
-                color: '#7E8299',
-                font: { size: 12, family: 'Inter', weight: '500' }
-              }
-            },
-            tooltip: {
-              backgroundColor: '#FFFFFF',
-              titleColor: '#181C32',
-              bodyColor: '#181C32',
-              borderColor: '#E4E6EF',
-              borderWidth: 1,
-              padding: 12,
-              usePointStyle: true,
-              bodyFont: { size: 13, family: 'Inter', weight: '600' },
-              callbacks: {
-                label: function(context) {
-                  return ' ' + formatCurrency(context.raw);
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%', // Anillo más fino
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 20, font: { size: 12, weight: '600' } }
                 }
-              }
             }
-          }
         }
-      });
-    }   
+    });
+}
 
   async function renderMonthlyView() {
     const data = await getData();
@@ -4095,129 +4294,141 @@ async function renderTable(type) {
     }
 
     async function renderInvestmentsView() {
-      const data = await getData();
-      const holdings = data.holdings || [];
-      const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
+  const data = await getData();
+  const holdings = data.holdings || [];
+  const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
 
-      // Calculate totals
-      const totalCapital = holdings.reduce((sum, h) => sum + parseFloat(h.capital), 0);
-      const totalValue = holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
-      const totalGainLoss = totalValue - totalCapital;
-      const totalReturn = totalCapital > 0 ? ((totalGainLoss / totalCapital) * 100) : 0;
+  // Cálculos de totales
+  const totalCapital = holdings.reduce((sum, h) => sum + parseFloat(h.capital), 0);
+  const totalValue = holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
+  const totalGainLoss = totalValue - totalCapital;
+  const totalReturn = totalCapital > 0 ? ((totalGainLoss / totalCapital) * 100) : 0;
 
-      // Update subtitle
-      document.getElementById('portfolio-subtitle').textContent = 
-        `Capital invertido: ${formatCurrency(totalCapital)}`;
+  document.getElementById('portfolio-subtitle').textContent = `Capital invertido: ${formatCurrency(totalCapital)}`;
 
-      // Render KPIs
-      const investmentKpis = document.getElementById('investment-kpis');
+  // Render de KPIs
+  const investmentKpis = document.getElementById('investment-kpis');
+  if (investmentKpis) {
       investmentKpis.innerHTML = `
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Capital Invertido</span>
-            <span class="kpi-icon">💰</span>
-          </div>
-          <div class="kpi-value">${formatCurrency(totalCapital)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Valor Actual</span>
-            <span class="kpi-icon">📈</span>
-          </div>
-          <div class="kpi-value">${formatCurrency(totalValue)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Ganancia/Pérdida</span>
-            <span class="kpi-icon">${totalGainLoss >= 0 ? '✅' : '❌'}</span>
-          </div>
-          <div class="kpi-value" style="color: ${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
-            ${formatCurrency(totalGainLoss)}
-          </div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Rentabilidad Total</span>
-            <span class="kpi-icon">📊</span>
-          </div>
-          <div class="kpi-value" style="color: ${totalReturn >= 0 ? 'var(--green)' : 'var(--red)'}">
-            ${totalReturn.toFixed(2)}%
-          </div>
-        </div>
+        <div class="kpi-card"><div class="kpi-label">Capital Invertido</div><div class="kpi-value">${formatCurrency(totalCapital)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor Actual</div><div class="kpi-value">${formatCurrency(totalValue)}</div></div>
+        <div class="kpi-card"><div class="kpi-label" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">Ganancia/Pérdida</div><div class="kpi-value" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(totalGainLoss)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Rentabilidad</div><div class="kpi-value">${totalReturn.toFixed(2)}%</div></div>
       `;
+  }
 
-      // Render holdings table
-      const holdingsTable = document.getElementById('holdings-table');
-      if (holdings.length === 0) {
-        holdingsTable.innerHTML = `
+  // 1. TABLA DE POSICIONES ACTUALES (Con todos los botones)
+  const holdingsTable = document.getElementById('holdings-table');
+  if (!holdingsTable) return;
+
+  if (holdings.length === 0) {
+    holdingsTable.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:48px;">No hay posiciones</td></tr>`;
+  } else {
+    holdingsTable.innerHTML = holdings.map(holding => {
+      const capital = parseFloat(holding.capital);
+      const currentValue = parseFloat(holding.currentValue);
+      const gainLoss = currentValue - capital;
+      const returnPercent = capital > 0 ? ((gainLoss / capital) * 100) : 0;
+
+      return `
+        <tr>
+          <td class="description-cell">
+            <div style="font-weight:700;">${holding.name}</div>
+            <div style="font-size:10px; color:var(--text-tertiary); text-transform:uppercase;">${holding.type}</div>
+          </td>
+          <td><span style="font-size:11px; color:var(--text-secondary)">${holding.account}</span></td>
+          <td><div class="sparkline-container"><canvas id="sparkline-${holding.id}"></canvas></div></td>
+          <td class="amount-cell">${formatCurrency(capital)}</td>
+          <td class="amount-cell" style="font-weight:800;">${formatCurrency(currentValue)}</td>
+          <td class="amount-cell" style="color:${gainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
+            ${gainLoss >= 0 ? '+' : ''}${formatCurrency(gainLoss)}
+          </td>
+          <td class="amount-cell" style="color:${returnPercent >= 0 ? 'var(--green)' : 'var(--red)'}">
+            ${returnPercent >= 0 ? '+' : ''}${returnPercent.toFixed(2)}%
+          </td>
+          <td>
+            <div class="row-actions">
+              <button class="action-btn" onclick="handleEditHolding('${holding.id}')">Editar</button>
+              <button class="action-btn" onclick="openUpdateValueModal('${holding.id}', '${holding.name}', ${currentValue})" style="color:var(--primary); font-weight:700;">📈 Valor</button>
+              <button class="action-btn delete" onclick="handleConfirmDeleteHolding('${holding.id}')">✕</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 2. TABLA DE HISTORIAL DE APORTACIONES (Restaurada)
+  const historyTable = document.getElementById('investment-history-table');
+  if (historyTable) {
+    if (investmentTransactions.length === 0) {
+      historyTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:48px;">No hay aportaciones registradas</td></tr>`;
+    } else {
+      historyTable.innerHTML = investmentTransactions
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map(txn => `
           <tr>
-            <td colspan="8" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
-              No hay posiciones en tu cartera
+            <td class="date-cell">${formatDate(txn.date)}</td>
+            <td class="description-cell">${txn.description}</td>
+            <td><span class="category-badge">${txn.category}</span></td>
+            <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
+            <td class="amount-cell">${formatCurrency(txn.amount)}</td>
+            <td>
+              <div class="row-actions">
+                <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
+                <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">✕</button>
+              </div>
             </td>
           </tr>
-        `;
-      } else {
-        holdingsTable.innerHTML = holdings.map(holding => {
-          const capital = parseFloat(holding.capital);
-          const currentValue = parseFloat(holding.currentValue);
-          const gainLoss = currentValue - capital;
-          const returnPercent = capital > 0 ? ((gainLoss / capital) * 100) : 0;
-
-          return `
-            <tr>
-              <td class="description-cell">${holding.name}</td>
-              <td><span class="category-badge">${holding.type}</span></td>
-              <td style="color: var(--text-tertiary); font-size: 13px;">${holding.account}</td>
-              <td class="amount-cell">${formatCurrency(capital)}</td>
-              <td class="amount-cell">${formatCurrency(currentValue)}</td>
-              <td class="amount-cell" style="color: ${gainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
-                ${gainLoss >= 0 ? '+' : ''}${formatCurrency(gainLoss)}
-              </td>
-              <td class="amount-cell" style="color: ${returnPercent >= 0 ? 'var(--green)' : 'var(--red)'}">
-                ${returnPercent >= 0 ? '+' : ''}${returnPercent.toFixed(2)}%
-              </td>
-              <td>
-                <div class="row-actions">
-                  <button class="action-btn" onclick="handleEditHolding('${holding.id}')">Editar</button>
-                  <button class="action-btn" style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.3)); backdrop-filter: blur(10px); border: 1px solid rgba(52, 211, 153, 0.3); color: #10B981; font-weight: 600; border-radius: 12px; padding: 8px 16px;" onclick="openUpdateValueModal('${holding.id}', '${holding.name}', ${currentValue})">📈 Actualizar</button>
-                  <button class="action-btn delete" onclick="handleConfirmDeleteHolding('${holding.id}')">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Render investment history
-      const historyTable = document.getElementById('investment-history-table');
-      if (investmentTransactions.length === 0) {
-        historyTable.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: 48px;">
-              No hay aportaciones registradas
-            </td>
-          </tr>
-        `;
-      } else {
-        historyTable.innerHTML = investmentTransactions
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .map(txn => `
-            <tr>
-              <td class="date-cell">${formatDate(txn.date)}</td>
-              <td class="description-cell">${txn.description}</td>
-              <td><span class="category-badge">${txn.category}</span></td>
-              <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
-              <td class="amount-cell">${formatCurrency(txn.amount)}</td>
-              <td>
-                <div class="row-actions">
-                  <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
-                  <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          `).join('');
-      }
+        `).join('');
     }
+  }
+
+  // 3. DIBUJAR SPARKLINES
+  setTimeout(() => {
+    holdings.forEach(h => renderIndividualSparkline(h.id, data.holdingsHistory || []));
+  }, 100);
+}
+
+// NUEVA FUNCIÓN: Dibuja el mini gráfico para cada activo
+function renderIndividualSparkline(holdingId, history) {
+    const canvas = document.getElementById(`sparkline-${holdingId}`);
+    if (!canvas) return;
+
+    const assetHistory = history.filter(p => p.holding_id === holdingId).sort((a,b) => new Date(a.date) - new Date(b.date));
+    if (assetHistory.length < 2) return;
+
+    const values = assetHistory.map(p => parseFloat(p.value));
+    const isUp = values[values.length - 1] >= values[0];
+    const color = isUp ? '#10B981' : '#F26464';
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: values,
+            datasets: [{
+                data: values,
+                borderColor: color,
+                borderWidth: 2.5, // Un poco más grueso
+                pointRadius: 0,
+                tension: 0.45,    // Curva más orgánica
+                fill: true,
+                backgroundColor: (context) => {
+                    const gradient = canvas.getContext('2d').createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, color + '22');
+                    gradient.addColorStop(1, color + '00');
+                    return gradient;
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+}
 
     // ============================================================================
     // MODAL MANAGEMENT
@@ -4836,7 +5047,10 @@ async function showPersonalExpensesBreakdown() {
         if (view === 'accounts') await renderAccountsView();
         if (view === 'settings') await renderSettingsView();
         if (view === 'accounts') await renderAccountsView();
-        if (view === 'budgets') await renderBudgetsView();
+        if (view === 'budgets') {
+          await renderBudgetsView();
+          await renderSavingGoals(); // <-- AÑADIDO
+        }
         if (view === 'search') await renderSearchView();
       });
     });
@@ -6276,12 +6490,36 @@ async function saveFixedExpense() {
   }
 }
 
-function deleteFixedExpense(id) {
-  const data = getData();
-  data.fixedExpenses = (data.fixedExpenses || []).filter(e => e.id !== id);
-  saveData(data);
-  renderSettingsView();
-  showToast('Gasto fijo eliminado', 'success');
+async function deleteFixedExpense(id) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este gasto fijo? Se dejará de tener en cuenta para los meses futuros.')) return;
+
+    try {
+        showToast('Eliminando gasto fijo...', 'info');
+
+        const { error } = await supabaseClient
+            .from('fixed_expenses')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showToast('Gasto fijo eliminado correctamente ✓', 'success');
+        
+        // 1. Limpiamos la caché para que la app sepa que ya no existe
+        invalidateCache();
+        
+        // 2. Refrescamos la vista de configuración para que desaparezca de la lista
+        renderSettingsView(); 
+        
+        // 3. Opcional: Si tienes la vista mensual abierta al fondo, esto asegura que se actualice
+        if (document.getElementById('inversiones-view').style.display === 'block') {
+            renderFixedExpensesInMonth();
+        }
+
+    } catch (error) {
+        console.error('Error al eliminar gasto fijo:', error);
+        showToast('No se pudo eliminar el gasto fijo', 'error');
+    }
 }
 
 // ============================================================================
@@ -6371,6 +6609,7 @@ async function renderFixedExpensesInMonth() {
   const data = await getData();
   const allFixedExpenses = data.fixedExpenses || [];
   
+  // Filtramos los gastos que corresponden a este mes
   const fixedExpenses = allFixedExpenses.filter(expense => {
     const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
     return months.includes(currentMonth);
@@ -6380,80 +6619,116 @@ async function renderFixedExpensesInMonth() {
   const paidExpenses = (data.fixedExpensesPaid || {})[monthKey] || [];
   const container = document.getElementById('fixed-expenses-list');
   
+  if (!container) return;
   if (fixedExpenses.length === 0) {
-    container.innerHTML = `<div style="text-align: center; padding: 32px; color: var(--text-tertiary);">No hay gastos fijos configurados.</div>`;
+    container.innerHTML = `<div style="text-align: center; padding: 32px; color: var(--text-tertiary);">No hay gastos fijos configurados para este mes.</div>`;
     return;
   }
 
+  // 1. CÁLCULO DE PROGRESO GLOBAL
+  const totalCount = fixedExpenses.length;
+  const paidCount = fixedExpenses.filter(exp => paidExpenses.includes(exp.id)).length;
+  const progressPercent = (paidCount / totalCount) * 100;
+  const globalTotalAmount = fixedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  // Cabecera con barra de progreso
+  let html = `
+    <div style="margin-bottom: 24px; background: var(--bg-surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Progreso de pagos: ${paidCount} de ${totalCount}</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--primary);">${progressPercent.toFixed(0)}%</div>
+        </div>
+        <div class="fixed-expenses-progress-container" style="margin: 8px 0;">
+            <div class="fixed-expenses-progress-bar" style="width: ${progressPercent}%"></div>
+        </div>
+    </div>
+  `;
+
+  // 2. AGRUPACIÓN POR CUENTA
   const expensesByAccount = {};
   fixedExpenses.forEach(expense => {
     if (!expensesByAccount[expense.account]) expensesByAccount[expense.account] = [];
     expensesByAccount[expense.account].push(expense);
   });
 
-  container.innerHTML = `
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-      ${Object.entries(expensesByAccount).map(([account, expenses]) => {
-        const accountTotal = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-        const accountPaid = expenses.filter(exp => paidExpenses.includes(exp.id)).length;
-        
-        // DETECCIÓN DE CUENTA COMPARTIDA
-        const isShared = account.toLowerCase().includes('santander pareja') || account.toLowerCase().includes('pareja');
-        
-        // ESTILOS DINÁMICOS
-        const cardBg = isShared ? 'rgba(255, 255, 255, 0.8)' : 'var(--bg-secondary)';
-        const accentColor = isShared ? '#FF2D55' : 'var(--blue)'; // Rosa/Rojo para pareja, Azul para personal
-        const borderColor = isShared ? `1px solid ${accentColor}33` : '1px solid var(--border-light)';
+  html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">`;
 
-        return `
-          <div style="background: ${cardBg}; border: ${borderColor}; border-radius: 16px; padding: 16px; position: relative; overflow: hidden; ${isShared ? 'box-shadow: 0 4px 15px rgba(255, 45, 85, 0.05);' : ''}">
-            
-            ${isShared ? `<div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: ${accentColor};"></div>` : ''}
+  for (const [account, expenses] of Object.entries(expensesByAccount)) {
+    const isShared = account.toLowerCase().includes('pareja') || account.toLowerCase().includes('compartida');
+    
+    // Cálculos de saldo y pendientes
+    const currentBalance = await calculateAccountBalance(account);
+    const pendingAmount = expenses
+        .filter(exp => !paidExpenses.includes(exp.id))
+        .reduce((sum, exp) => sum + exp.amount, 0);
 
-            <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: flex-end;">
-              <div>
-                <div style="font-weight: 700; color: ${isShared ? accentColor : 'var(--text-primary)'}; font-size: 15px; display: flex; align-items: center; gap: 6px;">
-                  ${isShared ? '👥' : '👤'} ${account}
+    const hasEnoughMoney = currentBalance >= pendingAmount;
+
+    html += `
+      <div style="background: rgba(255,255,255,0.6); border-radius: 20px; padding: 20px; border: 1px solid ${!hasEnoughMoney && pendingAmount > 0 ? 'rgba(242, 100, 100, 0.4)' : 'var(--border-color)'}; position: relative; display: flex; flex-direction: column; gap: 16px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span style="font-size: 14px;">${isShared ? '👥' : '👤'}</span>
+                    <span style="font-size: 15px; font-weight: 700; color: var(--text-primary);">${account}</span>
                 </div>
-                <div style="font-size: 11px; color: var(--text-tertiary);">${accountPaid} de ${expenses.length} pagados</div>
-              </div>
-              <div style="font-weight: 700; color: var(--text-primary); font-size: 16px;">${formatCurrency(accountTotal)}</div>
+                <div style="font-size: 12px; font-weight: 500; color: ${!hasEnoughMoney && pendingAmount > 0 ? 'var(--red)' : 'var(--text-secondary)'};">
+                    Saldo: ${formatCurrency(currentBalance)}
+                </div>
             </div>
+            
+            <div style="text-align: right;">
+                <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Pendiente</div>
+                <div style="
+                    background: ${pendingAmount > 0 ? 'var(--red-bg)' : 'var(--green-bg)'}; 
+                    color: ${pendingAmount > 0 ? 'var(--red)' : 'var(--green)'}; 
+                    padding: 4px 10px; 
+                    border-radius: 8px; 
+                    font-size: 13px; 
+                    font-weight: 800;
+                    display: inline-block;
+                ">
+                    ${formatCurrency(pendingAmount)}
+                </div>
+            </div>
+        </div>
 
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              ${expenses.map(expense => {
-                const isPaid = paidExpenses.includes(expense.id);
-                const typeLabel = expense.type === 'gastos_personales' ? '💳' : '🏠';
-                return `
-                  <div class="fixed-expense-item ${isPaid ? 'paid' : ''}">
-                    <input type="checkbox" class="fixed-expense-checkbox" ${isPaid ? 'checked' : ''} 
-                           style="accent-color: ${isShared ? accentColor : 'var(--green)'};"
-                           onchange="toggleFixedExpense('${expense.id}', ${currentMonth})">
-                    <div class="fixed-expense-details">
-                      <div class="fixed-expense-info">
-                        <div class="fixed-expense-name">${typeLabel} ${expense.name}</div>
-                        <div class="fixed-expense-meta">${expense.category}</div>
-                      </div>
-                      <div class="fixed-expense-amount">${formatCurrency(expense.amount)}</div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
+        ${!hasEnoughMoney && pendingAmount > 0 ? `
+            <div style="background: var(--red-bg); color: var(--red); padding: 10px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(242, 100, 100, 0.1);">
+                <span>⚠️</span> Falta ${formatCurrency(pendingAmount - currentBalance)} para cubrir recibos
             </div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-  
-  // Totales globales al final...
-  const totalAmount = fixedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-  document.getElementById('fixed-expenses-total').innerHTML = `
-    <div style="text-align: right;">
-      <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; font-weight: 700;">Total Gastos Fijos</div>
-      <div style="font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -1px;">${formatCurrency(totalAmount)}</div>
-    </div>
-  `;
+        ` : ''}
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${expenses.map(exp => {
+            const isPaid = paidExpenses.includes(exp.id);
+            return `
+              <div class="fixed-expense-item ${isPaid ? 'paid' : ''}" style="padding: 10px 12px; background: white; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.02);">
+                <input type="checkbox" class="fixed-expense-checkbox" ${isPaid ? 'checked' : ''} 
+                       onchange="toggleFixedExpense('${exp.id}', ${currentMonth})"
+                       style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                <div style="flex: 1; min-width: 0;">
+                  <div class="fixed-expense-name" style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${exp.name}</div>
+                  <div style="font-size: 10px; color: var(--text-tertiary);">${exp.category}</div>
+                </div>
+                <div class="fixed-expense-amount" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">${formatCurrency(exp.amount)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Actualizar totales globales del pie
+  const counterEl = document.getElementById('fixed-expenses-counter');
+  const totalEl = document.getElementById('fixed-expenses-total');
+  if (counterEl) counterEl.textContent = `${paidCount} de ${totalCount} pagados`;
+  if (totalEl) totalEl.textContent = formatCurrency(globalTotalAmount);
 }
 
 // ============================================================================
@@ -6887,57 +7162,88 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
     };
 
     async function renderInvestmentEvolutionChart() {
-  const canvas = document.getElementById('patrimony-chart'); // Reutilizamos este o crea uno nuevo
-  if (!canvas) return;
+    const canvas = document.getElementById('patrimony-chart');
+    if (!canvas) return;
 
-  const data = await getData();
-  const history = data.holdingsHistory || [];
-  
-  // Agrupamos por fecha para sumar todas las posiciones en cada punto del tiempo
-  const pointsByDate = {};
-  history.forEach(point => {
-    if (!pointsByDate[point.date]) pointsByDate[point.date] = 0;
-    pointsByDate[point.date] += parseFloat(point.value);
-  });
+    const data = await getData();
+    const history = data.holdingsHistory || [];
+    const holdings = data.holdings || [];
+    if (history.length === 0) return;
 
-  const dates = Object.keys(pointsByDate).sort();
-  const values = dates.map(d => pointsByDate[d]);
+    const uniqueDates = [...new Set(history.map(h => h.date))].sort();
+    const totalValues = uniqueDates.map(date => {
+        let total = 0;
+        holdings.forEach(h => {
+            const lastUpdate = history.filter(up => up.holding_id === h.id && up.date <= date)
+                                     .sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+            total += lastUpdate ? parseFloat(lastUpdate.value) : parseFloat(h.capital || 0);
+        });
+        return total;
+    });
 
-  if (window.patrimonyChart) window.patrimonyChart.destroy();
+    if (window.patrimonyChart) window.patrimonyChart.destroy();
 
-  window.patrimonyChart = new Chart(canvas, {
-    type: 'line',
-    data: {
-      labels: dates.map(d => new Date(d).toLocaleDateString('es-ES', {month: 'short', day: '2-digit'})),
-      datasets: [{
-        label: 'Valor de Cartera',
-        data: values,
-        borderColor: '#10B981', // Tu nuevo verde
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointRadius: 4,
-        pointBackgroundColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (context) => `Valor: ${formatCurrency(context.parsed.y)}`
-          }
+    const ctx = canvas.getContext('2d');
+    // Determinamos si la tendencia general es alcista o bajista
+    const isUp = totalValues[totalValues.length - 1] >= totalValues[0];
+    const mainColor = isUp ? '#10B981' : '#F26464';
+
+    window.patrimonyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: uniqueDates.map(d => new Date(d).toLocaleDateString('es-ES', {month: 'short', day: '2-digit'})),
+            datasets: [{
+                data: totalValues,
+                borderColor: mainColor,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3,           // Cambiado de 0 a 5 para que sean visibles siempre
+                pointHoverRadius: 8,      // El tamaño al pasar el ratón
+                pointBackgroundColor: '#fff', // Fondo blanco para que resalten
+                pointBorderColor: mainColor,  // Borde del color de la línea
+                pointBorderWidth: 2,      // Grosor del borde del punto
+                backgroundColor: (context) => {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, mainColor + '44');
+                    gradient.addColorStop(1, mainColor + '00');
+                    return gradient;
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                    titleColor: '#181C32',
+                    bodyColor: '#181C32',
+                    padding: 12,
+                    borderColor: mainColor + '44',
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: (context) => {
+                            const val = context.parsed.y;
+                            const prev = context.dataset.data[context.dataIndex - 1];
+                            let label = ` Total: ${formatCurrency(val)}`;
+                            if (prev) {
+                                const diff = ((val - prev) / prev * 100).toFixed(2);
+                                label += ` (${diff >= 0 ? '+' : ''}${diff}%)`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { grid: { borderDash: [5, 5], color: '#E4E6EF', drawBorder: false } },
+                x: { grid: { display: false } }
+            }
         }
-      },
-      scales: {
-        y: { beginAtZero: false, grid: { borderDash: [5, 5] } },
-        x: { grid: { display: false } }
-      }
-    }
-  });
+    });
 }
 
     // Función para subir archivos a Supabase Storage
@@ -7679,6 +7985,261 @@ window.toggleTimelineList = function(type) {
         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 };
+
+// ============================================================================
+// Sistema de Alertas de Presupuesto (Dashboard)
+// ============================================================================
+
+async function checkBudgetAlerts() {
+    const data = await getData();
+    const budgets = data.budgets || [];
+    const container = document.getElementById('dashboard-budget-alerts');
+    const list = document.getElementById('alerts-list');
+    
+    if (!budgets.length) return;
+
+    const currentMonthTxns = data.transactions.filter(t => new Date(t.date).getMonth() === currentMonth);
+    let alertsHTML = '';
+
+    budgets.forEach(b => {
+        const spent = currentMonthTxns
+            .filter(t => t.type === b.type && t.category === b.category)
+            .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount || 0)), 0);
+
+        const percent = (spent / b.amount) * 100;
+
+        if (percent >= 80) {
+            const isCritical = percent >= 100;
+            const color = isCritical ? 'var(--red)' : 'var(--orange)';
+            const bg = isCritical ? 'var(--red-bg)' : 'var(--orange-bg)';
+            
+            alertsHTML += `
+                <div class="budget-alert-item" style="border-left: 4px solid ${color}">
+                    <div class="alert-icon-box" style="background: ${bg}">
+                        ${isCritical ? '🚫' : '⚠️'}
+                    </div>
+                    <div class="alert-info">
+                        <div class="alert-title">${isCritical ? 'Límite superado' : 'Cerca del límite'} en ${b.category}</div>
+                        <div class="alert-desc">Has consumido el ${percent.toFixed(0)}% de tu presupuesto de ${formatCurrency(b.amount)}.</div>
+                    </div>
+                    <div style="text-align: right; font-weight: 800; color: ${color};">
+                        ${formatCurrency(spent)}
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    if (alertsHTML) {
+        list.innerHTML = alertsHTML;
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+// Añade 'saving_goals' a tu función getData() actual para cargarlas de Supabase
+// (O de momento podemos usar una función separada para probar)
+
+async function renderSavingGoals() {
+    const data = await getData();
+    const goals = data.savingGoals || [];
+    const container = document.getElementById('goals-list-container');
+    
+    if (!container) return;
+
+    if (goals.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; padding: 40px; text-align: center; background: rgba(0,0,0,0.02); border: 2px dashed var(--border-color); border-radius: 20px; color: var(--text-tertiary);">
+                <div style="font-size: 30px; margin-bottom: 10px;">🎯</div>
+                <div style="font-size: 14px; font-weight: 600;">Aún no tienes proyectos de ahorro</div>
+                <div style="font-size: 12px;">Crea uno para visualizar el progreso de tus sueños.</div>
+            </div>`;
+        return;
+    }
+
+    let html = '';
+    for (const g of goals) {
+        const balance = await calculateAccountBalance(g.account_name);
+        const percent = Math.min((balance / g.target_amount) * 100, 100);
+        
+        html += `
+            <div class="goal-card-vertical" style="position: relative;">
+                <button onclick="deleteSavingGoal('${g.id}', '${g.name}')" 
+                        style="position: absolute; top: 12px; right: 12px; border: none; background: rgba(0,0,0,0.05); width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; justify-content: center;"
+                        onmouseover="this.style.background='rgba(242, 100, 100, 0.1)'; this.style.color='var(--red)'"
+                        onmouseout="this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text-tertiary)'">
+                    ✕
+                </button>
+
+                <div style="font-size: 24px; margin-bottom: 8px;">${g.icon}</div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${g.name}</div>
+                
+                <div class="vertical-progress-container">
+                    <div class="vertical-progress-bar" style="height: ${percent}%"></div>
+                </div>
+                
+                <div style="font-size: 15px; font-weight: 800; color: var(--primary);">${percent.toFixed(0)}%</div>
+                <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 4px;">
+                    ${percent >= 100 ? '¡Completado! ✨' : 'Faltan ' + formatCurrency(g.target_amount - balance)}
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function openGoalModal() {
+    // Creamos el modal dinámicamente si no existe
+    let modal = document.getElementById('goal-modal');
+    if (!modal) {
+        const modalHTML = `
+            <div class="modal-overlay" id="goal-modal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Nueva Meta de Ahorro</h3>
+                        <button class="close-btn" onclick="closeGoalModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Nombre de la Meta</label>
+                            <input type="text" id="goal-name" class="form-input" placeholder="Ej: Viaje a Japón">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Importe Objetivo (€)</label>
+                            <input type="number" id="goal-target" class="form-input" placeholder="5000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vincular a Cuenta</label>
+                            <select id="goal-account" class="form-select">
+                                ${ACCOUNTS.map(acc => `<option value="${acc}">${acc}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Icono (Emoji)</label>
+                            <input type="text" id="goal-icon" class="form-input" value="🎯">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="closeGoalModal()">Cancelar</button>
+                        <button class="btn-primary" onclick="saveNewGoal()">Guardar Meta</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('goal-modal');
+    }
+    modal.classList.add('active');
+}
+
+function closeGoalModal() {
+    // Usamos el encadenamiento opcional (?.) por si el modal se cierra 
+    // antes de haber sido inyectado en el DOM alguna vez
+    document.getElementById('goal-modal')?.classList.remove('active');
+}
+
+async function saveNewGoal() {
+    const name = document.getElementById('goal-name').value;
+    const target = parseFloat(document.getElementById('goal-target').value);
+    const account = document.getElementById('goal-account').value;
+    const icon = document.getElementById('goal-icon').value;
+
+    if (!name || !target) return showToast('Completa los campos', 'error');
+
+    const { error } = await supabaseClient.from('saving_goals').insert({
+        user_id: currentUser.id,
+        name: name,
+        target_amount: target,
+        account_name: account,
+        icon: icon
+    });
+
+    if (!error) {
+        showToast('Meta guardada ✓', 'success');
+        closeGoalModal();
+        invalidateCache();
+        // CAMBIO: Ahora refrescamos la función de metas, no el Dashboard
+        await renderSavingGoals(); 
+    } else {
+        showToast('Error al guardar: ' + error.message, 'error');
+    }
+}
+
+async function deleteSavingGoal(id, name) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar la meta "${name}"?`)) return;
+
+    try {
+        showToast('Eliminando meta...', 'info');
+        
+        const { error } = await supabaseClient
+            .from('saving_goals')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showToast('Meta eliminada ✓', 'success');
+        
+        // Limpiamos caché para forzar la lectura de datos actualizados de Supabase
+        invalidateCache();
+        // CAMBIO: Refrescamos la vista de metas para que se vea el "Estado Vacío" si era la última
+        await renderSavingGoals();
+        
+    } catch (error) {
+        console.error('Error al eliminar la meta:', error);
+        showToast('No se pudo eliminar la meta', 'error');
+    }
+}
+
+// ============================================================================
+// ALERTAS DASHBOARD
+// ============================================================================
+
+// ALERTA 1: Saldo en cuenta inferior a recibos pendientes
+async function checkLiquidityAlerts() {
+    const data = await getData();
+    const list = document.getElementById('alerts-list');
+    const container = document.getElementById('dashboard-budget-alerts');
+    const monthKey = `${currentMonth}-${currentYear}`;
+    const paidExpenses = (data.fixedExpensesPaid || {})[monthKey] || [];
+    
+    let liquidityAlertsHTML = '';
+
+    // Agrupamos gastos fijos por cuenta
+    const expensesByAccount = {};
+    data.fixedExpenses.filter(e => (e.months || []).includes(currentMonth)).forEach(e => {
+        if (!expensesByAccount[e.account]) expensesByAccount[e.account] = [];
+        expensesByAccount[e.account].push(e);
+    });
+
+    for (const [account, expenses] of Object.entries(expensesByAccount)) {
+        const balance = await calculateAccountBalance(account);
+        const pending = expenses
+            .filter(exp => !paidExpenses.includes(exp.id))
+            .reduce((sum, exp) => sum + exp.amount, 0);
+
+        if (pending > balance) {
+            liquidityAlertsHTML += `
+                <div class="budget-alert-item" style="border-left: 4px solid var(--red); background: rgba(242, 100, 100, 0.05);">
+                    <div class="alert-icon-box" style="background: var(--red-bg); color: var(--red);">💸</div>
+                    <div class="alert-info">
+                        <div class="alert-title" style="color: var(--red);">Falta liquidez en ${account}</div>
+                        <div class="alert-desc">Saldo insuficiente para los recibos pendientes (${formatCurrency(pending)}).</div>
+                    </div>
+                    <div style="text-align: right; font-weight: 800; color: var(--red);">
+                        -${formatCurrency(pending - balance)}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Insertamos las alertas sin borrar las de presupuestos
+    if (liquidityAlertsHTML) {
+        list.innerHTML += liquidityAlertsHTML;
+        container.style.display = 'block';
+    }
+}
 
 // ============================================================================
 // INICIO DE LA APLICACIÓN
