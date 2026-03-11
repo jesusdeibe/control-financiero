@@ -2017,6 +2017,42 @@ body.privacy-mode #dashboard-runway-value {
     animation: checkPop 0.4s ease;
 }
 
+/* Estilos para la Barra de Acceso Rápido */
+/* Barra de herramientas integrada en el header */
+.header-tools {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tool-btn {
+    width: 42px;
+    height: 42px;
+    background: var(--primary-light) !important; /* Fondo crema sólido, sin transparencias */
+    border: 1px solid rgba(33, 69, 137, 0.08) !important;
+    border-radius: 12px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary) !important; /* Iconos en tu azul marino #214589 */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.tool-btn:hover {
+    background: var(--primary) !important; /* Inversión de color: fondo azul */
+    color: white !important; /* Icono blanco */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(33, 69, 137, 0.15);
+}
+
+.tool-btn .nav-icon {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5; /* Línea un poco más gruesa para que se vea pro */
+}
+
     /* ============================================================================
    OPTIMIZACIÓN MÓVIL TOTAL: iOS & ANDROID PREMIUM STYLE
    ============================================================================ */
@@ -2036,6 +2072,18 @@ body.privacy-mode #dashboard-runway-value {
         overflow-x: hidden !important;
         display: block !important;
         height: auto !important;
+    }
+
+    .header {
+        flex-direction: row !important; /* Mantenemos el título e iconos en la misma línea */
+        justify-content: space-between;
+    }
+    .tool-btn {
+        width: 38px;
+        height: 38px;
+    }
+    .page-title {
+        font-size: 20px !important; /* Reducimos título para que quepan los iconos a la derecha */
     }
 
     /* --- FIX BOTONES DE AÑADIR DESCUADRADOS --- */
@@ -2313,7 +2361,22 @@ body.privacy-mode #dashboard-runway-value {
           <h1 class="page-title">Sunday Money Club</h1>
           <p class="page-subtitle">Tu resumen financiero</p>
         </div>
-      </header>
+    
+        <div class="header-tools">
+            <button class="tool-btn" onclick="openTransactionModal('ingresos')" title="Nuevo Ingreso">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </button>
+            <button class="tool-btn" onclick="openTransactionModal('gastos_personales')" title="Gasto Rápido">
+                <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </button>
+            <button class="tool-btn" onclick="openTransactionModal('gastos_compartidos')" title="Gasto Casa">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </button>
+            <button class="tool-btn" onclick="openTransferModal()" title="Transferir">
+                <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            </button>
+        </div>
+    </header>
 
       <div id="dashboard-budget-alerts" style="margin-bottom: 24px; display: none;">
         <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
@@ -4292,7 +4355,7 @@ async function renderTable(type) {
     const isHidden = cardCount >= LIMIT;
     
     // Si tiene archivo, añadimos la clase 'has-attachment' para que destaque
-      html += `
+    html += `
       <div class="transaction-card ${hasFile ? 'has-attachment' : ''} ${isHidden ? 'hidden-transaction' : ''}" 
           style="${isHidden ? 'display: none;' : 'display: flex;'}">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -4312,7 +4375,10 @@ async function renderTable(type) {
           <div style="font-size: 16px; font-weight: 800; color: ${t.type === 'ingresos' ? 'var(--green)' : 'var(--red)'};">
             ${t.type === 'ingresos' ? '+' : '-'}${formatCurrency(t.amount)}
           </div>
-          <button class="action-btn" onclick="handleEditTransaction('${t.id}')" style="font-size: 10px; margin-top: 4px; padding: 0;">Editar</button>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="action-btn" onclick="handleEditTransaction('${t.id}')" style="font-size: 10px; margin-top: 4px; padding: 0;">Editar</button>
+            <button class="action-btn delete" onclick="handleConfirmDelete('${t.id}')" style="font-size: 10px; margin-top: 4px; padding: 0;">Eliminar</button>
+          </div>
         </div>
       </div>
     `;
@@ -4762,7 +4828,11 @@ function renderIndividualSparkline(holdingId, history) {
     }
 
     async function handleConfirmDelete(id) {
-      await confirmDelete(id);
+      // Añadimos confirmación nativa de navegador por seguridad
+      if (confirm('¿Estás seguro de que quieres eliminar este movimiento? Esta acción no se puede deshacer.')) {
+        await confirmDelete(id);
+        // La función confirmDelete ya se encarga de invalidar caché y refrescar las vistas
+      }
     }
 
     async function handleConfirmDeleteTransfer(id) {
