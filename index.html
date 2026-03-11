@@ -1901,37 +1901,69 @@
         margin-bottom: 32px;
     }
 
-    .goal-card-vertical {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
+    /* Nuevo diseño de Metas Horizontal */
+    .goal-card-new {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(14px);
         border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 20px;
+        border-radius: 24px;
         padding: 20px;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        text-align: center;
-        height: 240px;
-    }
-
-    .vertical-progress-container {
-        width: 12px;
-        height: 100px;
-        background: rgba(0,0,0,0.05);
-        border-radius: 20px;
+        gap: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
-        margin: 12px 0;
     }
 
-    .vertical-progress-bar {
-        width: 100%;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        border-radius: 20px;
-        background: linear-gradient(to top, var(--primary), #34D399);
-        transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    .goal-card-new:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-color: var(--primary);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .goal-icon-box {
+        width: 56px;
+        height: 56px;
+        background: var(--primary-light);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .goal-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .goal-title-new {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .goal-meta-new {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .goal-progress-info {
+        text-align: right;
+        min-width: 80px;
+    }
+
+    .goal-percent-new {
+        font-size: 18px;
+        font-weight: 900;
+        color: var(--primary);
     }
 
     /* --- ELIMINAR SCROLL EN TABLAS DE INVERSIÓN (Corregido ID) --- */
@@ -2135,9 +2167,144 @@ body.privacy-mode #dashboard-runway-value {
     font-weight: 700;
 }
 
+/* --- REDISEÑO VIAJES PREMIUM --- */
+.travel-card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 28px !important;
+    padding: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer; /* Indicar que es un elemento interactivo */
+}
+
+.travel-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(33, 69, 137, 0.1) !important;
+    border-color: var(--primary) !important;
+}
+
+.travel-header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.travel-dest-badge {
+    padding: 6px 14px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Panel de métricas rápidas */
+.travel-metrics-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.metric-box {
+    background: rgba(0, 0, 0, 0.02);
+    padding: 12px;
+    border-radius: 16px;
+}
+
+.metric-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.metric-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+/* El desglose ahora es una caja "flotante" */
+.travel-category-hub {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.travel-cat-row-new {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.travel-cat-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* --- CABECERA INTEGRADA (SIN GRADIENTES NI ESQUINAS CUADRADAS) --- */
+.travel-header-map {
+    position: relative;
+    /* Los márgenes negativos lo llevan al borde, el redondeado lo ajusta */
+    margin: -24px -24px 20px -24px; 
+    padding: 32px 24px 24px 24px;
+    background: rgba(0, 0, 0, 0.02); /* Fondo plano muy sutil */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    
+    /* LA SOLUCIÓN: Redondeamos las esquinas superiores para que no se salgan */
+    border-radius: 28px 28px 0 0; 
+    overflow: hidden;
+}
+
+/* Mantenemos el patrón de mapa pero más minimalista */
+.travel-header-map::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.02) 1px, transparent 0);
+    background-size: 16px 16px;
+    pointer-events: none;
+}
+
+.travel-dest-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.travel-location-pin {
+    width: 38px;
+    height: 38px;
+    background: var(--bg-surface);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    font-size: 18px;
+}
+
 /* ============================================================================
    OPTIMIZACIÓN MÓVIL: ESTILO LIQUID GLASS (ISLA FLOTANTE)
    ============================================================================ */
+
    @media (max-width: 768px) {
     /* 1. AJUSTES DE ESPACIADO Y FONDO */
     html, body {
@@ -2344,7 +2511,7 @@ body.privacy-mode #dashboard-runway-value {
         
         <button class="nav-item nav-btn" data-view="budgets">
             <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-            <span>Presupuestos</span>
+            <span>Presupuestos y Metas</span>
         </button>
         
         <button class="nav-item nav-btn" data-view="search">
@@ -2431,6 +2598,8 @@ body.privacy-mode #dashboard-runway-value {
         </div>
         <div id="alerts-list"></div>
       </div>
+
+      <div id="dashboard-active-travel" style="margin-bottom: 24px; display: none;"></div>
 
       <div id="dashboard-upcoming-expenses" style="margin-bottom: 24px; display: none;">
         <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
@@ -2935,6 +3104,22 @@ body.privacy-mode #dashboard-runway-value {
           <p class="page-subtitle">Gestiona tus límites mensuales y tus proyectos de ahorro</p>
         </div>
       </header>
+
+      <section>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
+          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">📉 Presupuestos por Categoría</div>
+          <button class="add-btn" onclick="openBudgetModal()">+ Nuevo Límite</button>
+        </div>
+        <div id="budgets-list" class="budget-grid"></div>
+      </section>
+
+      <section class="section" style="margin-top: 60px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 48px;">        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
+          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">✈️ Planificador de Viajes</div>
+          <button class="add-btn" onclick="openTravelModal()">+ Nuevo Viaje</button>
+        </div>
+        <div id="travel-plans-list" class="budget-grid">
+            </div>
+      </section>
     
       <section class="section" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 48px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
@@ -2943,14 +3128,7 @@ body.privacy-mode #dashboard-runway-value {
         </div>
         <div id="goals-list-container" class="goals-grid"></div>
       </section>
-    
-      <section>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
-          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">📉 Presupuestos por Categoría</div>
-          <button class="add-btn" onclick="openBudgetModal()">+ Nuevo Límite</button>
-        </div>
-        <div id="budgets-list" class="budget-grid"></div>
-      </section>
+      
     </div>
 
     <div id="search-view" class="view">
@@ -3819,7 +3997,7 @@ body.privacy-mode #dashboard-runway-value {
             initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), 
             includeInPatrimony: a.include_in_patrimony, isDisposable: a.is_disposable, isShared: a.is_shared
           })),
-          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url })),
+          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url, travel_id: t.travel_id, travel_category_name: t.travel_category_name })),
           holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
           transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
@@ -3884,7 +4062,9 @@ body.privacy-mode #dashboard-runway-value {
           account: transaction.account,
           amount: transaction.amount,
           file_url: transaction.file_url,
-          fixed_expense_id: transaction.fixedExpenseId || null
+          fixed_expense_id: transaction.fixedExpenseId || null,
+          travel_id: transaction.travel_id,
+          travel_category_name: transaction.travel_category_name
         }).select();
         
         if (error) throw error;
@@ -3907,7 +4087,9 @@ body.privacy-mode #dashboard-runway-value {
           category: updates.category,
           account: updates.account,
           amount: updates.amount,
-          file_url: updates.file_url // <-- AÑADE ESTA LÍNEA
+          file_url: updates.file_url,
+          travel_id: updates.travel_id,
+          travel_category_name: updates.travel_category_name
         }).eq('id', id);
         
         if (error) throw error;
@@ -4124,7 +4306,8 @@ body.privacy-mode #dashboard-runway-value {
       await checkLiquidityAlerts(); // NUEVAS: Alertas de liquidez
       await renderSavingGoals();
       await renderUpcomingExpenses();
-      await renderSavingsStreak(); // NUEVO: Actualiza la racha
+      await renderSavingsStreak(); 
+      await renderActiveTravelWidget();
     }
 
     async function renderInvestmentSparkline() {
@@ -4656,7 +4839,7 @@ function renderIndividualSparkline(holdingId, history) {
     const overlay = document.getElementById('transaction-modal');
     const modal = overlay.querySelector('.modal');
 
-    // 1. RECONSTRUIR EL FORMULARIO (Evita el error de 'null')
+    // 1. RECONSTRUIR EL FORMULARIO INTEGRAL
     modal.innerHTML = `
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nueva Transacción</h3>
@@ -4686,6 +4869,18 @@ function renderIndividualSparkline(holdingId, history) {
                     <label class="form-label">Categoría</label>
                     <select class="form-select" id="txn-category" required></select>
                 </div>
+
+                <div id="travel-selection-group" style="display: none; background: rgba(33, 69, 137, 0.05); padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--primary-light);">
+                    <div class="form-group">
+                        <label class="form-label">✈️ Vincular a Viaje</label>
+                        <select class="form-select" id="txn-travel-id" onchange="updateTravelSubCategories()"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">📍 Sub-categoría del Viaje</label>
+                        <select class="form-select" id="txn-travel-cat"></select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Cuenta</label>
                     <select class="form-select" id="txn-account" required></select>
@@ -4716,13 +4911,31 @@ function renderIndividualSparkline(holdingId, history) {
     };
 
     document.getElementById('modal-title').textContent = titles[type];
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('txn-date').value = today;
+    document.getElementById('txn-date').value = new Date().toISOString().split('T')[0];
 
     // 3. CARGAR DATOS EN SELECTORES
     const data = await getData();
-    document.getElementById('txn-category').innerHTML = CATEGORIES[type].map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    const catSelect = document.getElementById('txn-category');
+    catSelect.innerHTML = CATEGORIES[type].map(cat => `<option value="${cat}">${cat}</option>`).join('');
     document.getElementById('txn-account').innerHTML = data.accounts.map(acc => `<option value="${acc.name}">${acc.name}</option>`).join('');
+
+    // Lógica para mostrar/ocultar campos de viaje
+    const travelGroup = document.getElementById('travel-selection-group');
+    const updateTravelUI = async () => {
+        if (catSelect.value === 'Viajes') {
+            const { data: plans } = await supabaseClient.from('travel_plans').select('*');
+            if (plans && plans.length > 0) {
+                document.getElementById('txn-travel-id').innerHTML = 
+                    '<option value="">-- Seleccionar Viaje --</option>' + 
+                    plans.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                travelGroup.style.display = 'block';
+            }
+        } else {
+            travelGroup.style.display = 'none';
+        }
+    };
+
+    catSelect.addEventListener('change', updateTravelUI);
 
     // Lógica especial para inversiones
     if (type === 'inversiones') {
@@ -4737,61 +4950,43 @@ function renderIndividualSparkline(holdingId, history) {
     overlay.classList.add('active');
 }
 
-    async function editTransaction(id) {
-      const data = await getData();
-      const txn = data.transactions.find(t => t.id === id);
-      if (!txn) return;
 
-      editingId = id;
-      currentType = txn.type;
+async function editTransaction(id) {
+  const data = await getData();
+  const txn = data.transactions.find(t => t.id === id);
+  if (!txn) return;
 
-      const titles = {
-        ingresos: 'Editar Ingreso',
-        gastos_personales: 'Editar Gasto Personal',
-        gastos_compartidos: 'Editar Gasto Compartido',
-        inversiones: 'Editar Inversión'
-      };
+  editingId = id;
+  currentType = txn.type;
 
-      // Rellenar campos básicos
-      document.getElementById('modal-title').textContent = titles[txn.type];
-      document.getElementById('txn-date').value = txn.date;
-      document.getElementById('txn-description').value = txn.description;
-      document.getElementById('txn-amount').value = txn.amount;
+  // 1. Abrimos el modal con la estructura limpia llamando a la función base
+  await openTransactionModal(txn.type);
+  editingId = id; // Lo reasignamos porque openTransactionModal lo pone a null
 
-      // Rellenar categorías según el tipo
-      const categorySelect = document.getElementById('txn-category');
-      categorySelect.innerHTML = CATEGORIES[txn.type]
-        .map(cat => `<option value="${cat}" ${cat === txn.category ? 'selected' : ''}>${cat}</option>`)
-        .join('');
+  // 2. Rellenamos los campos básicos
+  document.getElementById('modal-title').textContent = 'Editar Movimiento';
+  document.getElementById('txn-date').value = txn.date;
+  document.getElementById('txn-description').value = txn.description;
+  document.getElementById('txn-amount').value = txn.amount;
+  document.getElementById('txn-category').value = txn.category;
+  document.getElementById('txn-account').value = txn.account;
 
-      // Rellenar cuentas
-      const accountSelect = document.getElementById('txn-account');
-      accountSelect.innerHTML = ACCOUNTS
-        .map(acc => `<option value="${acc}" ${acc === txn.account ? 'selected' : ''}>${acc}</option>`)
-        .join('');
-
-      // --- GESTIÓN DE ARCHIVOS ---
-      const fileInput = document.getElementById('txn-file');
-      const infoAdjunto = document.getElementById('file-info-msg');
-
-      if (fileInput) fileInput.value = ""; // Limpiar el selector de archivos siempre
-
-      if (infoAdjunto) {
-        if (txn.file_url) {
-          infoAdjunto.innerHTML = `
-            <div style="margin-top: 8px; padding: 8px; background: var(--primary-light); border-radius: 8px; font-size: 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
-              <span>📎 Archivo actual:</span>
-              <a href="${txn.file_url}" target="_blank" style="font-weight: 600; color: var(--primary); text-decoration: underline;">Ver documento</a>
-            </div>
-            <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 4px;">* Si seleccionas uno nuevo, se reemplazará al guardar.</div>
-          `;
-        } else {
-          infoAdjunto.innerHTML = `<div style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">Sin archivo adjunto.</div>`;
-        }
-      }
-
-      document.getElementById('transaction-modal').classList.add('active');
-    }
+  // 3. LÓGICA DE VIAJE: Si el gasto pertenece a un viaje, lo mostramos
+  if (txn.category === 'Viajes' && txn.travel_id) {
+    const travelGroup = document.getElementById('travel-selection-group');
+    travelGroup.style.display = 'block';
+    
+    // Rellenamos el selector de viajes
+    const { data: plans } = await supabaseClient.from('travel_plans').select('*');
+    const travelSelect = document.getElementById('txn-travel-id');
+    travelSelect.innerHTML = '<option value="">-- Seleccionar Viaje --</option>' + 
+                             plans.map(p => `<option value="${p.id}" ${p.id === txn.travel_id ? 'selected' : ''}>${p.name}</option>`).join('');
+    
+    // Cargamos las subcategorías de ese viaje
+    await updateTravelSubCategories();
+    document.getElementById('txn-travel-cat').value = txn.travel_category_name;
+  }
+}
 
     async function handleEditTransaction(id) {
       await editTransaction(id);
@@ -4849,87 +5044,80 @@ function renderIndividualSparkline(holdingId, history) {
     }
 
     async function saveTransactionClick() {
-      const date = document.getElementById('txn-date').value;
-      const amount = parseFloat(document.getElementById('txn-amount').value);
-      const fileInput = document.getElementById('txn-file');
-      const file = fileInput ? fileInput.files[0] : null;
+  const date = document.getElementById('txn-date').value;
+  const amount = parseFloat(document.getElementById('txn-amount').value);
+  const fileInput = document.getElementById('txn-file');
+  const file = fileInput ? fileInput.files[0] : null;
+  
+  let description = document.getElementById('txn-description').value;
+  let fileUrl = null;
+
+  if (!date || isNaN(amount)) {
+    showToast('Por favor completa los campos obligatorios', 'error');
+    return;
+  }
+
+  try {
+    showToast('Procesando...', 'info');
+
+    if (file && file.size > 0) fileUrl = await uploadFile(file);
+
+    if (currentType === 'inversiones') {
+      const selector = document.getElementById('txn-holding-id');
+      const holdingId = selector.value;
+      const holdingName = selector.options[selector.selectedIndex].dataset.name;
+      description = `Aportación: ${holdingName}`; 
       
-      let description = document.getElementById('txn-description').value;
-      let fileUrl = null;
+      const newMarketValue = parseFloat(document.getElementById('txn-new-market-value').value);
+      const data = await getData();
+      const holding = data.holdings.find(h => h.id === holdingId);
 
-      if (!date || isNaN(amount)) {
-        showToast('Por favor completa los campos obligatorios', 'error');
-        return;
-      }
-
-      try {
-        showToast('Procesando...', 'info');
-
-        // 1. Subida de archivo si existe
-        if (file && file.size > 0) fileUrl = await uploadFile(file);
-
-        // 2. Lógica especial para INVERSIONES
-        if (currentType === 'inversiones') {
-          const selector = document.getElementById('txn-holding-id');
-          const holdingId = selector.value;
-          const holdingName = selector.options[selector.selectedIndex].dataset.name;
-          description = `Aportación: ${holdingName}`; // Auto-descripción
-          
-          const newMarketValue = parseFloat(document.getElementById('txn-new-market-value').value);
-
-          // Buscamos la posición actual en los datos
-          const data = await getData();
-          const holding = data.holdings.find(h => h.id === holdingId);
-
-          if (holding) {
-            // A. Sumamos al CAPITAL INVERTIDO
-            const updates = { capital: parseFloat(holding.capital) + amount };
-
-            // B. Si el usuario puso un nuevo valor de mercado...
-            if (!isNaN(newMarketValue) && newMarketValue > 0) {
-              updates.current_value = newMarketValue;
-
-              // Guardamos en la tabla de HISTORIAL (holdings_history)
-              await supabaseClient.from('holdings_history').insert({
-                holding_id: holdingId,
-                date: date,
-                value: newMarketValue
-              });
-            }
-
-            // Actualizamos la tabla principal de holdings
-            await supabaseClient.from('holdings').update(updates).eq('id', holdingId);
-          }
+      if (holding) {
+        const updates = { capital: parseFloat(holding.capital) + amount };
+        if (!isNaN(newMarketValue) && newMarketValue > 0) {
+          updates.current_value = newMarketValue;
+          await supabaseClient.from('holdings_history').insert({
+            holding_id: holdingId, date: date, value: newMarketValue
+          });
         }
-
-        // 3. Guardar la transacción normal (para la vista mensual)
-        const transaction = {
-          type: currentType,
-          date: date,
-          description: description,
-          category: document.getElementById('txn-category').value,
-          account: document.getElementById('txn-account').value,
-          amount: amount,
-          file_url: fileUrl
-        };
-
-        if (editingId) {
-          await updateTransaction(editingId, transaction);
-        } else {
-          await addTransaction(transaction);
-        }
-        
-        closeModal();
-        invalidateCache();
-        await renderMonthlyView();
-        await renderDashboard();
-        showToast('Inversión y capital actualizados ✓', 'success');
-
-      } catch (error) {
-        console.error('Error al guardar:', error);
-        showToast('Error: ' + error.message, 'error');
+        await supabaseClient.from('holdings').update(updates).eq('id', holdingId);
       }
     }
+
+    // --- CORRECCIÓN AQUÍ: Añadida coma y campos de viaje ---
+    const transaction = {
+      type: currentType,
+      date: date,
+      description: description,
+      category: document.getElementById('txn-category').value,
+      account: document.getElementById('txn-account').value,
+      amount: amount,
+      file_url: fileUrl, // <--- COMA AÑADIDA AQUÍ
+      travel_id: document.getElementById('txn-travel-id')?.value || null,
+      travel_category_name: document.getElementById('txn-travel-cat')?.value || null
+    };
+
+    if (editingId) {
+      await updateTransaction(editingId, transaction);
+    } else {
+      await addTransaction(transaction);
+    }
+    
+    closeModal();
+    invalidateCache(); // Vital para que el planificador de viajes sume el nuevo gasto
+    await renderMonthlyView();
+    await renderDashboard();
+    
+    // Si tienes viajes, los refrescamos también
+    if (typeof renderTravelPlans === 'function') await renderTravelPlans();
+    
+    showToast('Guardado correctamente ✓', 'success');
+
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    showToast('Error: ' + error.message, 'error');
+  }
+}
 
     async function confirmDelete(id) {
       console.log('Deleting transaction:', id);
@@ -5310,7 +5498,8 @@ async function showPersonalExpensesBreakdown() {
         if (view === 'accounts') await renderAccountsView();
         if (view === 'budgets') {
           await renderBudgetsView();
-          await renderSavingGoals(); // <-- AÑADIDO
+          await renderSavingGoals();
+          await renderTravelPlans(); // NUEVO: Carga los viajes
         }
         if (view === 'search') await renderSearchView();
       });
@@ -8396,38 +8585,47 @@ async function renderSavingGoals() {
 
     if (goals.length === 0) {
         container.innerHTML = `
-            <div style="grid-column: 1/-1; padding: 40px; text-align: center; background: rgba(0,0,0,0.02); border: 2px dashed var(--border-color); border-radius: 20px; color: var(--text-tertiary);">
-                <div style="font-size: 30px; margin-bottom: 10px;">🎯</div>
-                <div style="font-size: 14px; font-weight: 600;">Aún no tienes proyectos de ahorro</div>
-                <div style="font-size: 12px;">Crea uno para visualizar el progreso de tus sueños.</div>
+            <div style="grid-column: 1/-1; padding: 40px; text-align: center; background: rgba(0,0,0,0.02); border: 2px dashed var(--border-color); border-radius: 24px; color: var(--text-tertiary);">
+                <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                <div style="font-size: 14px; font-weight: 700;">Define tus próximos proyectos</div>
+                <p style="font-size: 12px; margin-top: 4px;">Tus ahorros vinculados aparecerán aquí.</p>
             </div>`;
         return;
     }
+
+    // Usamos un grid de 2 columnas en PC y 1 en móvil
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(340px, 1fr))';
+    container.style.gap = '16px';
 
     let html = '';
     for (const g of goals) {
         const balance = await calculateAccountBalance(g.account_name);
         const percent = Math.min((balance / g.target_amount) * 100, 100);
+        const remaining = Math.max(0, g.target_amount - balance);
         
         html += `
-            <div class="goal-card-vertical" style="position: relative;">
-                <button onclick="deleteSavingGoal('${g.id}', '${g.name}')" 
-                        style="position: absolute; top: 12px; right: 12px; border: none; background: rgba(0,0,0,0.05); width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; justify-content: center;"
-                        onmouseover="this.style.background='rgba(242, 100, 100, 0.1)'; this.style.color='var(--red)'"
-                        onmouseout="this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text-tertiary)'">
-                    ✕
-                </button>
-
-                <div style="font-size: 24px; margin-bottom: 8px;">${g.icon}</div>
-                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${g.name}</div>
+            <div class="goal-card-new">
+                <div class="goal-icon-box">${g.icon}</div>
                 
-                <div class="vertical-progress-container">
-                    <div class="vertical-progress-bar" style="height: ${percent}%"></div>
+                <div class="goal-content">
+                    <div class="goal-title-new">${g.name}</div>
+                    <div class="goal-meta-new">Meta: ${formatCurrency(g.target_amount)}</div>
+                    
+                    <div class="progress-container-saas" style="height: 6px; margin: 10px 0;">
+                        <div class="progress-bar-saas" style="width: ${percent}%; background: var(--primary);"></div>
+                    </div>
+                    
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">
+                        ${percent >= 100 ? '✨ ¡Objetivo cumplido!' : 'Faltan ' + formatCurrency(remaining)}
+                    </div>
                 </div>
-                
-                <div style="font-size: 15px; font-weight: 800; color: var(--primary);">${percent.toFixed(0)}%</div>
-                <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 4px;">
-                    ${percent >= 100 ? '¡Completado! ✨' : 'Faltan ' + formatCurrency(g.target_amount - balance)}
+
+                <div class="goal-progress-info">
+                    <div class="goal-percent-new">${percent.toFixed(0)}%</div>
+                    <button onclick="deleteSavingGoal('${g.id}', '${g.name}')" 
+                            style="margin-top: 8px; border: none; background: none; cursor: pointer; color: var(--text-tertiary); font-size: 14px; padding: 4px;"
+                            title="Eliminar meta">✕</button>
                 </div>
             </div>
         `;
@@ -8921,6 +9119,314 @@ async function calculateScenarioComparison() {
         animateValue(`sim-val-b-${years}`, parseFloat(document.getElementById(`sim-val-b-${years}`).textContent.replace(/[.€\s]/g, '').replace(',','.')) || 0, futureB, 600);
         animateValue(`sim-cost-${years}`, parseFloat(document.getElementById(`sim-cost-${years}`).textContent.replace(/[.€\s]/g, '').replace(',','.')) || 0, futureB - futureA, 600);
     });
+}
+
+let editingTravelId = null; // Para rastrear el viaje en edición
+
+// A. Abrir Modal de Viaje con campos dinámicos
+async function openTravelModal(id = null) {
+    editingTravelId = id;
+    let modal = document.getElementById('travel-modal');
+    
+    if (!modal) {
+        const html = `
+            <div class="modal-overlay" id="travel-modal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="travel-modal-title">✈️ Planificar Viaje</h3>
+                        <button class="close-btn" onclick="closeTravelModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Nombre del Viaje</label>
+                            <input type="text" id="travel-name" class="form-input" placeholder="Ej: Japón 2026">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Inicio (Opcional)</label>
+                            <input type="date" id="travel-start-date" class="form-input">
+                        </div>
+                        <div id="travel-cats-container">
+                            <label class="form-label">Desglose de Gastos</label>
+                        </div>
+                        <button class="btn-secondary" onclick="addTravelRow()" style="width:100%; font-size:11px; margin-top:10px;">+ Añadir Categoría</button>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="closeTravelModal()">Cancelar</button>
+                        <button class="btn-primary" onclick="saveTravelPlan()">Guardar Plan</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', html);
+        modal = document.getElementById('travel-modal');
+    }
+
+    const container = document.getElementById('travel-cats-container');
+    container.innerHTML = '<label class="form-label">Desglose de Gastos</label>';
+
+    if (id) {
+        document.getElementById('travel-modal-title').textContent = '✈️ Editar Plan de Viaje';
+        const { data: plan } = await supabaseClient.from('travel_plans').select('*').eq('id', id).single();
+        document.getElementById('travel-name').value = plan.name;
+        document.getElementById('travel-start-date').value = plan.start_date || ''; // Carga la fecha
+        plan.breakdown.forEach(c => addTravelRow(c.category, c.goal));
+    } else {
+        document.getElementById('travel-modal-title').textContent = '✈️ Nuevo Plan de Viaje';
+        document.getElementById('travel-name').value = '';
+        document.getElementById('travel-start-date').value = '';
+        addTravelRow();
+    }
+    modal.classList.add('active');
+}
+
+// Función para añadir filas con valores (opcionales para edición)
+function addTravelRow(name = '', goal = '') {
+    const html = `
+        <div class="travel-cat-input-row" style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" class="form-input t-cat-n" placeholder="Categoría" style="flex:2" value="${name}">
+            <input type="number" class="form-input t-cat-g" placeholder="0" style="flex:1" value="${goal}">
+        </div>`;
+    document.getElementById('travel-cats-container').insertAdjacentHTML('beforeend', html);
+}
+
+function closeTravelModal() {
+    document.getElementById('travel-modal').classList.remove('active');
+    editingTravelId = null;
+}
+
+// B. Guardar en Supabase
+async function saveTravelPlan() {
+    const name = document.getElementById('travel-name').value;
+    const cats = document.querySelectorAll('.t-cat-n');
+    const goals = document.querySelectorAll('.t-cat-g');
+    let breakdown = [], total = 0;
+
+    cats.forEach((c, i) => {
+        const goal = parseFloat(goals[i].value) || 0;
+        if (c.value && goal > 0) { 
+            breakdown.push({ category: c.value, goal: goal, spent: 0 }); 
+            total += goal; 
+        }
+    });
+
+    const payload = { 
+        user_id: currentUser.id, 
+        name, 
+        total_budget: total, 
+        breakdown,
+        start_date: document.getElementById('travel-start-date').value || null // NUEVO
+    };
+    let error;
+
+    if (editingTravelId) {
+        // ACTUALIZAR EXISTENTE
+        ({ error } = await supabaseClient.from('travel_plans').update(payload).eq('id', editingTravelId));
+    } else {
+        // INSERTAR NUEVO
+        ({ error } = await supabaseClient.from('travel_plans').insert(payload));
+    }
+
+    if (!error) {
+        closeTravelModal();
+        invalidateCache();
+        await renderTravelPlans();
+        showToast(editingTravelId ? 'Viaje actualizado ✓' : 'Viaje creado ✓', 'success');
+    }
+}
+
+// C. Renderizar tarjetas de viaje
+async function renderTravelPlans() {
+    const { data: plans } = await supabaseClient.from('travel_plans').select('*');
+    const container = document.getElementById('travel-plans-list');
+    if (!container || !plans) return;
+
+    if (plans.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-tertiary);">Aún no tienes viajes planeados. ✈️</div>`;
+        return;
+    }
+
+    const data = await getData(); // Traemos transacciones frescas
+    const allTransactions = data.transactions || [];
+
+    container.innerHTML = plans.map(p => {
+        // --- CÁLCULO CORREGIDO: Cerramos el map y devolvemos el objeto ---
+        const breakdownWithSpent = (p.breakdown || []).map(cat => {
+            const spentInCategory = allTransactions
+                .filter(t => t.travel_id === p.id && t.travel_category_name === cat.category)
+                .reduce((sum, t) => {
+                    // Sumamos solo si es un tipo de gasto
+                    return t.type.includes('gastos') ? sum + Math.abs(t.amount) : sum;
+                }, 0);
+            
+            return { ...cat, spent: spentInCategory }; // Devolvemos la categoría con su gasto
+        }); // <-- AQUÍ SE CIERRA EL MAPA INTERNO
+
+        const totalSpent = breakdownWithSpent.reduce((s, c) => s + (c.spent || 0), 0);
+        const totalPercent = Math.min((totalSpent / p.total_budget) * 100, 100);
+        const remaining = Math.max(0, p.total_budget - totalSpent);
+
+        // Dentro del .map de renderTravelPlans
+        return `
+            <div class="travel-card" onclick="openTravelDetailDrawer('${p.id}')">
+                <div class="travel-header-map">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="travel-dest-title">
+                            <div class="travel-location-pin">📍</div>
+                            ${p.name}
+                        </div>
+                        <div style="display:flex; gap:6px; position:relative; z-index:2;">
+                            <button class="icon-only-btn" onclick="event.stopPropagation(); openTravelModal('${p.id}')" style="width:30px; height:30px; background:white; font-size:12px;">✏️</button>
+                            <button class="icon-only-btn" onclick="event.stopPropagation(); deleteTravelPlan('${p.id}')" style="width:30px; height:30px; background:white; color:var(--red); font-size:12px;">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="travel-metrics-strip">
+                    <div class="metric-box">
+                        <div class="metric-label">Presupuesto</div>
+                        <div class="metric-value">${formatCurrency(p.total_budget)}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Restante</div>
+                        <div class="metric-value" style="color:${remaining > 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(remaining)}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <div class="progress-container-saas" style="height:8px; background:rgba(0,0,0,0.05); margin:0;">
+                        <div class="progress-bar-saas" style="width:${totalPercent}%; background:var(--primary);"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                        <span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">Gasto Total</span>
+                        <span style="font-size:11px; font-weight:800; color:var(--primary);">${totalPercent.toFixed(0)}% consumido</span>
+                    </div>
+                </div>
+
+                <div class="travel-category-hub">
+                    ${breakdownWithSpent.map(c => {
+                        const catPercent = Math.min((c.spent / c.goal) * 100, 100);
+                        const isOver = (c.spent / c.goal) * 100 > 100;
+                        return `
+                            <div class="travel-cat-row-new">
+                                <div class="travel-cat-meta">
+                                    <span style="color:var(--text-primary); font-size:12px; font-weight:600;">${c.category}</span>
+                                    <span style="color:${isOver ? 'var(--red)' : 'var(--text-secondary)'}; font-size:12px;">${formatCurrency(c.spent)} <small style="opacity:0.4;">/ ${formatCurrency(c.goal)}</small></span>
+                                </div>
+                                <div style="height:3px; background:rgba(0,0,0,0.03); border-radius:10px; overflow:hidden;">
+                                    <div style="width:${catPercent}%; height:100%; background:${isOver ? 'var(--red)' : 'var(--primary)'}; opacity:0.6;"></div>
+                                </div>
+                            </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+    }).join('');
+}
+
+async function updateTravelSubCategories() {
+    const travelId = document.getElementById('txn-travel-id').value;
+    if (!travelId) return;
+
+    const { data: plan } = await supabaseClient.from('travel_plans').select('breakdown').eq('id', travelId).single();
+    if (plan) {
+        document.getElementById('txn-travel-cat').innerHTML = 
+            plan.breakdown.map(c => `<option value="${c.category}">${c.category}</option>`).join('');
+    }
+}
+
+async function openTravelDetailDrawer(travelId) {
+    const data = await getData();
+    const { data: plan } = await supabaseClient.from('travel_plans').select('*').eq('id', travelId).single();
+    
+    const transactions = (data.transactions || [])
+        .filter(t => t.travel_id === travelId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const overlay = document.getElementById('transaction-modal'); 
+    const modal = overlay.querySelector('.modal');
+    
+    modal.innerHTML = `
+        <div class="modal-header">
+            <h3 class="modal-title">✈️ ${plan.name}</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <div style="height: 180px; margin-bottom: 24px; position: relative;">
+                <canvas id="travel-donut-chart"></canvas>
+            </div>
+
+            <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; font-weight: 800;">Cronograma de Pagos</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${transactions.map(t => `
+                    <div class="transaction-card" style="margin-bottom: 0; padding: 12px; border: 1px solid var(--border-color);">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; font-weight: 700;">${t.description}</div>
+                            <div style="font-size: 10px; color: var(--primary); font-weight: 700;">${t.travel_category_name}</div>
+                        </div>
+                        <div style="text-align: right; font-weight: 800; color: var(--red);">-${formatCurrency(t.amount)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    overlay.classList.add('active');
+
+    // Inicializar gráfico de tarta
+    const catTotals = {};
+    transactions.forEach(t => {
+        catTotals[t.travel_category_name] = (catTotals[t.travel_category_name] || 0) + Math.abs(t.amount);
+    });
+
+    new Chart(document.getElementById('travel-donut-chart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(catTotals),
+            datasets: [{
+                data: Object.values(catTotals),
+                backgroundColor: ['#214589', '#3B82F6', '#10B981', '#F59E0B', '#F26464'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+    });
+}
+
+async function renderActiveTravelWidget() {
+    const { data: plans } = await supabaseClient.from('travel_plans').select('*');
+    const container = document.getElementById('dashboard-active-travel');
+    if (!plans || plans.length === 0 || !container) return;
+
+    const today = new Date();
+    // Buscamos viajes que empiecen pronto o estén en curso
+    const activeTrip = plans.find(p => {
+        if (!p.start_date) return false;
+        const start = new Date(p.start_date);
+        const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+        return diffDays >= -7 && diffDays <= 14; // En curso o empieza en menos de 14 días
+    });
+
+    if (activeTrip) {
+        const start = new Date(activeTrip.start_date);
+        const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+        let statusText = diffDays === 0 ? "¡Hoy empieza tu viaje! ✈️" : 
+                         (diffDays < 0 ? "Viaje en curso 📍" : `Faltan ${diffDays} días para tu viaje 🗓️`);
+
+        container.innerHTML = `
+            <div style="background: var(--primary); color: white; padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(33,69,137,0.2);">
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Próximo Destino</div>
+                    <div style="font-size: 20px; font-weight: 900;">${activeTrip.name}</div>
+                    <div style="font-size: 13px; margin-top: 4px; font-weight: 600;">${statusText}</div>
+                </div>
+                <button class="btn-primary" onclick="switchView('budgets')" style="background: white !important; color: var(--primary) !important; font-size: 12px !important; padding: 8px 16px !important;">Ver detalles</button>
+            </div>
+        `;
+        container.style.display = 'block';
+    }
 }
 
 // ============================================================================
