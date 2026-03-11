@@ -54,12 +54,21 @@
 
     /* 1. Estructura General de Pantalla Dividida */
     body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    height: 100vh; /* Ocupa el 100% del alto de la ventana */
-    overflow: hidden; /* Evita que la página entera haga scroll, solo el contenido lo hará */
-    background-color: var(--bg-body);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      /* Gradiente más presente pero sofisticado */
+      background: 
+          radial-gradient(at 0% 0%, rgba(33, 69, 137, 0.12) 0px, transparent 55%),
+          radial-gradient(at 100% 0%, rgba(241, 234, 212, 0.6) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(33, 69, 137, 0.08) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(241, 234, 212, 0.4) 0px, transparent 50%),
+          #F4F7F9; /* Un gris ligeramente más azulado de base */
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
     }
 
     /* 2. Sidebar Estilo Glassmorphism Premium */
@@ -674,13 +683,13 @@
     /* --- ESTRUCTURA FUNCIONAL DE LOS MODALES --- */
 
     .modal-overlay {
-      display: none; /* Vital: oculta el modal por defecto */
+      display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 3000; /* Aseguramos que esté por encima de todo */
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      z-index: 3000;
+      background: rgba(15, 23, 42, 0.2) !important; /* Velo más sutil */
+      backdrop-filter: blur(4px) !important;
+      justify-content: flex-end !important; /* Alineación a la derecha */
     }
 
     /* Clase que activa el JS para mostrarlo */
@@ -703,7 +712,9 @@
     }
 
     .modal-body {
-      padding: 24px;
+      flex: 1;
+      overflow-y: auto; /* Permite scroll si el formulario es largo */
+      padding: 10px 5px;
     }
 
     /* --- CAMPOS DE FORMULARIO (ESTILO LIMPIO) --- */
@@ -1177,19 +1188,21 @@
       align-items: center;
     }
 
-    /* 2. La tarjeta blanca (Ahora sí usamos .modal porque así está en tu HTML) */
+    /* El modal ahora es un panel lateral (Drawer) */
     .modal-overlay .modal {
-        background: #FFFFFF !important; /* Blanco sólido absoluto */
-      backdrop-filter: none !important;
+      width: 480px !important; /* Ancho de panel profesional */
+      height: 100vh !important;
+      max-height: 100vh !important;
+      max-width: 90% !important;
+      background: #FFFFFF !important;
+      border-radius: 32px 0 0 32px !important; /* Solo redondeamos el lado izquierdo */
+      margin: 0 !important;
       padding: 24px;
-      border-radius: 16px !important;
-      width: 90%;
-      max-width: 450px;
-      border: 1px solid var(--border-color) !important;
-      
-      /* Sombra espectacular y realista */
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-      animation: ios-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      box-shadow: -10px 0 50px rgba(0,0,0,0.1) !important;
+      display: flex;
+      flex-direction: column;
+      /* Animación de entrada lateral */
+      animation: drawer-slide 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
     }
 
     /* 3. Forzar texto negro para que no sea gris */
@@ -1211,9 +1224,9 @@
     }
 
     /* Animación nueva */
-    @keyframes ios-pop {
-      from { opacity: 0; transform: scale(0.9) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    @keyframes drawer-slide {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
 
     .close-btn {
@@ -2025,187 +2038,225 @@ body.privacy-mode #dashboard-runway-value {
     align-items: center;
 }
 
+/* Botones de Acceso Rápido Rediseñados */
 .tool-btn {
-    width: 42px;
-    height: 42px;
-    background: var(--primary-light) !important; /* Fondo crema sólido, sin transparencias */
-    border: 1px solid rgba(33, 69, 137, 0.08) !important;
-    border-radius: 12px !important;
+    width: 46px;
+    height: 46px;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 16px !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary) !important; /* Iconos en tu azul marino #214589 */
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efecto rebote suave */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .tool-btn:hover {
-    background: var(--primary) !important; /* Inversión de color: fondo azul */
-    color: white !important; /* Icono blanco */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(33, 69, 137, 0.15);
+    transform: translateY(-4px) scale(1.05);
+    background: #FFFFFF !important;
+    box-shadow: 0 12px 20px rgba(33, 69, 137, 0.12);
+    border-color: var(--primary) !important;
 }
+
+/* Colores específicos para cada acción */
+.tool-btn[title="Nuevo Ingreso"] { color: var(--green) !important; }
+.tool-btn[title="Gasto Rápido"] { color: var(--red) !important; }
+.tool-btn[title="Gasto Casa"] { color: var(--orange) !important; }
+.tool-btn[title="Transferir"] { color: var(--primary) !important; }
 
 .tool-btn .nav-icon {
-    width: 18px;
-    height: 18px;
-    stroke-width: 2.5; /* Línea un poco más gruesa para que se vea pro */
+    width: 22px;
+    height: 22px;
+    stroke-width: 2.2;
 }
 
-    /* ============================================================================
-   OPTIMIZACIÓN MÓVIL TOTAL: iOS & ANDROID PREMIUM STYLE
+/* ============================================================================
+   GRÁFICO EVOLUCIÓN DE GASTOS (DASHBOARD)
    ============================================================================ */
-@media (max-width: 768px) {
-    /* 1. ESTRUCTURA Y FONDO */
+
+/* Contenedor del gráfico más espacioso */
+.chart-container-refined {
+    padding: 24px 10px;
+    height: 320px;
+    position: relative;
+    /* Fondo muy sutil para que el gráfico "flote" */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+}
+
+/* Leyenda estilo "Píldora" mejorada */
+.chart-legend-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(33, 69, 137, 0.08);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+
+.chart-legend-pill:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+/* Mini estadísticas dentro de la tarjeta */
+.card-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mini-stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-stat-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.mini-stat-value {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* ============================================================================
+   OPTIMIZACIÓN MÓVIL: ESTILO LIQUID GLASS (ISLA FLOTANTE)
+   ============================================================================ */
+   @media (max-width: 768px) {
+    /* 1. AJUSTES DE ESPACIADO Y FONDO */
     html, body {
-        overflow-x: hidden !important; /* Bloquea el desplazamiento a los lados */
+        overflow-x: hidden !important;
         width: 100% !important;
-        height: auto !important; /* Permite que el contenido crezca */
+        height: auto !important;
         min-height: 100vh !important;
     }
 
     .main-content {
-        padding: 16px 12px 120px 12px !important; 
+        padding: 16px 12px 120px 12px !important; /* Espacio extra para que el menú no tape */
         width: 100% !important;
-        overflow-y: visible !important; /* Permite scroll vertical infinito */
+        overflow-y: visible !important;
         overflow-x: hidden !important;
         display: block !important;
         height: auto !important;
     }
 
     .header {
-        flex-direction: row !important; /* Mantenemos el título e iconos en la misma línea */
-        justify-content: space-between;
-    }
-    .tool-btn {
-        width: 38px;
-        height: 38px;
-    }
-    .page-title {
-        font-size: 20px !important; /* Reducimos título para que quepan los iconos a la derecha */
-    }
-
-    /* --- FIX BOTONES DE AÑADIR DESCUADRADOS --- */
-    .section-header {
-        display: flex !important;
-        flex-direction: row !important; /* Siempre en línea */
-        justify-content: space-between !important;
-        align-items: center !important;
-        flex-wrap: nowrap !important; /* Prohíbe saltar de línea */
-        gap: 8px !important;
-    }
-
-    .section-title {
-        font-size: 14px !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important; /* Pone "..." si no cabe el texto */
-        flex-shrink: 1 !important;
-    }
-
-    /* El botón de añadir */
-    .section-header .add-btn, 
-    .section-header .btn-primary {
-        flex-shrink: 0 !important; /* El botón nunca se encoge ni se deforma */
-        padding: 6px 12px !important;
-        font-size: 12px !important;
-    }
-
-    /* Forzar que ningún contenedor se salga del ancho de pantalla */
-    .section, .kpi-grid, .budget-grid, .account-group-container {
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 2. BARRA DE NAVEGACIÓN INFERIOR (ESTILO APPLE) */
-    .sidebar {
-        width: 100% !important;
-        height: 75px !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
         flex-direction: row !important;
-        padding: 0 8px !important;
-        background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-top: 1px solid var(--border-color) !important;
-        border-right: none !important;
-        border-radius: 0 !important;
-        justify-content: space-around !important;
-        z-index: 5000 !important;
+        justify-content: space-between;
+        margin-bottom: 24px;
     }
 
-    .sidebar-logo, .nav-section-title, .sidebar-actions, #user-profile-btn {
-        display: none !important; /* Ocultar elementos innecesarios en móvil */
+    .page-title { font-size: 20px !important; }
+    .tool-btn { width: 38px; height: 38px; }
+
+    /* 2. MENÚ INFERIOR: LIQUID GLASS ISLAND */
+    .sidebar {
+        width: 92% !important; /* Estilo isla, no ocupa todo el ancho */
+        max-width: 450px !important;
+        height: 68px !important;
+        position: fixed !important;
+        bottom: 20px !important; /* Flotando desde el borde inferior */
+        left: 50% !important;
+        transform: translateX(-50%) !important; /* Centrado perfecto */
+        margin: 0 !important;
+        flex-direction: row !important;
+        padding: 0 10px !important;
+        
+        /* Efecto Cristal Líquido */
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 35px !important; /* Bordes muy redondeados tipo pastilla */
+        
+        justify-content: space-around !important;
+        align-items: center !important;
+        z-index: 5000 !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Ocultamos elementos innecesarios y textos */
+    .sidebar-logo, .nav-section-title, .sidebar-actions, #user-profile-btn, .nav-item span {
+        display: none !important; 
     }
 
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 14px; /* Bordes más redondeados */
-      color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid transparent;
+        flex: 1 !important;
+        height: 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 0 4px !important;
+        border-radius: 25px !important; /* Círculos para el efecto hover */
+        border: none !important;
+        background: transparent !important;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* 3. DASHBOARD Y KPIs: FUERZA A 1 COLUMNA */
+    .nav-icon {
+        width: 24px !important;
+        height: 24px !important;
+        stroke-width: 2.2;
+        color: var(--text-secondary);
+        transition: transform 0.3s ease !important;
+    }
+
+    /* Indicador Activo "Liquid" */
+    .nav-item.active {
+        background: rgba(33, 69, 137, 0.08) !important; /* Fondo sutil al icono activo */
+    }
+
+    .nav-item.active .nav-icon {
+        color: var(--primary) !important;
+        transform: scale(1.15) translateY(-2px); /* El icono parece flotar */
+    }
+
+    .nav-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        width: 6px;
+        height: 6px;
+        background: var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary); /* Resplandor líquido */
+        animation: liquid-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes liquid-pop {
+        from { transform: scale(0) translateY(5px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* 3. GRIDS Y TARJETAS A 1 COLUMNA */
     div[style*="grid-template-columns: repeat(3, 1fr)"],
     div[style*="grid-template-columns: 1fr 1fr"],
-    .kpi-grid {
-        grid-template-columns: 1fr !important; /* Todo en una columna vertical */
+    .kpi-grid, .budget-grid, .monthly-disponible-grid, #accounts-master-layout {
+        grid-template-columns: 1fr !important;
         gap: 12px !important;
     }
 
-    .kpi-card {
-        padding: 20px !important;
-        min-height: auto !important;
-    }
-
-    /* 4. VISTA DE CUENTAS: AJUSTE DE GRUPOS */
-    .account-group-container {
-        padding: 12px !important;
-        margin-bottom: 24px !important;
-    }
-
-    .accounts-grid-grouped, .budget-grid, .monthly-disponible-grid {
-        grid-template-columns: 1fr !important; /* Evita que las tarjetas choquen */
-        gap: 12px !important;
-    }
-
-    /* 5. VISTA MENSUAL: CABECERA INTEGRADA */
-    div[style*="padding: 32px"] {
-        padding: 20px !important; /* Reducir rellenos excesivos */
-    }
-
-    #monthly-disponible-total {
-        font-size: 30px !important; /* Escalar número grande */
-    }
-
-    /* 6. SELECTOR DE MESES: HACERLO MÁS ALTO PARA EL DEDO */
-    .month-selector {
-        padding: 4px !important;
-        margin-bottom: 20px !important;
-    }
-
-    .month-btn {
-        padding: 12px 0 !important;
-        font-size: 10px !important;
-    }
-
-    /* 7. TABLAS A TARJETAS (MOVIMIENTOS) */
-    table, thead, tbody, th, td, tr {
-        display: block !important;
-    }
-
+    /* 4. TABLAS A TARJETAS */
+    table, thead, tbody, th, td, tr { display: block !important; }
     thead { display: none !important; }
-
     tr {
         background: var(--bg-surface) !important;
         margin-bottom: 12px !important;
@@ -2213,17 +2264,12 @@ body.privacy-mode #dashboard-runway-value {
         border-radius: 16px !important;
         border: 1px solid var(--border-color) !important;
     }
-
     td {
         display: flex !important;
-        justify-content: space-between !important; /* Etiqueta a la izquierda, valor a la derecha */
+        justify-content: space-between !important;
         padding: 10px 0 !important;
         border-bottom: 1px solid rgba(0,0,0,0.03) !important;
-        text-align: left !important;
     }
-
-    td:last-child { border-bottom: none !important; }
-
     .description-cell {
         font-size: 15px !important;
         color: var(--primary) !important;
@@ -2233,23 +2279,15 @@ body.privacy-mode #dashboard-runway-value {
         margin-bottom: 8px !important;
     }
 
-    .amount-cell {
-        font-size: 16px !important;
-        font-weight: 800 !important;
-    }
-
-    /* 8. MODALES EN MÓVIL */
+    /* 5. MODALES EN MÓVIL (PANTALLA COMPLETA) */
     .modal-overlay .modal {
-        width: 95% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
         max-width: none !important;
         padding: 16px !important;
-        max-height: 90vh !important;
     }
-
-    .form-row {
-        flex-direction: column !important;
-        gap: 0 !important;
-    }
+    .form-row { flex-direction: column !important; }
 }
 
   </style>
@@ -2357,26 +2395,35 @@ body.privacy-mode #dashboard-runway-value {
     <!-- Dashboard View -->
     <div id="dashboard-view" class="view active">
       <header class="header">
-        <div>
-          <h1 class="page-title">Sunday Money Club</h1>
-          <p class="page-subtitle">Tu resumen financiero</p>
-        </div>
-    
-        <div class="header-tools">
-            <button class="tool-btn" onclick="openTransactionModal('ingresos')" title="Nuevo Ingreso">
-                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            </button>
-            <button class="tool-btn" onclick="openTransactionModal('gastos_personales')" title="Gasto Rápido">
-                <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-            </button>
-            <button class="tool-btn" onclick="openTransactionModal('gastos_compartidos')" title="Gasto Casa">
-                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </button>
-            <button class="tool-btn" onclick="openTransferModal()" title="Transferir">
-                <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-            </button>
-        </div>
-    </header>
+          <div>
+            <h1 class="page-title">Sunday Money Club</h1>
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 2px;">
+                <p class="page-subtitle" style="margin:0;">Racha de días sin gastar</p>
+                
+                <div id="streak-mini-widget" style="display: flex; align-items: center; gap: 6px; background: rgba(33, 69, 137, 0.06); padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(33, 69, 137, 0.1);">
+                    <span style="font-size: 10px;">🔥</span>
+                    <span id="streak-count-text" style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">0 DÍAS</span>
+                    <div id="streak-dots-mini" style="display: flex; gap: 3px; margin-left: 2px;">
+                        </div>
+                </div>
+            </div>
+          </div>
+      
+          <div class="header-tools">
+              <button class="tool-btn" onclick="openTransactionModal('ingresos')" title="Nuevo Ingreso">
+                  <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </button>
+              <button class="tool-btn" onclick="openTransactionModal('gastos_personales')" title="Gasto Rápido">
+                  <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              </button>
+              <button class="tool-btn" onclick="openTransactionModal('gastos_compartidos')" title="Gasto Casa">
+                  <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              </button>
+              <button class="tool-btn" onclick="openTransferModal()" title="Transferir">
+                  <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              </button>
+          </div>
+      </header>
 
       <div id="dashboard-budget-alerts" style="margin-bottom: 24px; display: none;">
         <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
@@ -2702,35 +2749,24 @@ body.privacy-mode #dashboard-runway-value {
 
     </div>
 
-
-   
+    
     <!-- Accounts View -->
     <div id="accounts-view" class="view">
       <header class="header">
         <div>
           <h1 class="page-title">Mis Cuentas</h1>
-          <p class="page-subtitle" id="accounts-subtitle">Patrimonio Total: 0,00 €</p>
-        </div>
+          </div>
         <button class="add-btn" onclick="openTransferModal()">+ Nueva Transferencia</button>
       </header>
-
-      <div class="kpi-grid" id="accounts-kpis">
-        <!-- Accounts KPIs -->
+    
+      <div id="accounts-master-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+          
+          <div id="personal-wealth-col">
+              </div>
+    
+          <div id="shared-wealth-col">
+              </div>
       </div>
-
-      <!-- Accounts Grid -->
-      <div id="accounts-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 32px;">
-          <!-- Account cards generated dynamically -->
-      </div>
-
-      <!-- Balance por Cuenta -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title"><span>💸</span> Flujo por Cuenta (Año Completo)</h2>
-        </div>
-        <div id="account-flow-table" class="timeline-container">
-          </div>
-      </section>
 
       <!-- Transferencias -->
       <section class="section">
@@ -2833,6 +2869,36 @@ body.privacy-mode #dashboard-runway-value {
           </table>
         </div>
       </section>
+
+      <!-- Gráfico -->
+      <section class="section" style="background: linear-gradient(135deg, rgba(33, 69, 137, 0.05), rgba(16, 185, 129, 0.05)) !important;">
+        <div class="section-header">
+          <h2 class="section-title"><span>🚀</span> Proyector de Libertad Financiera</h2>
+          <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Basado en interés compuesto</div>
+              <button class="add-btn" onclick="openScenarioSimulator()" style="font-size: 10px; padding: 4px 10px; background: var(--primary); color: white; border: none;">⚔️ Simular Decisión</button>
+          </div>
+        </div>
+    
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; align-items: start;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Ahorro Mensual Extra (€)</label>
+                    <input type="number" id="proj-savings" class="form-input" value="100" oninput="calculateProjections()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rentabilidad Anual Esperada (%)</label>
+                    <input type="number" id="proj-return" class="form-input" value="4" oninput="calculateProjections()">
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                    Este cálculo toma tu <strong>patrimonio actual</strong> como base y le suma tus aportaciones mensuales.
+                </p>
+            </div>
+    
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;" id="projections-container">
+                </div>
+        </div>
+    </section>
 
       <!-- Transaction History -->
       <section class="section">
@@ -3645,6 +3711,8 @@ body.privacy-mode #dashboard-runway-value {
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let dataCache = null;
     console.log('✅ Supabase initialized');
+    // Forzar Outfit como fuente global para todos los gráficos
+    Chart.defaults.font.family = "'Outfit', sans-serif";
 
     function invalidateCache() {
       dataCache = null;
@@ -4055,7 +4123,8 @@ body.privacy-mode #dashboard-runway-value {
       await checkBudgetAlerts();   // Alertas de presupuestos
       await checkLiquidityAlerts(); // NUEVAS: Alertas de liquidez
       await renderSavingGoals();
-      await renderUpcomingExpenses(); // <-- NUEVA LLAMADA
+      await renderUpcomingExpenses();
+      await renderSavingsStreak(); // NUEVO: Actualiza la racha
     }
 
     async function renderInvestmentSparkline() {
@@ -4437,94 +4506,94 @@ async function renderTable(type) {
       return total;
     }
 
-    async function renderInvestmentsView() {
-  const data = await getData();
-  const holdings = data.holdings || [];
-  const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
+  async function renderInvestmentsView() {
+    const data = await getData();
+    const holdings = data.holdings || [];
+    const investmentTransactions = data.transactions.filter(t => t.type === 'inversiones');
 
-  // Cálculos de totales
-  const totalCapital = holdings.reduce((sum, h) => sum + parseFloat(h.capital), 0);
-  const totalValue = holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
-  const totalGainLoss = totalValue - totalCapital;
-  const totalReturn = totalCapital > 0 ? ((totalGainLoss / totalCapital) * 100) : 0;
+    // Cálculos de totales
+    const totalCapital = holdings.reduce((sum, h) => sum + parseFloat(h.capital), 0);
+    const totalValue = holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
+    const totalGainLoss = totalValue - totalCapital;
+    const totalReturn = totalCapital > 0 ? ((totalGainLoss / totalCapital) * 100) : 0;
 
-  document.getElementById('portfolio-subtitle').textContent = `Capital invertido: ${formatCurrency(totalCapital)}`;
+    document.getElementById('portfolio-subtitle').textContent = `Capital invertido: ${formatCurrency(totalCapital)}`;
 
-  // Render de KPIs
-  const investmentKpis = document.getElementById('investment-kpis');
-  if (investmentKpis) {
-      investmentKpis.innerHTML = `
-        <div class="kpi-card"><div class="kpi-label">Capital Invertido</div><div class="kpi-value">${formatCurrency(totalCapital)}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Valor Actual</div><div class="kpi-value">${formatCurrency(totalValue)}</div></div>
-        <div class="kpi-card"><div class="kpi-label" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">Ganancia/Pérdida</div><div class="kpi-value" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(totalGainLoss)}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Rentabilidad</div><div class="kpi-value">${totalReturn.toFixed(2)}%</div></div>
-      `;
-  }
+    // Render de KPIs
+    const investmentKpis = document.getElementById('investment-kpis');
+    if (investmentKpis) {
+        investmentKpis.innerHTML = `
+          <div class="kpi-card"><div class="kpi-label">Capital Invertido</div><div class="kpi-value">${formatCurrency(totalCapital)}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Valor Actual</div><div class="kpi-value">${formatCurrency(totalValue)}</div></div>
+          <div class="kpi-card"><div class="kpi-label" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">Ganancia/Pérdida</div><div class="kpi-value" style="color:${totalGainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(totalGainLoss)}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Rentabilidad</div><div class="kpi-value">${totalReturn.toFixed(2)}%</div></div>
+        `;
+    }
 
-  // 1. TABLA DE POSICIONES ACTUALES (Con todos los botones)
-  const holdingsTable = document.getElementById('holdings-table');
-  if (!holdingsTable) return;
+    // 1. TABLA DE POSICIONES ACTUALES (Con todos los botones)
+    const holdingsTable = document.getElementById('holdings-table');
+    if (!holdingsTable) return;
 
-  if (holdings.length === 0) {
-    holdingsTable.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:48px;">No hay posiciones</td></tr>`;
-  } else {
-    holdingsTable.innerHTML = holdings.map(holding => {
-      const capital = parseFloat(holding.capital);
-      const currentValue = parseFloat(holding.currentValue);
-      const gainLoss = currentValue - capital;
-      const returnPercent = capital > 0 ? ((gainLoss / capital) * 100) : 0;
-
-      return `
-        <tr>
-          <td class="description-cell">
-            <div style="font-weight:700;">${holding.name}</div>
-            <div style="font-size:10px; color:var(--text-tertiary); text-transform:uppercase;">${holding.type}</div>
-          </td>
-          <td><span style="font-size:11px; color:var(--text-secondary)">${holding.account}</span></td>
-          <td><div class="sparkline-container"><canvas id="sparkline-${holding.id}"></canvas></div></td>
-          <td class="amount-cell">${formatCurrency(capital)}</td>
-          <td class="amount-cell" style="font-weight:800;">${formatCurrency(currentValue)}</td>
-          <td class="amount-cell" style="color:${gainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
-            ${gainLoss >= 0 ? '+' : ''}${formatCurrency(gainLoss)}
-          </td>
-          <td class="amount-cell" style="color:${returnPercent >= 0 ? 'var(--green)' : 'var(--red)'}">
-            ${returnPercent >= 0 ? '+' : ''}${returnPercent.toFixed(2)}%
-          </td>
-          <td>
-            <div class="row-actions">
-              <button class="action-btn" onclick="handleEditHolding('${holding.id}')">Editar</button>
-              <button class="action-btn" onclick="openUpdateValueModal('${holding.id}', '${holding.name}', ${currentValue})" style="color:var(--primary); font-weight:700;">📈 Valor</button>
-              <button class="action-btn delete" onclick="handleConfirmDeleteHolding('${holding.id}')">✕</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  // 2. TABLA DE HISTORIAL DE APORTACIONES (Restaurada)
-  const historyTable = document.getElementById('investment-history-table');
-  if (historyTable) {
-    if (investmentTransactions.length === 0) {
-      historyTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:48px;">No hay aportaciones registradas</td></tr>`;
+    if (holdings.length === 0) {
+      holdingsTable.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:48px;">No hay posiciones</td></tr>`;
     } else {
-      historyTable.innerHTML = investmentTransactions
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .map(txn => `
+      holdingsTable.innerHTML = holdings.map(holding => {
+        const capital = parseFloat(holding.capital);
+        const currentValue = parseFloat(holding.currentValue);
+        const gainLoss = currentValue - capital;
+        const returnPercent = capital > 0 ? ((gainLoss / capital) * 100) : 0;
+
+        return `
           <tr>
-            <td class="date-cell">${formatDate(txn.date)}</td>
-            <td class="description-cell">${txn.description}</td>
-            <td><span class="category-badge">${txn.category}</span></td>
-            <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
-            <td class="amount-cell">${formatCurrency(txn.amount)}</td>
+            <td class="description-cell">
+              <div style="font-weight:700;">${holding.name}</div>
+              <div style="font-size:10px; color:var(--text-tertiary); text-transform:uppercase;">${holding.type}</div>
+            </td>
+            <td><span style="font-size:11px; color:var(--text-secondary)">${holding.account}</span></td>
+            <td><div class="sparkline-container"><canvas id="sparkline-${holding.id}"></canvas></div></td>
+            <td class="amount-cell">${formatCurrency(capital)}</td>
+            <td class="amount-cell" style="font-weight:800;">${formatCurrency(currentValue)}</td>
+            <td class="amount-cell" style="color:${gainLoss >= 0 ? 'var(--green)' : 'var(--red)'}">
+              ${gainLoss >= 0 ? '+' : ''}${formatCurrency(gainLoss)}
+            </td>
+            <td class="amount-cell" style="color:${returnPercent >= 0 ? 'var(--green)' : 'var(--red)'}">
+              ${returnPercent >= 0 ? '+' : ''}${returnPercent.toFixed(2)}%
+            </td>
             <td>
               <div class="row-actions">
-                <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
-                <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">✕</button>
+                <button class="action-btn" onclick="handleEditHolding('${holding.id}')">Editar</button>
+                <button class="action-btn" onclick="openUpdateValueModal('${holding.id}', '${holding.name}', ${currentValue})" style="color:var(--primary); font-weight:700;">📈 Valor</button>
+                <button class="action-btn delete" onclick="handleConfirmDeleteHolding('${holding.id}')">✕</button>
               </div>
             </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+    }
+
+// 2. TABLA DE HISTORIAL DE APORTACIONES (Restaurada)
+const historyTable = document.getElementById('investment-history-table');
+if (historyTable) {
+  if (investmentTransactions.length === 0) {
+    historyTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:48px;">No hay aportaciones registradas</td></tr>`;
+  } else {
+    historyTable.innerHTML = investmentTransactions
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .map(txn => `
+        <tr>
+          <td class="date-cell">${formatDate(txn.date)}</td>
+          <td class="description-cell">${txn.description}</td>
+          <td><span class="category-badge">${txn.category}</span></td>
+          <td style="color: var(--text-tertiary); font-size: 13px;">${txn.account}</td>
+          <td class="amount-cell">${formatCurrency(txn.amount)}</td>
+          <td>
+            <div class="row-actions">
+              <button class="action-btn" onclick="handleEditTransaction('${txn.id}')">Editar</button>
+              <button class="action-btn delete" onclick="handleConfirmDelete('${txn.id}')">✕</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
   }
 
@@ -4532,6 +4601,8 @@ async function renderTable(type) {
   setTimeout(() => {
     holdings.forEach(h => renderIndividualSparkline(h.id, data.holdingsHistory || []));
   }, 100);
+
+  await calculateProjections();
 }
 
 // NUEVA FUNCIÓN: Dibuja el mini gráfico para cada activo
@@ -4579,50 +4650,92 @@ function renderIndividualSparkline(holdingId, history) {
     // ============================================================================
 
     async function openTransactionModal(type) {
-      currentType = type;
-      editingId = null;
-      
-      const titles = {
+    currentType = type;
+    editingId = null;
+
+    const overlay = document.getElementById('transaction-modal');
+    const modal = overlay.querySelector('.modal');
+
+    // 1. RECONSTRUIR EL FORMULARIO (Evita el error de 'null')
+    modal.innerHTML = `
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Transacción</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="transaction-form">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" class="form-input" id="txn-date" required>
+                </div>
+                <div class="form-group" id="holding-selector-group" style="display: none;">
+                    <label class="form-label">📈 Seleccionar Inversión</label>
+                    <select class="form-select" id="txn-holding-id"></select>
+                </div>
+                <div class="form-group" id="description-group">
+                    <label class="form-label">Descripción</label>
+                    <input type="text" class="form-input" id="txn-description" required>
+                </div>
+                <div id="investment-extra-fields" style="display: none; background: rgba(16, 185, 129, 0.05); padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--primary);">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">💰 Nuevo Valor Actual (Opcional)</label>
+                        <input type="number" step="0.01" class="form-input" id="txn-new-market-value">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" id="txn-category" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cuenta</label>
+                    <select class="form-select" id="txn-account" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Importe (€)</label>
+                    <input type="number" step="0.01" class="form-input" id="txn-amount" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📎 Adjuntar Ticket</label>
+                    <input type="file" class="form-input" id="txn-file" accept="image/*,application/pdf">
+                    <div id="file-info-msg"></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn-primary" onclick="saveTransactionClick()">Guardar</button>
+            </div>
+        </form>
+    `;
+
+    // 2. CONFIGURAR TÍTULOS Y CAMPOS
+    const titles = {
         ingresos: 'Nuevo Ingreso',
         gastos_personales: 'Nuevo Gasto Personal',
-        gastos_compartidos: 'Nuevo Gasto Compartido',
+        gastos_compartidos: 'Nuevo Gasto Casa',
         inversiones: 'Aportación a Inversión'
-      };
+    };
 
-      document.getElementById('modal-title').textContent = titles[type];
-      document.getElementById('transaction-form').reset();
-      
-      // Referencias a los nuevos campos
-      const holdingGroup = document.getElementById('holding-selector-group');
-      const descGroup = document.getElementById('description-group');
-      const investmentFields = document.getElementById('investment-extra-fields');
-      
-      if (type === 'inversiones') {
-        holdingGroup.style.display = 'block';
-        investmentFields.style.display = 'block';
-        descGroup.style.display = 'none'; // No necesitamos escribir descripción manual
-        
-        // Cargamos tus posiciones actuales en el desplegable
-        const data = await getData();
-        const holdingSelect = document.getElementById('txn-holding-id');
-        holdingSelect.innerHTML = data.holdings.map(h => 
-          `<option value="${h.id}" data-name="${h.name}">${h.name} (${h.account})</option>`
+    document.getElementById('modal-title').textContent = titles[type];
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('txn-date').value = today;
+
+    // 3. CARGAR DATOS EN SELECTORES
+    const data = await getData();
+    document.getElementById('txn-category').innerHTML = CATEGORIES[type].map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    document.getElementById('txn-account').innerHTML = data.accounts.map(acc => `<option value="${acc.name}">${acc.name}</option>`).join('');
+
+    // Lógica especial para inversiones
+    if (type === 'inversiones') {
+        document.getElementById('holding-selector-group').style.display = 'block';
+        document.getElementById('investment-extra-fields').style.display = 'block';
+        document.getElementById('description-group').style.display = 'none';
+        document.getElementById('txn-holding-id').innerHTML = data.holdings.map(h => 
+            `<option value="${h.id}" data-name="${h.name}">${h.name} (${h.account})</option>`
         ).join('');
-      } else {
-        holdingGroup.style.display = 'none';
-        investmentFields.style.display = 'none';
-        descGroup.style.display = 'block';
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('txn-date').value = today;
-
-      // Cargar categorías y cuentas (esto se mantiene igual que tu código)
-      document.getElementById('txn-category').innerHTML = CATEGORIES[type].map(cat => `<option value="${cat}">${cat}</option>`).join('');
-      document.getElementById('txn-account').innerHTML = ACCOUNTS.map(acc => `<option value="${acc}">${acc}</option>`).join('');
-
-      document.getElementById('transaction-modal').classList.add('active');
     }
+
+    overlay.classList.add('active');
+}
 
     async function editTransaction(id) {
       const data = await getData();
@@ -5346,7 +5459,7 @@ async function renderAccountsView() {
   const data = await getData();
   const filterAccount = document.getElementById('account-filter')?.value || '';
   
-  // 1. CÁLCULO DE SALDOS (Sync con Dashboard)
+  // 1. CÁLCULO DE SALDOS
   const accountEntries = await Promise.all(
     data.accounts.map(async (acc) => {
       const balance = await calculateAccountBalance(acc.name);
@@ -5358,78 +5471,95 @@ async function renderAccountsView() {
     .filter(acc => acc.includeInPatrimony !== false && !(acc.isShared === true || acc.is_shared === true))
     .reduce((sum, acc) => sum + acc.currentBalance, 0);
 
-  const sharedTotal = accountEntries
+  const totalShared = accountEntries
     .filter(acc => acc.isShared === true || acc.is_shared === true)
     .reduce((sum, acc) => sum + acc.currentBalance, 0);
 
-  // 2. ACTUALIZAR CABECERA (Estilo limpio)
-  const subtitleEl = document.getElementById('accounts-subtitle');
-  if (subtitleEl) {
-    subtitleEl.innerHTML = `
-      <div style="margin-top: 12px;">
-        <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Patrimonio Personal Neto</div>
-        <div style="font-size: 42px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;">${formatCurrency(totalPersonal)}</div>
-      </div>
-    `;
-  }
-
-  const accountsKpis = document.getElementById('accounts-kpis');
-  if (accountsKpis) {
-    accountsKpis.innerHTML = `
-      <div class="kpi-card" style="border-left: 4px solid var(--primary);"><div class="kpi-label">👤 Mi Patrimonio</div><div class="kpi-value">${formatCurrency(totalPersonal)}</div></div>
-      <div class="kpi-card" style="border-left: 4px solid var(--orange);"><div class="kpi-label">👥 Saldo Compartido</div><div class="kpi-value">${formatCurrency(sharedTotal)}</div></div>
-    `;
-  }
-
-  // 3. GENERAR GRUPOS
-  const groups = [
+  // 2. RENDER COLUMNA PERSONAL (Cuentas + Inversiones)
+  const personalCol = document.getElementById('personal-wealth-col');
+  const personalGroups = [
     { title: 'Cuentas Personales', icon: '👤', items: accountEntries.filter(a => !a.isShared && a.type !== 'Broker' && a.type !== 'Exchange Crypto') },
-    { title: 'Inversiones', icon: '📈', items: accountEntries.filter(a => !a.isShared && (a.type === 'Broker' || a.type === 'Exchange Crypto')) },
+    { title: 'Inversiones', icon: '📈', items: accountEntries.filter(a => !a.isShared && (a.type === 'Broker' || a.type === 'Exchange Crypto')) }
+  ];
+
+  if (personalCol) {
+    personalCol.innerHTML = `
+      <div class="kpi-card" style="border-left: 4px solid var(--primary); margin-bottom: 24px; padding: 16px 24px !important; min-height: auto !important;">
+          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">👤 Mi Patrimonio Personal</div>
+          <div style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">${formatCurrency(totalPersonal)}</div>
+      </div>
+      ${renderGroupList(personalGroups, data.transactions)} `;
+  }
+
+  // 3. RENDER COLUMNA COMPARTIDA
+  const sharedCol = document.getElementById('shared-wealth-col');
+  const sharedGroups = [
     { title: 'Cuentas Compartidas', icon: '🏠', items: accountEntries.filter(a => a.isShared) }
   ];
 
-  const cardsGrid = document.getElementById('accounts-cards-grid');
-  if (cardsGrid) {
-    cardsGrid.innerHTML = groups.map(group => {
+  if (sharedCol) {
+    sharedCol.innerHTML = `
+      <div class="kpi-card" style="border-left: 4px solid var(--orange); margin-bottom: 24px; padding: 16px 24px !important; min-height: auto !important;">
+          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">👥 Saldo Compartido</div>
+          <div style="font-size: 28px; font-weight: 800; color: var(--orange); margin-top: 4px;">${formatCurrency(totalShared)}</div>
+      </div>
+      ${renderGroupList(sharedGroups, data.transactions)} `;
+  }
+
+  // 4. TABLAS INFERIORES
+  await renderAccountTables(data, accountEntries, filterAccount);
+}
+
+// Función auxiliar para generar las tarjetas de cuenta dentro de cada columna
+function renderGroupList(groups, allTransactions) {
+    return groups.map(group => {
       if (group.items.length === 0) return '';
       const groupTotal = group.items.reduce((s, i) => s + i.currentBalance, 0);
       
       return `
-        <div class="account-group-container">
-          <div class="group-header">
-            <span class="group-title"><span>${group.icon}</span> ${group.title}</span>
-            <span class="group-sum">${formatCurrency(groupTotal)}</span>
+        <div class="account-group-container" style="margin-bottom: 24px; padding: 16px; border-radius: 20px;">
+          <div class="group-header" style="margin-bottom: 16px;">
+            <span class="group-title" style="font-size: 10px;"><span>${group.icon}</span> ${group.title}</span>
+            <span class="group-sum" style="font-size: 12px;">${formatCurrency(groupTotal)}</span>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
             ${group.items.map(acc => {
-              const diff = acc.currentBalance - (acc.initialBalance || 0);
+              // Filtramos movimientos de esta cuenta en el mes seleccionado
+              const monthTxns = (allTransactions || []).filter(t => 
+                t.account === acc.name && 
+                new Date(t.date).getMonth() === currentMonth && 
+                new Date(t.date).getFullYear() === currentYear
+              );
+              
+              const income = monthTxns.filter(t => t.type === 'ingresos').reduce((s, t) => s + Math.abs(t.amount), 0);
+              const expenses = monthTxns.filter(t => t.type.includes('gastos')).reduce((s, t) => s + Math.abs(t.amount), 0);
+
               return `
-                <div class="account-card-integrated" onclick="handleAccountClick('${acc.name}')">
+                <div class="account-card-integrated" onclick="openAccountDetailDrawer('${acc.name}')" style="min-height: 150px !important; padding: 16px !important;">
                   <div class="card-top-info">
                     <div>
-                      <div class="card-acc-type">${acc.type}</div>
-                      <div class="card-acc-name">${acc.name}</div>
+                      <div class="card-acc-type" style="font-size: 8px;">${acc.type}</div>
+                      <div class="card-acc-name" style="font-size: 14px;">${acc.name}</div>
                     </div>
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${acc.color || '#CCC'}; box-shadow: 0 0 8px ${acc.color || '#CCC'}"></div>
+                    <div style="width: 6px; height: 6px; border-radius: 50%; background: ${acc.color || '#CCC'}"></div>
                   </div>
+                  <div class="card-acc-balance" style="font-size: 20px !important; margin: 8px 0 !important;">${formatCurrency(acc.currentBalance)}</div>
                   
-                  <div class="card-acc-balance">${formatCurrency(acc.currentBalance)}</div>
-                  
-                  <div class="card-acc-footer">
-                    <div class="card-diff" style="color: ${diff >= 0 ? 'var(--green)' : 'var(--red)'}">
-                      ${diff >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(diff))}
-                    </div>
-                    <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 700;">VS INICIAL</div>
+                  <div class="card-stats-grid">
+                      <div class="mini-stat-item">
+                          <span class="mini-stat-label">Ingresos</span>
+                          <span class="mini-stat-value" style="color: var(--green)">+${formatCurrency(income)}</span>
+                      </div>
+                      <div class="mini-stat-item" style="text-align: right;">
+                          <span class="mini-stat-label">Gastos</span>
+                          <span class="mini-stat-value" style="color: var(--red)">-${formatCurrency(expenses)}</span>
+                      </div>
                   </div>
                 </div>`;
             }).join('')}
           </div>
         </div>`;
     }).join('');
-  }
-
-  // 4. TABLAS INFERIORES (Mantenemos la lógica que funcionaba)
-  await renderAccountTables(data, accountEntries, filterAccount);
 }
 
 // Función auxiliar unificada para las tablas
@@ -7223,122 +7353,122 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
     const canvas = document.getElementById('evolutionChart');
     if (!canvas) return;
 
-    const last6Months = [];
+    const ctx = canvas.getContext('2d');
     const now = new Date();
+    const last6Months = [];
+    
     for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         last6Months.push({
-            monthIndex: d.getMonth(),
+            monthIndex: d.getMonth(), 
             year: d.getFullYear(),
-            label: new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(d)
+            label: new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(d).toUpperCase()
         });
     }
 
     const categoryData = {};
     const categoryTotals = {};
-    const labels = last6Months.map(m => m.label);
+    const data = await getData();
     const dbTable = type === 'personal' ? 'gastos_personales' : 'gastos_compartidos';
 
-    // Recopilar datos de los últimos 6 meses
-    const data = await getData();
-    for (let i = 0; i < last6Months.length; i++) {
-        const m = last6Months[i];
+    last6Months.forEach((m, i) => {
         const transactions = data.transactions.filter(t => {
             const tDate = new Date(t.date);
             return t.type === dbTable && tDate.getMonth() === m.monthIndex && tDate.getFullYear() === m.year;
         });
-
+        
         transactions.forEach(t => {
             const cat = t.category || 'Otros';
-            const amount = Math.abs(parseFloat(t.amount || 0));
             if (!categoryData[cat]) categoryData[cat] = new Array(6).fill(0);
-            categoryData[cat][i] += amount;
-            categoryTotals[cat] = (categoryTotals[cat] || 0) + amount;
+            categoryData[cat][i] += Math.abs(parseFloat(t.amount || 0));
+            categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(parseFloat(t.amount || 0));
         });
-    }
+    });
 
-    const sortedCategories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]).slice(0, 5); // Top 5 para no saturar
+    const sortedCats = Object.keys(categoryTotals).sort((a,b) => categoryTotals[b] - categoryTotals[a]).slice(0, 5);
+    const saasColors = ['#214589', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'];
 
-    const saasColors = ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EF4444'];
+    if (window.evolutionChartInstance) window.evolutionChartInstance.destroy();
 
-    if (evolutionChartInstance) evolutionChartInstance.destroy();
-
-    const ctx = canvas.getContext('2d');
-    
-    evolutionChartInstance = new Chart(ctx, {
-        type: 'line', // Cambiamos a línea
-        data: {
-            labels: labels,
-            datasets: sortedCategories.map((cat, i) => {
-                const color = saasColors[i % saasColors.length];
-                return {
-                    label: cat,
-                    data: categoryData[cat],
-                    borderColor: color,
-                    backgroundColor: (context) => {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) return null;
-                        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                        gradient.addColorStop(0, color + '44'); // Color con transparencia
-                        gradient.addColorStop(1, color + '00'); // Transparente al final
-                        return gradient;
-                    },
-                    fill: true, // Efecto de área
-                    tension: 0.4, // Curvas suaves
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 2
-                };
-            })
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: '#181C32',
-                    bodyColor: '#181C32',
-                    borderColor: '#E4E6EF',
-                    borderWidth: 1,
-                    padding: 12,
-                    boxPadding: 6,
-                    usePointStyle: true,
-                    callbacks: {
-                        label: (context) => ` ${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                    }
+    window.evolutionChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: last6Months.map(m => m.label),
+        datasets: sortedCats.map((cat, i) => ({
+            label: cat,
+            data: categoryData[cat],
+            backgroundColor: saasColors[i % saasColors.length],
+            // --- CAMBIO: ESQUINAS RECTAS PARA UN LOOK PRO ---
+            borderRadius: 0, 
+            borderSkipped: true, 
+            maxBarThickness: 45, // Un poco más anchas para que se vean sólidas
+            categoryPercentage: 0.85,
+            barPercentage: 0.95
+        }))
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                // --- CONFIGURACIÓN DE TOOLTIP PREMIUM ---
+                backgroundColor: '#1A2B4D', // Azul marino sólido
+                padding: 14,
+                cornerRadius: 8,
+                displayColors: true,
+                usePointStyle: true,
+                boxPadding: 8,
+                titleColor: '#FFFFFF',
+                titleFont: { family: "'Outfit', sans-serif", size: 14, weight: '700' },
+                bodyColor: '#FFFFFF',
+                bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: '500' },
+                callbacks: {
+                    label: (context) => ` ${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
                 }
+            }
+        },
+        scales: {
+            x: { 
+                stacked: true,
+                grid: { display: false }, 
+                ticks: { 
+                    color: '#A1A5B7', 
+                    font: { family: "'Outfit', sans-serif", size: 11, weight: '700' },
+                    padding: 10
+                } 
             },
-            scales: {
-                x: { 
-                    grid: { display: false },
-                    ticks: { color: '#A1A5B7', font: { family: 'Inter', size: 12 } }
+            y: {
+                stacked: true,
+                beginAtZero: true,
+                border: { display: false },
+                grid: { 
+                    color: 'rgba(228, 230, 239, 0.6)', 
+                    drawBorder: false, 
+                    borderDash: [4, 4] // Líneas de guía punteadas sutiles
                 },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#E4E6EF', borderDash: [5, 5], drawBorder: false },
-                    ticks: {
-                        color: '#A1A5B7',
-                        callback: (value) => value >= 1000 ? (value/1000) + 'k' : value
-                    }
+                ticks: {
+                    color: '#A1A5B7',
+                    font: { family: "'Outfit', sans-serif", size: 11, weight: '600' },
+                    padding: 10,
+                    callback: (v) => v >= 1000 ? (v/1000) + 'K' : v
                 }
             }
         }
-    });
+    }
+});
 
-    // Actualizar leyenda
+    // Leyenda con fuente Outfit
+    // Dentro de renderEvolutionChart, al final:
     const legendContainer = document.getElementById('chart-legend');
-    legendContainer.innerHTML = sortedCategories.map((cat, i) => `
-      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: var(--bg-surface); padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border-color);">
-        <div style="width: 10px; height: 10px; border-radius: 50%; background: ${saasColors[i % saasColors.length]};"></div>
-        ${cat}
-      </div>
-    `).join('');
+    if (legendContainer) {
+        legendContainer.innerHTML = sortedCats.map((cat, i) => `
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--text-secondary); background: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Outfit', sans-serif;">
+            <div style="width: 10px; height: 10px; border-radius: 3px; background: ${saasColors[i % saasColors.length]};"></div>
+            ${cat}
+          </div>
+        `).join('');
+    }
 }
 
     window.updateEvolutionChart = function(type) {
@@ -8570,6 +8700,227 @@ function togglePrivacyMode() {
       `;
       showToast('Modo Privacidad: Desactivado', 'success');
   }
+}
+
+async function calculateProjections() {
+    const data = await getData();
+    
+    // 1. Calculamos la base (Patrimonio actual: Cuentas + Inversiones)
+    const accountsTotal = await Promise.all(data.accounts.filter(a => a.includeInPatrimony !== false)
+        .map(a => calculateAccountBalance(a.name)))
+        .then(balances => balances.reduce((sum, b) => sum + b, 0));
+        
+    const investmentsTotal = data.holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
+    const currentBase = accountsTotal + investmentsTotal;
+
+    // 2. Parámetros del proyector
+    const monthlyContribution = parseFloat(document.getElementById('proj-savings').value) || 0;
+    const annualReturn = (parseFloat(document.getElementById('proj-return').value) || 0) / 100;
+    const monthlyRate = annualReturn / 12;
+
+    const container = document.getElementById('projections-container');
+    const periods = [
+        { years: 5, label: 'En 5 años' },
+        { years: 10, label: 'En 10 años' },
+        { years: 20, label: 'En 20 años' }
+    ];
+
+    container.innerHTML = periods.map(p => {
+        const months = p.years * 12;
+        
+        // Fórmula Interés Compuesto con Aportaciones Mensuales
+        const futureValue = currentBase * Math.pow(1 + monthlyRate, months) + 
+                            monthlyContribution * (Math.pow(1 + monthlyRate, months) - 1) / (monthlyRate || 0.00001);
+
+        const totalInvested = currentBase + (monthlyContribution * months);
+        const benefits = futureValue - totalInvested;
+
+        return `
+            <div class="kpi-card" style="margin-bottom:0; background: white !important;">
+                <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">${p.label}</div>
+                <div style="font-size: 22px; font-weight: 800; color: var(--primary); margin: 8px 0;">${formatCurrency(futureValue)}</div>
+                <div style="font-size: 10px; color: var(--green); font-weight: 700;">
+                    +${formatCurrency(benefits)} en intereses
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function renderSavingsStreak() {
+  const data = await getData();
+  const container = document.getElementById('savings-streak-container');
+  const badge = document.getElementById('streak-count-badge');
+  if (!container) return;
+
+  const now = new Date();
+  let streakCount = 0;
+  let html = '';
+
+  // Analizamos los últimos 15 días
+  for (let i = 14; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      
+      // Buscamos si hubo gastos personales ese día
+      const hasSpend = data.transactions.some(t => 
+          t.date === dateStr && t.type === 'gastos_personales'
+      );
+
+      if (!hasSpend) streakCount++;
+      else if (i === 0) streakCount = 0; // Si hoy has gastado, la racha se rompe para el contador actual
+
+      // Diseño del punto (Azul si es ahorro, Gris si hubo gasto)
+      const color = hasSpend ? 'rgba(0,0,0,0.05)' : 'var(--primary)';
+      const shadow = hasSpend ? 'none' : '0 0 8px var(--primary)';
+      
+      html += `<div title="${dateStr}" style="flex:1; height:8px; border-radius:4px; background:${color}; box-shadow:${shadow}; transition:all 0.3s;"></div>`;
+  }
+
+  container.innerHTML = html;
+  badge.textContent = `${streakCount} ${streakCount === 1 ? 'día' : 'días'} de ahorro`;
+  badge.style.background = streakCount > 0 ? 'var(--green-bg)' : 'var(--red-bg)';
+  badge.style.color = streakCount > 0 ? 'var(--green)' : 'var(--red)';
+}
+
+async function openAccountDetailDrawer(accountName) {
+    const data = await getData();
+    const transactions = data.transactions
+        .filter(t => t.account === accountName)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5); 
+
+    const balance = await calculateAccountBalance(accountName);
+    const overlay = document.getElementById('transaction-modal'); 
+    const modal = overlay.querySelector('.modal');
+    
+    // Cambiamos el contenido del modal para que sea un Drawer de Detalle
+    modal.innerHTML = `
+        <div class="modal-header">
+            <h3 class="modal-title"><span>💳</span> Detalle de Cuenta</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 32px; padding: 24px; background: var(--primary-light); border-radius: 20px; border: 1px solid rgba(33,69,137,0.05);">
+                <div style="font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">${accountName}</div>
+                <div style="font-size: 32px; font-weight: 900; color: var(--text-primary); margin: 8px 0;">${formatCurrency(balance)}</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Saldo actual disponible</div>
+            </div>
+
+            <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; letter-spacing: 1px; font-weight: 800;">Últimos Movimientos</h4>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+                ${transactions.length > 0 ? transactions.map(t => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.03);">
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">${t.description}</div>
+                            <div style="font-size: 10px; color: var(--text-tertiary);">${formatDate(t.date)}</div>
+                        </div>
+                        <div style="font-weight: 800; font-size: 14px; color: ${t.type === 'ingresos' ? 'var(--green)' : 'var(--red)'}">
+                            ${t.type === 'ingresos' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </div>
+                    </div>
+                `).join('') : '<div style="font-size: 13px; color: var(--text-tertiary); text-align: center; padding: 20px;">Sin movimientos recientes</div>'}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <button class="btn-primary" onclick="openAccountModal('${accountName}')" style="width: 100%;">⚙️ Editar Configuración</button>
+                <button class="btn-secondary" onclick="closeModal()" style="width: 100%;">Cerrar</button>
+            </div>
+        </div>
+    `;
+
+    overlay.classList.add('active');
+}
+
+// Función para abrir el panel lateral del simulador
+async function openScenarioSimulator() {
+    const overlay = document.getElementById('transaction-modal'); 
+    const modal = overlay.querySelector('.modal');
+    
+    // Contenido del Drawer del Simulador
+    modal.innerHTML = `
+        <div class="modal-header">
+            <h3 class="modal-title"><span>⚔️</span> Simulador de Decisión</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <div style="background: var(--primary-light); padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid rgba(33,69,137,0.1);">
+                <p style="font-size: 13px; color: var(--text-primary); line-height: 1.5; margin: 0;">
+                    ¿Estás pensando en un gasto importante? Descubre cuánto dinero le "quitas" a tu yo del futuro si te lo gastas hoy en lugar de invertirlo.
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Importe del Dilema (€)</label>
+                <input type="number" id="sim-dilemma" class="form-input" value="10000" oninput="calculateScenarioComparison()" placeholder="Ej: 10000">
+                <small style="color: var(--text-tertiary); font-size: 11px;">Ej: El precio de un coche, una moto o un viaje.</small>
+            </div>
+
+            <div id="simulation-results" style="display: flex; flex-direction: column; gap: 16px; margin-top: 32px;">
+                </div>
+
+            <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <button class="btn-secondary" onclick="closeModal()" style="width: 100%;">Cerrar Simulador</button>
+            </div>
+        </div>
+    `;
+
+    overlay.classList.add('active');
+    calculateScenarioComparison(); // Ejecutar cálculo inicial
+}
+
+// Función de cálculo comparativo
+async function calculateScenarioComparison() {
+    const dilemmaAmount = parseFloat(document.getElementById('sim-dilemma').value) || 0;
+    const monthlyContribution = parseFloat(document.getElementById('proj-savings').value) || 0;
+    const annualReturn = (parseFloat(document.getElementById('proj-return').value) || 0) / 100;
+    const monthlyRate = annualReturn / 12;
+
+    const data = await getData();
+    const accountsTotal = await Promise.all(data.accounts.filter(a => a.includeInPatrimony !== false)
+        .map(a => calculateAccountBalance(a.name)))
+        .then(balances => balances.reduce((sum, b) => sum + b, 0));
+    const investmentsTotal = data.holdings.reduce((sum, h) => sum + parseFloat(h.currentValue), 0);
+    const currentBase = accountsTotal + investmentsTotal;
+
+    const resultsContainer = document.getElementById('simulation-results');
+    
+    // Creamos la estructura fija la primera vez
+    if (!document.getElementById('sim-val-a-10')) {
+        resultsContainer.innerHTML = [10, 20].map(years => `
+            <div style="background: white; border-radius: 16px; border: 1px solid var(--border-color); padding: 16px;">
+                <div style="font-size: 10px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">En ${years} años</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">Si compras hoy:</span>
+                        <span style="font-weight: 700; color: var(--text-primary);" id="sim-val-a-${years}">0,00 €</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">Si inviertes hoy:</span>
+                        <span style="font-weight: 700; color: var(--green);" id="sim-val-b-${years}">0,00 €</span>
+                    </div>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--red); text-transform: uppercase;">Coste Real:</span>
+                        <span style="font-size: 18px; font-weight: 900; color: var(--red);" id="sim-cost-${years}">0,00 €</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Calculamos y animamos los valores
+    [10, 20].forEach(years => {
+        const months = years * 12;
+        const futureA = (currentBase - dilemmaAmount) * Math.pow(1 + monthlyRate, months) + 
+                        monthlyContribution * (Math.pow(1 + monthlyRate, months) - 1) / (monthlyRate || 0.00001);
+        const futureB = currentBase * Math.pow(1 + monthlyRate, months) + 
+                        monthlyContribution * (Math.pow(1 + monthlyRate, months) - 1) / (monthlyRate || 0.00001);
+
+        // Usamos tu función animateValue para el efecto SaaS premium
+        animateValue(`sim-val-a-${years}`, parseFloat(document.getElementById(`sim-val-a-${years}`).textContent.replace(/[.€\s]/g, '').replace(',','.')) || 0, futureA, 600);
+        animateValue(`sim-val-b-${years}`, parseFloat(document.getElementById(`sim-val-b-${years}`).textContent.replace(/[.€\s]/g, '').replace(',','.')) || 0, futureB, 600);
+        animateValue(`sim-cost-${years}`, parseFloat(document.getElementById(`sim-cost-${years}`).textContent.replace(/[.€\s]/g, '').replace(',','.')) || 0, futureB - futureA, 600);
+    });
 }
 
 // ============================================================================
