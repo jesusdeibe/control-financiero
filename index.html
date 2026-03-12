@@ -6,7 +6,7 @@
   <title>Control Financiero - App Completa</title>
   <link rel="icon" type="image/png" sizes="any" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Finanzas">
   <style>
@@ -2301,6 +2301,123 @@ body.privacy-mode #dashboard-runway-value {
     font-size: 18px;
 }
 
+/* --- REDISEÑO BUSCADOR: ACTIVITY FEED --- */
+.search-filters-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 20px 0;
+    scrollbar-width: none;
+}
+.search-filters-scroll::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.filter-pill:hover { border-color: var(--primary); color: var(--primary); }
+.filter-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Tarjetas de Resultado */
+.activity-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+.activity-card:hover { transform: translateX(5px); border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+
+.activity-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Grupo de filtros de fecha */
+.search-date-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.date-input-mini {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--primary) !important;
+    padding: 4px !important;
+    cursor: pointer;
+}
+
+.date-label-mini {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Tarejetas de deuda*/
+
+.loan-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+.loan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+.loan-progress-bg {
+    height: 10px;
+    background: #F0F2F5;
+    border-radius: 20px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+.loan-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 20px;
+    transition: width 1s ease-in-out;
+}
+.loan-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
 /* ============================================================================
    OPTIMIZACIÓN MÓVIL: ESTILO LIQUID GLASS (ISLA FLOTANTE)
    ============================================================================ */
@@ -2919,31 +3036,42 @@ body.privacy-mode #dashboard-runway-value {
     </div>
 
     
-    <!-- Accounts View -->
     <div id="accounts-view" class="view">
-      <header class="header">
+      <header class="header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
         <div>
-          <h1 class="page-title">Mis Cuentas</h1>
-          </div>
-        <button class="add-btn" onclick="openTransferModal()">+ Nueva Transferencia</button>
+          <h1 class="page-title">Patrimonio Neto</h1>
+          <p class="page-subtitle">Desglose de capital y deuda</p>
+        </div>
+        
+        <div style="text-align: right; display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 10px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">Mi Capital (Cuentas + Inv.)</div>
+            <div id="personal-liquid-assets" style="font-size: 28px; font-weight: 900; color: var(--text-primary); line-height: 1;">0,00 €</div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 20px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+                <div style="text-align: right;">
+                    <div style="font-size: 9px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Real (Menos Deuda)</div>
+                    <div id="personal-net-worth" style="font-size: 15px; font-weight: 800; color: var(--text-primary);">0,00 €</div>
+                </div>
+                
+                <div style="text-align: right;">
+                    <div style="font-size: 9px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Total Compartido</div>
+                    <div id="shared-assets-total" style="font-size: 15px; font-weight: 800; color: var(--orange);">0,00 €</div>
+                </div>
+            </div>
+        </div>
       </header>
     
       <div id="accounts-master-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+          <div id="personal-wealth-col"></div>
           
-          <div id="personal-wealth-col">
-              </div>
-    
-          <div id="shared-wealth-col">
-              </div>
+          <div id="shared-wealth-col"></div>
       </div>
-
-      <!-- Transferencias -->
-      <section class="section">
+    
+      <div id="loans-container"></div>
+    
+      <section class="section" style="margin-top: 32px;">
         <div class="section-header">
-          <h2 class="section-title">
-            <span>🔄</span>
-            Transferencias entre Cuentas
-          </h2>
+          <h2 class="section-title"><span>🔄</span> Transferencias entre Cuentas</h2>
           <button class="add-btn" onclick="openTransferModal()">+ Nueva Transferencia</button>
         </div>
         <div class="table-container">
@@ -2958,40 +3086,7 @@ body.privacy-mode #dashboard-runway-value {
                 <th></th>
               </tr>
             </thead>
-            <tbody id="transfers-table">
-              <!-- Transfers generated dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Historial por Cuenta -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>📋</span>
-            Movimientos por Cuenta
-          </h2>
-          <div class="form-group" style="margin: 0;">
-              <select class="form-select" id="account-filter" onchange="filterAccountMovements()"></select>
-              <option value="">Todas las cuentas</option>
-            </select>
-          </div>
-        </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Tipo</th>
-                <th>Categoría</th>
-                <th style="text-align: right;">Importe</th>
-              </tr>
-            </thead>
-            <tbody id="account-movements-table">
-              <!-- Movements generated dynamically -->
-            </tbody>
+            <tbody id="transfers-table"></tbody>
           </table>
         </div>
       </section>
@@ -3134,65 +3229,53 @@ body.privacy-mode #dashboard-runway-value {
     <div id="search-view" class="view">
       <header class="header">
         <div>
-          <h1 class="page-title">Buscador Global</h1>
-          <p class="page-subtitle">Encuentra cualquier movimiento en todo tu historial</p>
+          <h1 class="page-title">Buscador Inteligente</h1>
+          <p class="page-subtitle">Explora toda tu actividad financiera</p>
         </div>
       </header>
-
-      <div class="section" style="padding: 16px; margin-bottom: 16px;">
-        <div class="form-group" style="margin-bottom: 0; position: relative; display: flex; align-items: center;">
-          <span style="
-            position: absolute; 
-            left: 18px; 
-            font-size: 20px; 
-            z-index: 10; 
-            pointer-events: none; /* Esto permite que puedas hacer clic a través de la lupa */
-            line-height: 1;
-          ">🔍</span>
-          
+    
+      <div style="margin-bottom: 12px;">
+        <div style="position: relative; display: flex; align-items: center;">
+          <span style="position: absolute; left: 20px; font-size: 22px; pointer-events: none;">🔍</span>
           <input type="text" class="form-input" id="global-search-input" 
-                 placeholder="Busca por nombre, categoría o cuenta..." 
+                 placeholder="Busca un comercio, categoría o cuenta..." 
                  oninput="handleGlobalSearch()" 
-                 style="
-                  padding-left: 52px !important; /* Más espacio para que la letra nunca toque la lupa */
-                  height: 54px; 
-                  font-size: 16px;
-                  width: 100%;
-                  border-radius: 14px !important;
-                 ">
+                 style="padding-left: 60px !important; height: 64px; font-size: 18px; border-radius: 20px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
         </div>
       </div>
-
-      <div class="section">
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Cuenta</th>
-                <th>Importe</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="search-results-table">
-              <tr>
-                <td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:60px;">
-                  <div style="font-size: 40px; margin-bottom: 10px;">🔎</div>
-                  Escribe algo arriba para empezar a buscar...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div> </div> <div id="search-total-summary" style="display: none; margin-top: 16px; padding: 20px; background: var(--primary-light); border-radius: 12px; border: 1px solid var(--primary);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-weight: 600; color: var(--primary); font-size: 14px; text-transform: uppercase;">Suma total de resultados:</span>
-          <span id="search-total-amount" style="font-size: 24px; font-weight: 800; color: var(--primary);">0,00 €</span>
+    
+      <div class="search-date-group" style="display: flex; gap: 12px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.4); padding: 12px; border-radius: 16px; border: 1px solid var(--border-color);">
+        <div style="flex: 1;">
+            <span style="font-size: 9px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; display: block; margin-bottom: 2px;">Desde</span>
+            <input type="date" id="search-start-date" class="date-input-mini" onchange="handleGlobalSearch()" style="width: 100%; border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--primary); padding: 4px; cursor: pointer;">
+        </div>
+        <div style="width: 1px; background: var(--border-color); margin: 4px 0;"></div>
+        <div style="flex: 1;">
+            <span style="font-size: 9px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; display: block; margin-bottom: 2px;">Hasta</span>
+            <input type="date" id="search-end-date" class="date-input-mini" onchange="handleGlobalSearch()" style="width: 100%; border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--primary); padding: 4px; cursor: pointer;">
+        </div>
+        <button onclick="clearSearchDates()" style="border:none; background:none; color:var(--red); font-size:12px; cursor:pointer; font-weight:700; padding: 0 8px;">Limpiar</button>
+      </div>
+    
+      <div class="search-filters-scroll" id="search-quick-filters">
+        <button class="filter-pill active" onclick="setSearchFilter('all', this)">Todos</button>
+        <button class="filter-pill" onclick="setSearchFilter('gastos', this)">📉 Gastos</button>
+        <button class="filter-pill" onclick="setSearchFilter('ingresos', this)">💰 Ingresos</button>
+        <button class="filter-pill" onclick="setSearchFilter('tickets', this)">📎 Con Ticket</button>
+        <button class="filter-pill" onclick="setSearchFilter('viajes', this)">✈️ Viajes</button>
+      </div>
+    
+      <div id="search-results-feed" style="margin-bottom: 100px;">
+        <div class="empty-state-card">
+            <div class="empty-state-icon">🔎</div>
+            <div class="empty-state-title">Tu historial al completo</div>
+            <div class="empty-state-text">Usa la barra superior o los filtros rápidos para encontrar movimientos.</div>
         </div>
       </div>
-
-    </div>  
+    
+      <div id="search-total-summary" style="display: none; margin-top: 16px; padding: 20px; background: var(--primary-light); border-radius: 12px; border: 1px solid var(--primary);">
+      </div>
+    </div>
   
     <div id="settings-view" class="view">
       <header class="header">
@@ -3355,6 +3438,72 @@ body.privacy-mode #dashboard-runway-value {
 
     </div>
   </div>
+
+
+  <!-- Loan Modal -->
+  <div class="modal-overlay" id="loan-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><span>📉</span> Configurar Préstamo</h3>
+            <button class="close-btn" onclick="closeLoanModal()">&times;</button>
+        </div>
+        <form id="loan-form" onsubmit="event.preventDefault(); saveLoan();">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" id="loan-name-input" class="form-input" required>
+                </div>
+                <div class="form-row" style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" id="loan-start-date" class="form-input" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Duración (meses)</label>
+                        <input type="number" id="loan-duration" class="form-input" placeholder="Ej: 48" required>
+                    </div>
+                </div>
+                <div class="form-row" style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Total Concedido (€)</label>
+                        <input type="number" id="loan-total-input" step="0.01" class="form-input" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Pendiente Actual (€)</label>
+                        <input type="number" id="loan-current-input" step="0.01" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-row" style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Cuota (€)</label>
+                        <input type="number" id="loan-payment-input" step="0.01" class="form-input">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Interés (%)</label>
+                        <input type="number" id="loan-interest-input" step="0.01" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeLoanModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="loan-detail-modal">
+    <div class="modal" style="max-width: 600px; width: 95%;">
+        <div class="modal-header">
+            <h3 id="detail-loan-name" class="modal-title">Seguimiento de Pagos</h3>
+            <button class="close-btn" onclick="closeLoanDetail()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="payment-calendar" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                </div>
+        </div>
+    </div>
+</div>
 
   <!-- Transaction Modal -->
   <div class="modal-overlay" id="transaction-modal">
@@ -3780,6 +3929,13 @@ body.privacy-mode #dashboard-runway-value {
                 <label class="form-label">Día Cobro</label>
                 <input type="number" id="fixed-expense-day" class="form-input" min="1" max="31" placeholder="1-31">
             </div>
+            <div class="form-group">
+              <label class="form-label">🔗 Vincular a Préstamo (Opcional)</label>
+              <select class="form-select" id="fixed-expense-loan-id">
+                  <option value="">-- No vincular --</option>
+                  </select>
+              <small style="color: var(--text-tertiary); font-size: 11px;">Si lo vinculas, al marcar este gasto se descontará del préstamo automáticamente.</small>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Meses en los que aplica</label>
@@ -3922,6 +4078,7 @@ body.privacy-mode #dashboard-runway-value {
     let currentYear = new Date().getFullYear();
     let currentType = '';
     let editingId = null;
+    let editingLoanId = null; // Para rastrear si estamos creando o editando un préstamo
     let currentView = 'dashboard';
 
     // Initialize data structure
@@ -3978,11 +4135,15 @@ body.privacy-mode #dashboard-runway-value {
         const validAccounts = (accountsRes.data || []).filter(a => 
           a.user_id === currentUser.id || a.is_shared === true || a.is_shared === 'true' || a.isShared === true
         );
-        
+
         const validAccountNames = validAccounts.map(a => a.name);
 
-        // 3. FILTRADO DE MOVIMIENTOS Y METAS
-        const validTransactions = (transactionsRes.data || []).filter(t => validAccountNames.includes(t.account));
+        // 3. FILTRADO DE MOVIMIENTOS (MODIFICADO PARA VER INGRESOS DE AMBOS)
+        const validTransactions = (transactionsRes.data || []).filter(t => 
+          // Permitimos la transacción si:
+          validAccountNames.includes(t.account) || // Es de una cuenta que puedo ver
+          t.type === 'ingresos'                   // O es un ingreso (para calcular el esfuerzo)
+        );
         const validHoldings = (holdingsRes.data || []).filter(h => validAccountNames.includes(h.account));
         const validTransfers = (transfersRes.data || []).filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
         const validFixedExpenses = (fixedExpensesRes.data || []).filter(f => validAccountNames.includes(f.account));
@@ -3997,11 +4158,11 @@ body.privacy-mode #dashboard-runway-value {
             initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), 
             includeInPatrimony: a.include_in_patrimony, isDisposable: a.is_disposable, isShared: a.is_shared
           })),
-          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url, travel_id: t.travel_id, travel_category_name: t.travel_category_name })),
+          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url, travel_id: t.travel_id, travel_category_name: t.travel_category_name, user_id: t.user_id })),
           holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
           transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
           contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
-          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months, day: f.day })),
+          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months, day: f.day, loan_id: f.loan_id })),
           fixedExpensesPaid: {}, 
           monthlyPatrimony: {}, 
           customCategories: {},
@@ -4111,13 +4272,25 @@ body.privacy-mode #dashboard-runway-value {
       }
     }
 
+    // index.html: Función de filtrado con lógica de privacidad
     async function getTransactionsByMonth(month, type = null) {
       const data = await getData();
       return data.transactions.filter(t => {
         const txnMonth = new Date(t.date).getMonth();
         const matchesMonth = txnMonth === month;
         const matchesType = type ? t.type === type : true;
-        return matchesMonth && matchesType;
+        
+        if (!matchesMonth || !matchesType) return false;
+
+        // LÓGICA DE PRIVACIDAD EN LISTAS:
+        // Si la tabla es de 'ingresos', 'gastos_personales' o 'inversiones', 
+        // solo devolvemos los movimientos creados por el usuario actual.
+        if (type === 'ingresos' || type === 'gastos_personales' || type === 'inversiones') {
+            return t.user_id === currentUser.id;
+        }
+
+        // Para 'gastos_compartidos' devolvemos ambos, ya que son gastos de la casa.
+        return true;
       });
     }
 
@@ -4490,6 +4663,7 @@ function renderDistributionChart(normal, investments, shared) {
 }
 
   async function renderMonthlyView() {
+    dataCache = null;
     const data = await getData();
     
     // 1. GENERADOR DEL SELECTOR CON INDICADOR DE "HOY"
@@ -5533,6 +5707,10 @@ async function showPersonalExpensesBreakdown() {
       if (e.target.id === 'transaction-modal') closeModal();
     });
 
+    document.getElementById('loan-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'loan-modal') closeLoanModal();
+    });
+
     document.getElementById('investment-modal').addEventListener('click', (e) => {
       if (e.target.id === 'investment-modal') closeInvestmentModal();
     });
@@ -5644,59 +5822,159 @@ function filterAccountMovements() {
 }
 
 // Render Accounts View
+// index.html: Lógica con separación Ahorros / Inversión / Compartido
 async function renderAccountsView() {
-  const data = await getData();
-  const filterAccount = document.getElementById('account-filter')?.value || '';
-  
-  // 1. CÁLCULO DE SALDOS
-  const accountEntries = await Promise.all(
-    data.accounts.map(async (acc) => {
-      const balance = await calculateAccountBalance(acc.name);
-      return { ...acc, currentBalance: balance };
-    })
-  );
+    const data = await getData();
+    // 1. Obtener préstamos de Supabase
+    const { data: loans } = await supabaseClient.from('loans').select('*');
+    
+    // Referencias a los elementos del DOM
+    const personalCol = document.getElementById('personal-wealth-col');
+    const sharedCol = document.getElementById('shared-wealth-col');
+    const loansContainer = document.getElementById('loans-container');
+    
+    // IDs de los nuevos KPIs del encabezado
+    const liquidAssetsEl = document.getElementById('personal-liquid-assets');
+    const netWorthEl = document.getElementById('personal-net-worth');
+    const sharedTotalEl = document.getElementById('shared-assets-total');
 
-  const totalPersonal = accountEntries
-    .filter(acc => acc.includeInPatrimony !== false && !(acc.isShared === true || acc.is_shared === true))
-    .reduce((sum, acc) => sum + acc.currentBalance, 0);
+    if (!personalCol || !sharedCol) return;
 
-  const totalShared = accountEntries
-    .filter(acc => acc.isShared === true || acc.is_shared === true)
-    .reduce((sum, acc) => sum + acc.currentBalance, 0);
+    // 2. OBTENER SALDOS REALES (Calculando Brokers/Exchange por sus holdings)
+    const accountsWithBalance = await Promise.all(data.accounts.map(async acc => {
+        const balance = await calculateAccountBalance(acc.name);
+        return { ...acc, currentBalance: balance };
+    }));
 
-  // 2. RENDER COLUMNA PERSONAL (Cuentas + Inversiones)
-  const personalCol = document.getElementById('personal-wealth-col');
-  const personalGroups = [
-    { title: 'Cuentas Personales', icon: '👤', items: accountEntries.filter(a => !a.isShared && a.type !== 'Broker' && a.type !== 'Exchange Crypto') },
-    { title: 'Inversiones', icon: '📈', items: accountEntries.filter(a => !a.isShared && (a.type === 'Broker' || a.type === 'Exchange Crypto')) }
-  ];
+    // 3. SEPARACIÓN LÓGICA POR GRUPOS
+    // Ahorros Personales (No compartidos y no inversión)
+    const personalNormal = accountsWithBalance.filter(a => 
+        !(a.isShared || a.is_shared === true) && 
+        a.type !== 'Broker' && a.type !== 'Exchange Crypto'
+    );
+    
+    // Inversiones Personales (No compartidos y tipo Broker/Exchange)
+    const personalInvest = accountsWithBalance.filter(a => 
+        !(a.isShared || a.is_shared === true) && 
+        (a.type === 'Broker' || a.type === 'Exchange Crypto')
+    );
+    
+    // Cuentas Compartidas
+    const sharedAccounts = accountsWithBalance.filter(a => a.isShared || a.is_shared === true);
 
-  if (personalCol) {
+    // 4. CÁLCULOS PARA LOS 3 NÚMEROS DEL ENCABEZADO
+    const sumAhorros = personalNormal.reduce((s, a) => s + a.currentBalance, 0);
+    const sumInversiones = personalInvest.reduce((s, a) => s + a.currentBalance, 0);
+    const totalDebts = (loans || []).reduce((s, l) => s + parseFloat(l.current_balance), 0);
+    const sumShared = sharedAccounts.reduce((s, a) => s + a.currentBalance, 0);
+
+    // Número 1: Mi Capital Principal (Ahorros + Inversiones)
+    const myLiquidCapital = sumAhorros + sumInversiones;
+    // Número 2: Patrimonio Real (Mi capital - Deuda)
+    const myRealNetWorth = myLiquidCapital - totalDebts;
+
+    // 5. INYECTAR LOS 3 NÚMEROS EN EL ENCABEZADO
+    if (liquidAssetsEl) liquidAssetsEl.textContent = formatCurrency(myLiquidCapital);
+    
+    if (netWorthEl) {
+        netWorthEl.textContent = formatCurrency(myRealNetWorth);
+        netWorthEl.style.color = myRealNetWorth >= 0 ? 'var(--text-primary)' : 'var(--red)';
+    }
+
+    if (sharedTotalEl) sharedTotalEl.textContent = formatCurrency(sumShared);
+
+    // 6. RENDER COLUMNA IZQUIERDA (Ahorros + Inversiones por separado)
+    const renderCard = (acc) => `
+        <div class="account-card-integrated" onclick="openAccountDetailDrawer('${acc.name}')" style="min-height: auto; padding: 20px;">
+            <div class="card-top-info">
+                <div>
+                    <div class="card-acc-type" style="font-size: 8px; font-weight: 700; text-transform: uppercase; opacity: 0.7;">${acc.type}</div>
+                    <div class="card-acc-name" style="font-size: 15px; font-weight: 800;">${acc.name}</div>
+                </div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: ${acc.color || 'var(--primary)'}"></div>
+            </div>
+            <div class="card-acc-balance" style="font-size: 24px; margin-top: 10px; font-weight: 900;">${formatCurrency(acc.currentBalance)}</div>
+        </div>`;
+
     personalCol.innerHTML = `
-      <div class="kpi-card" style="border-left: 4px solid var(--primary); margin-bottom: 24px; padding: 16px 24px !important; min-height: auto !important;">
-          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">👤 Mi Patrimonio Personal</div>
-          <div style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">${formatCurrency(totalPersonal)}</div>
-      </div>
-      ${renderGroupList(personalGroups, data.transactions)} `;
-  }
+        <div class="group-header">
+            <span class="group-title">👤 Mis Ahorros</span>
+            <span class="group-sum">${formatCurrency(sumAhorros)}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px;">
+            ${personalNormal.map(renderCard).join('')}
+        </div>
+        
+        <div class="group-header">
+            <span class="group-title">📈 Mis Inversiones</span>
+            <span class="group-sum">${formatCurrency(sumInversiones)}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+            ${personalInvest.map(renderCard).join('')}
+        </div>`;
 
-  // 3. RENDER COLUMNA COMPARTIDA
-  const sharedCol = document.getElementById('shared-wealth-col');
-  const sharedGroups = [
-    { title: 'Cuentas Compartidas', icon: '🏠', items: accountEntries.filter(a => a.isShared) }
-  ];
-
-  if (sharedCol) {
+    // 7. RENDER COLUMNA DERECHA (Compartido - Diseño Compacto)
     sharedCol.innerHTML = `
-      <div class="kpi-card" style="border-left: 4px solid var(--orange); margin-bottom: 24px; padding: 16px 24px !important; min-height: auto !important;">
-          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">👥 Saldo Compartido</div>
-          <div style="font-size: 28px; font-weight: 800; color: var(--orange); margin-top: 4px;">${formatCurrency(totalShared)}</div>
-      </div>
-      ${renderGroupList(sharedGroups, data.transactions)} `;
-  }
+        <div class="group-header">
+            <span class="group-title">👥 Compartido</span>
+            <span class="group-sum">${formatCurrency(sumShared)}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${sharedAccounts.map(acc => `
+                <div class="account-card-integrated" onclick="openAccountDetailDrawer('${acc.name}')" style="min-height: auto; padding: 16px; border-left: 4px solid var(--orange);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-acc-name" style="font-size: 14px; font-weight: 700;">${acc.name}</div>
+                        <div class="card-acc-balance" style="font-size: 16px; margin: 0; font-weight: 800;">${formatCurrency(acc.currentBalance)}</div>
+                    </div>
+                </div>`).join('')}
+        </div>`;
 
-  // 4. TABLAS INFERIORES
-  await renderAccountTables(data, accountEntries, filterAccount);
+    // 8. RENDER DEUDAS (Al final de las columnas)
+    if (loansContainer) {
+        loansContainer.innerHTML = `
+            <section class="section" style="margin-top: 24px; border-top: 4px solid var(--red);">
+                <div class="section-header">
+                    <h2 class="section-title">📉 Deudas y Préstamos</h2>
+                    <button class="btn-primary" onclick="openLoanModal()" style="font-size: 11px; padding: 6px 12px;">+ Añadir Préstamo</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+                    ${(loans && loans.length > 0) ? loans.map(loan => {
+                        const total = parseFloat(loan.total_amount);
+                        const current = parseFloat(loan.current_balance);
+                        const progress = ((total - current) / total) * 100;
+                        return `
+                        <div class="loan-card" onclick="openLoanDetail('${loan.id}')" style="cursor:pointer; position: relative;">
+                            <div class="loan-header">
+                                <div>
+                                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${loan.name}</div>
+                                    <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 700;">${loan.duration_months || 48} MESES</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 15px; font-weight: 800; color: var(--red);">-${formatCurrency(current)}</div>
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+                                        <button onclick="event.stopPropagation(); editLoan('${loan.id}')" style="background:none; border:none; color:var(--primary); font-size:10px; cursor:pointer; font-weight:700;">EDITAR ✏️</button>
+                                        <button onclick="event.stopPropagation(); deleteLoan('${loan.id}')" style="background:none; border:none; color:var(--text-tertiary); font-size:10px; cursor:pointer;">ELIMINAR</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="loan-progress-bg"><div class="loan-progress-bar" style="width: ${progress}%"></div></div>
+                            <div class="loan-stats">
+                                <span>Amortizado: ${progress.toFixed(1)}%</span>
+                                <span style="font-size: 10px;">${loan.interest_rate || 0}% INT.</span>
+                            </div>
+                        </div>`;
+                    }).join('') : '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-tertiary);">No hay deudas registradas. 🙌</div>'}
+                </div>
+            </section>`;
+    }
+
+    // 9. Historial de transferencias
+    const transEl = document.getElementById('transfers-table');
+    if (transEl) {
+        const trs = (data.transfers || []).sort((a,b) => new Date(b.date) - new Date(a.date));
+        transEl.innerHTML = trs.length === 0 ? '<tr><td colspan="6" style="text-align:center; padding:20px;">Sin transferencias</td></tr>' :
+            trs.map(t => `<tr><td>${formatDate(t.date)}</td><td>${t.from}</td><td>${t.to}</td><td>${t.concept || '-'}</td><td>${formatCurrency(t.amount)}</td><td><button class="action-btn delete" onclick="handleConfirmDeleteTransfer('${t.id}')">✕</button></td></tr>`).join('');
+    }
 }
 
 // Función auxiliar para generar las tarjetas de cuenta dentro de cada columna
@@ -6054,56 +6332,100 @@ async function renderContributionsList() {
   const data = await getData();
   const monthKey = `${currentMonth}-${currentYear}`;
   
-  // 1. LEER EL DATO OFICIAL DE LA TABLA (Para que coincida con el "500" de tu DB)
+  // 1. OBTENER APORTACIONES DEL MES
   const monthData = data.contributions.find(c => c.month === monthKey);
-  const my = monthData ? parseFloat(monthData.my || 0) : 0;
-  const partner = monthData ? parseFloat(monthData.partner || 0) : 0;
+  const jesusAportacion = monthData ? parseFloat(monthData.my || 0) : 0;
+  const silviaAportacion = monthData ? parseFloat(monthData.partner || 0) : 0;
   const external = monthData ? parseFloat(monthData.external || 0) : 0;
+
+  // 2. IDENTIFICAR USUARIOS
+  const isJesusLogged = currentUser.email.toLowerCase().includes('jesus');
+  
+  // Filtramos todos los ingresos del mes
+  const monthIncomeTx = data.transactions.filter(t => {
+      const d = new Date(t.date);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear && t.type === 'ingresos';
+  });
+
+  // Calculamos ingresos por ID de usuario
+  const miIngreso = monthIncomeTx
+    .filter(t => t.user_id === currentUser.id)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const ingresoPareja = monthIncomeTx
+    .filter(t => t.user_id !== currentUser.id)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  // Asignamos correctamente según quién esté mirando
+  const jesusIncome = isJesusLogged ? miIngreso : ingresoPareja;
+  const silviaIncome = isJesusLogged ? ingresoPareja : miIngreso;
+
+  // Helper visual para el porcentaje
+  const getEffortHtml = (userLabel, aportacion, ingreso, color) => {
+      if (!ingreso || ingreso <= 0) {
+          return `
+            <div style="margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.03); border-radius: 8px; text-align: center;">
+                <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">⚠️ Sin ingresos</div>
+                <div style="font-size: 8px; color: var(--text-tertiary); opacity: 0.7;">(No detectados para ${userLabel})</div>
+            </div>`;
+      }
+      const percent = (aportacion / ingreso) * 100;
+      return `
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+            <div style="flex: 1; height: 4px; background: #E4E6EF; border-radius: 10px; overflow: hidden;">
+                <div style="width: ${Math.min(percent, 100)}%; height: 100%; background: ${color};"></div>
+            </div>
+            <span style="font-size: 11px; font-weight: 800; color: ${color};">${percent.toFixed(1)}%</span>
+        </div>
+        <div style="font-size: 9px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; margin-top: 2px;">Esfuerzo sobre ingresos</div>
+      `;
+  };
 
   const container = document.getElementById('contributions-list');
   if (!container) return;
 
-  // 2. ACTUALIZAR LOS MARCADORES SUPERIORES (Añadida la tarjeta de EXTERNAs)
   container.innerHTML = `
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px;">
-      <div style="background:rgba(59,130,246,0.05); padding:15px; border-radius:12px; border:1px solid rgba(59,130,246,0.2); text-align:center;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px;">
+      
+      <div style="background:rgba(33, 69, 137, 0.05); padding:15px; border-radius:12px; border:1px solid rgba(33, 69, 137, 0.2);">
         <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px; font-weight:700; text-transform:uppercase;">Jesús</div>
-        <div style="font-size:20px; font-weight:700; color:var(--primary);">${formatCurrency(my)}</div>
+        <div style="font-size:22px; font-weight:800; color:var(--primary);">${formatCurrency(jesusAportacion)}</div>
+        ${getEffortHtml('Jesús', jesusAportacion, jesusIncome, 'var(--primary)')}
       </div>
       
-      <div style="background:rgba(249,115,22,0.05); padding:15px; border-radius:12px; border:1px solid rgba(249,115,22,0.2); text-align:center;">
+      <div style="background:rgba(249,115,22,0.05); padding:15px; border-radius:12px; border:1px solid rgba(249,115,22,0.2);">
         <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px; font-weight:700; text-transform:uppercase;">Silvia</div>
-        <div style="font-size:20px; font-weight:700; color:var(--orange);">${formatCurrency(partner)}</div>
+        <div style="font-size:22px; font-weight:800; color:var(--orange);">${formatCurrency(silviaAportacion)}</div>
+        ${getEffortHtml('Silvia', silviaAportacion, silviaIncome, 'var(--orange)')}
       </div>
 
-      <div style="background:rgba(16, 185, 129, 0.05); padding:15px; border-radius:12px; border:1px solid rgba(16, 185, 129, 0.2); text-align:center;">
+      <div style="background:rgba(16, 185, 129, 0.05); padding:15px; border-radius:12px; border:1px solid rgba(16, 185, 129, 0.2); text-align:center; display: flex; flex-direction: column; justify-content: center;">
         <div style="font-size:10px; color:var(--text-secondary); margin-bottom:5px; font-weight:700; text-transform:uppercase;">Externas</div>
-        <div style="font-size:20px; font-weight:700; color:var(--green);">${formatCurrency(external)}</div>
+        <div style="font-size:22px; font-weight:800; color:var(--green);">${formatCurrency(external)}</div>
       </div>
     </div>
     
-    <div style="font-weight:600; margin-bottom:12px; font-size:14px; display:flex; align-items:center; gap:8px;">
+    <div style="font-weight:600; margin-bottom:12px; font-size:14px; display:flex; align-items:center; gap:8px; color: var(--text-primary);">
       <span>📋</span> Historial de transferencias detectadas
     </div>
     <div id="contributions-detail-list"></div>
   `;
 
-  // 3. LISTAR LOS MOVIMIENTOS REALES (Muestra las piezas que suman los 350)
+  // El resto del renderizado del historial se mantiene igual...
   const detailContainer = document.getElementById('contributions-detail-list');
   const sharedNames = data.accounts.filter(a => a.isShared || a.is_shared || a.name.includes('Pareja')).map(a => a.name);
-  
   const movements = (data.transfers || []).filter(t => {
     const d = new Date(t.date);
     return d.getMonth() === currentMonth && d.getFullYear() === currentYear && sharedNames.includes(t.to);
   });
 
   if (movements.length === 0) {
-    detailContainer.innerHTML = `<div style="text-align:center; padding:20px; color:gray; font-size:13px;">No hay transferencias registradas en el historial.</div>`;
+    detailContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-tertiary); font-size:13px;">No hay transferencias registradas.</div>`;
   } else {
     detailContainer.innerHTML = movements.map(t => `
       <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom: 1px solid var(--border-color);">
         <div style="display:flex; flex-direction:column;">
-          <span style="font-size:13px; font-weight:500;">${t.concept || 'Aportación'}</span>
+          <span style="font-size:13px; font-weight:600; color: var(--text-primary);">${t.concept || 'Aportación'}</span>
           <span style="font-size:10px; color:var(--text-tertiary);">${new Date(t.date).toLocaleDateString()}</span>
         </div>
         <span style="font-weight:700; color:var(--text-primary);">${formatCurrency(t.amount)}</span>
@@ -6111,9 +6433,8 @@ async function renderContributionsList() {
     `).join('');
   }
 
-  // 4. ACTUALIZAR EL TOTAL DE LA SECCIÓN
   const totalHeader = document.getElementById('contributions-total');
-  if (totalHeader) totalHeader.textContent = formatCurrency(my + partner + external);
+  if (totalHeader) totalHeader.textContent = formatCurrency(jesusAportacion + silviaAportacion + external);
 }
 
 async function openEditContributionModal(transferId) {
@@ -6824,7 +7145,8 @@ let editingFixedExpenseId = null;
 // MODAL FUNCTIONS
 // ============================================================================
 
-function openAddFixedExpenseModal() {
+// index.html: Añadido 'async' y corregida la limpieza del campo loan_id
+async function openAddFixedExpenseModal() {
   editingFixedExpenseId = null;
   document.getElementById('fixed-expense-modal-title').textContent = 'Nuevo Gasto Fijo';
   document.getElementById('fixed-expense-form').reset();
@@ -6836,11 +7158,18 @@ function openAddFixedExpenseModal() {
   updateFixedExpenseCategories();
   populateFixedExpenseAccounts();
   
+  // Cargamos los préstamos disponibles en el selector
+  await populateFixedExpenseLoans();
+  
+  // Limpiamos el vínculo de préstamo (al ser nuevo, no tiene)
+  const loanSelect = document.getElementById('fixed-expense-loan-id');
+  if (loanSelect) loanSelect.value = '';
+
   document.getElementById('fixed-expense-modal').classList.add('active');
 }
 
+// Función de edición corregida
 async function openEditFixedExpenseModal(id) {
-  // Añadimos await para que espere a tener los datos reales
   const data = await getData();
   const expense = (data.fixedExpenses || []).find(e => e.id === id);
   
@@ -6856,10 +7185,7 @@ async function openEditFixedExpenseModal(id) {
   document.getElementById('fixed-expense-name').value = expense.name || '';
   document.getElementById('fixed-expense-type').value = expense.type || 'gastos_personales';
   document.getElementById('fixed-expense-amount').value = expense.amount || 0;
-  
-  // NUEVO: Rellenamos el día de cobro si existe
-  const dayInput = document.getElementById('fixed-expense-day');
-  if (dayInput) dayInput.value = expense.day || '';
+  document.getElementById('fixed-expense-day').value = expense.day || '';
   
   updateFixedExpenseCategories();
   document.getElementById('fixed-expense-category').value = expense.category;
@@ -6867,11 +7193,23 @@ async function openEditFixedExpenseModal(id) {
   populateFixedExpenseAccounts();
   document.getElementById('fixed-expense-account').value = expense.account;
   
-  // Marcamos los meses correspondientes
+  // Marcamos los meses
   const months = expense.months || [0,1,2,3,4,5,6,7,8,9,10,11];
   document.querySelectorAll('.month-checkbox').forEach(cb => {
     cb.checked = months.includes(parseInt(cb.value));
   });
+
+  // CARGA DE PRÉSTAMOS
+  // Primero cargamos las opciones en el select y esperamos a que termine
+  await populateFixedExpenseLoans();
+  
+  // Ahora que las opciones existen, seleccionamos la que toca
+  const loanSelect = document.getElementById('fixed-expense-loan-id');
+  if (loanSelect && expense.loan_id) {
+      loanSelect.value = expense.loan_id;
+  } else {
+      loanSelect.value = '';
+  }
   
   document.getElementById('fixed-expense-modal').classList.add('active');
 }
@@ -6950,7 +7288,8 @@ async function saveFixedExpense() {
       account: account,
       amount: amount,
       months: months,
-      day: day // <-- NUEVA COLUMNA
+      day: day,
+      loan_id: document.getElementById('fixed-expense-loan-id').value || null
     };
 
     if (editingFixedExpenseId) {
@@ -7029,22 +7368,61 @@ async function deleteFixedExpense(id) {
 async function toggleFixedExpense(expenseId, month) {
   try {
     const data = await getData();
-    const monthKey = `${month}-${currentYear}`;
+    const monthKey = `${month}-${currentYear}`; // Ejemplo: "2-2026"
     
     const expense = (data.fixedExpenses || []).find(e => e.id === expenseId);
     if (!expense) return;
     
     const isPaid = (data.fixedExpensesPaid[monthKey] || []).includes(expenseId);
     
+    // ==========================================================
+    // 1. LÓGICA VINCULADA AL PRÉSTAMO (Si existe loan_id)
+    // ==========================================================
+    if (expense.loan_id) {
+        const { data: loan } = await supabaseClient
+            .from('loans')
+            .select('*')
+            .eq('id', expense.loan_id)
+            .single();
+
+        if (loan) {
+            let updatedPaidMonths = [...(loan.paid_months || [])];
+            let newLoanBalance = parseFloat(loan.current_balance);
+
+            if (!isPaid) {
+                // AL PAGAR: Añadimos el mes al calendario del préstamo y restamos dinero
+                if (!updatedPaidMonths.includes(monthKey)) {
+                    updatedPaidMonths.push(monthKey);
+                }
+                newLoanBalance -= parseFloat(expense.amount);
+            } else {
+                // AL DESMARCAR: Quitamos el mes del calendario y devolvemos el dinero
+                updatedPaidMonths = updatedPaidMonths.filter(m => m !== monthKey);
+                newLoanBalance += parseFloat(expense.amount);
+            }
+
+            // Actualizamos el préstamo en Supabase
+            await supabaseClient
+                .from('loans')
+                .update({
+                    paid_months: updatedPaidMonths,
+                    current_balance: newLoanBalance
+                })
+                .eq('id', loan.id);
+        }
+    }
+
+    // ==========================================================
+    // 2. LÓGICA DE MARCADO DE GASTO FIJO (Capa de persistencia)
+    // ==========================================================
     if (isPaid) {
-      // 1. DESMARCAR: Eliminar de la lista de pagados y borrar la transacción asociada
+      // --- DESMARCAR ---
       await supabaseClient
         .from('fixed_expenses_paid')
         .delete()
         .eq('month_key', monthKey)
         .eq('fixed_expense_id', expenseId);
       
-      // Corregido: Usamos .ilike() correctamente para encontrar la transacción del mes
       const monthPrefix = `${currentYear}-${String(month + 1).padStart(2, '0')}%`;
       const { data: transactions } = await supabaseClient
         .from('transactions')
@@ -7059,9 +7437,9 @@ async function toggleFixedExpense(expenseId, month) {
           .eq('id', transactions[0].id);
       }
       
-      showToast('Gasto desmarcado y transacción eliminada', 'info');
+      showToast('Gasto y préstamo actualizados', 'info');
     } else {
-      // 2. MARCAR: Añadir a pagados y crear la transacción
+      // --- MARCAR ---
       await supabaseClient
         .from('fixed_expenses_paid')
         .insert({
@@ -7069,7 +7447,6 @@ async function toggleFixedExpense(expenseId, month) {
           fixed_expense_id: expenseId
         });
       
-      // CAMBIO: Usamos el día configurado en el gasto fijo (o 1 por defecto)
       const dayToUse = expense.day || 1;
       const scheduledDate = new Date(currentYear, month, dayToUse).toISOString().split('T')[0];
 
@@ -7086,12 +7463,12 @@ async function toggleFixedExpense(expenseId, month) {
           amount: expense.amount
         });
       
-      showToast(`✓ ${expense.name} pagado`, 'success');
+      showToast(`✓ ${expense.name} y préstamo descontados`, 'success');
 
-      // --- LÓGICA DE CELEBRACIÓN (CONFETI) ---
+      // Lógica de confeti si todo el mes está pagado
       invalidateCache();
       const freshData = await getData();
-      const totalMes = freshData.fixedExpenses.filter(e => (e.months || []).includes(currentMonth)).length;
+      const totalMes = freshData.fixedExpenses.filter(e => (e.months || []).includes(month)).length;
       const pagadosMes = (freshData.fixedExpensesPaid[monthKey] || []).length;
 
       if (pagadosMes === totalMes && totalMes > 0) {
@@ -7099,11 +7476,13 @@ async function toggleFixedExpense(expenseId, month) {
       }
     }
     
-    // Refrescar todas las vistas afectadas
+    // ==========================================================
+    // 3. ACTUALIZAR INTERFAZ
+    // ==========================================================
     invalidateCache();
     await renderMonthlyView();
     await renderDashboard();
-    await renderAccountsView();
+    await renderAccountsView(); // Crucial para ver el nuevo Patrimonio Neto y la barra de la moto
   } catch (error) {
     console.error('Error toggling fixed expense:', error);
     showToast('Error al procesar el gasto', 'error');
@@ -7923,32 +8302,25 @@ function closeAuthModal() {
 // LOGIN AUTOMÁTICO AL HACER CLIC EN EL PERFIL
 // ============================================================================
 
+// Actualización de autoLogin
 async function autoLogin(email, password) {
-  // Mostramos un mensajito de que está cargando
   showToast('Iniciando sesión...', 'info');
   
-  // Hacemos el login en Supabase usando los datos invisibles
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email: email,
     password: password,
   });
 
   if (error) {
-    showToast('Error de conexión. Revisa el código.', 'error');
-    console.error("Error al loguear:", error.message);
+    showToast('Error de conexión', 'error');
   } else {
     currentUser = data.user;
-    
-    // Ocultamos la pantalla gigante
-    document.getElementById('fullscreen-login').style.display = 'none';
-    
-    // Actualizamos el menú lateral
-    updateSidebarUserUI(currentUser.email);
-    showToast('¡Bienvenido!', 'success');
-    
-    // Recargamos los datos para este usuario
     invalidateCache();
     await initializeApp();
+    
+    // FORZAR RECARGA: Esto limpia la memoria del navegador y garantiza 
+    // que el nuevo usuario entre con una "pizarra limpia".
+    location.reload(); 
   }
 }
 
@@ -8115,109 +8487,109 @@ async function renderBudgetsView() {
 // LÓGICA DEL BUSCADOR GLOBAL
 // ============================================================================
 
+let currentSearchType = 'all';
+
+function setSearchFilter(type, btn) {
+    currentSearchType = type;
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    handleGlobalSearch(); // Re-ejecutar con el nuevo filtro
+}
+
 async function renderSearchView() {
-  const input = document.getElementById('global-search-input');
-  if (input) input.value = '';
-  document.getElementById('search-results-table').innerHTML = `
-    <tr>
-      <td colspan="6">
+    const input = document.getElementById('global-search-input');
+    if (input) input.value = '';
+    document.getElementById('search-results-feed').innerHTML = `
         <div class="empty-state-card">
-          <div class="empty-state-icon">🔎</div>
-          <div class="empty-state-title">¿Qué buscas hoy?</div>
-          <div class="empty-state-text">Encuentra cualquier gasto por nombre, categoría o cuenta en todo tu historial.</div>
-        </div>
-      </td>
-    </tr>`;   
+            <div class="empty-state-icon">🔎</div>
+            <div class="empty-state-title">Tu historial al completo</div>
+            <div class="empty-state-text">Usa la barra superior o los filtros rápidos para encontrar movimientos.</div>
+        </div>`;
 }
 
 async function handleGlobalSearch() {
-  const query = document.getElementById('global-search-input').value.toLowerCase().trim();
-  const resultsTable = document.getElementById('search-results-table');
-  const summaryContainer = document.getElementById('search-total-summary');
-  
-  // 1. Si la búsqueda es muy corta, limpiamos todo
-  if (query.length < 2) {
-    resultsTable.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:40px;">Escribe al menos 2 caracteres...</td></tr>';
-    if (summaryContainer) summaryContainer.style.display = 'none';
-    return;
-  }
-
-  const data = await getData();
-  
-  // 2. Buscamos en todas las transacciones
-  const results = data.transactions.filter(t => 
-    (t.description || "").toLowerCase().includes(query) || 
-    (t.category || "").toLowerCase().includes(query) ||
-    (t.account || "").toLowerCase().includes(query)
-  );
-
-  // 3. Si no hay resultados
-  if (results.length === 0) {
-    resultsTable.innerHTML = `
-    <tr>
-      <td colspan="6">
-        <div class="empty-state-card" style="border-color: var(--red); background: rgba(242, 100, 100, 0.02);">
-          <div class="empty-state-icon">🧊</div>
-          <div class="empty-state-title">Sin rastro de "${query}"</div>
-          <div class="empty-state-text">No hemos encontrado ningún movimiento con ese nombre. Prueba con algo más genérico.</div>
-        </div>
-      </td>
-    </tr>`;
-  if (summaryContainer) summaryContainer.style.display = 'none';
-  return;
-  }
-
-  // 4. Calculamos la suma total (Ingresos - Gastos)
-  const totalSum = results.reduce((acc, t) => {
-    return t.type === 'ingresos' ? acc + t.amount : acc - t.amount;
-  }, 0);
-
-  // 5. Dibujamos las filas (con el diseño que tú has puesto)
-  resultsTable.innerHTML = results.map(t => {
-    const hasFile = t.file_url && t.file_url !== "";
-    const isIncome = t.type === 'ingresos';
+    const query = document.getElementById('global-search-input').value.toLowerCase().trim();
+    // Capturamos los nuevos campos de fecha
+    const startDate = document.getElementById('search-start-date')?.value;
+    const endDate = document.getElementById('search-end-date')?.value;
     
-    return `
-      <tr>
-        <td class="date-cell">${new Date(t.date).toLocaleDateString()}</td>
-        <td class="description-cell">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span>${t.description}</span>
-              ${hasFile ? `
-                <a href="${t.file_url}" target="_blank" style="background:var(--primary-light); color:var(--primary); padding:4px 8px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">📎</a>
-              ` : ''}
-            </div>
-        </td>
-        <td><span class="category-badge">${t.category || 'Sin categoría'}</span></td>
-        <td><span style="font-size: 11px; color: var(--text-secondary)">${t.account}</span></td>
-        <td class="amount-cell ${isIncome ? 'amount-positive' : 'amount-negative'}">
-          ${formatCurrency(t.amount)}
-        </td>
-        <td class="row-actions">
-          <button class="action-btn" onclick="handleEditTransaction('${t.id}')">Editar</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+    const container = document.getElementById('search-results-feed');
+    const summary = document.getElementById('search-total-summary');
+    const data = await getData();
 
-  // 6. Mostramos el resumen con el contador y la suma total
-  if (summaryContainer) {
-    summaryContainer.style.display = 'block';
-    summaryContainer.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <span style="font-weight: 600; color: var(--primary); font-size: 14px; text-transform: uppercase;">Resultados encontrados:</span>
-          <span style="display: block; font-size: 12px; color: var(--text-secondary);">${results.length} movimientos</span>
-        </div>
-        <div style="text-align: right;">
-          <span style="display: block; font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; font-weight: 700;">Suma Total</span>
-          <span id="search-total-amount" style="font-size: 24px; font-weight: 800; color: ${totalSum >= 0 ? 'var(--green)' : 'var(--red)'};">
-            ${formatCurrency(totalSum)}
-          </span>
-        </div>
-      </div>
-    `;
-  }
+    // 1. FILTRADO MULTI-NIVEL (Texto + Rango de Fechas)
+    let results = data.transactions.filter(t => {
+        const matchesText = (t.description || "").toLowerCase().includes(query) || 
+                          (t.category || "").toLowerCase().includes(query) ||
+                          (t.account || "").toLowerCase().includes(query);
+        
+        // Comprobación de fechas
+        const matchesStart = startDate ? (t.date >= startDate) : true;
+        const matchesEnd = endDate ? (t.date <= endDate) : true;
+
+        return matchesText && matchesStart && matchesEnd;
+    });
+
+    // 2. Aplicar filtros de las "píldoras" (Gastos, Ingresos, etc.)
+    if (currentSearchType === 'gastos') results = results.filter(t => t.type.includes('gastos'));
+    if (currentSearchType === 'ingresos') results = results.filter(t => t.type === 'ingresos');
+    if (currentSearchType === 'tickets') results = results.filter(t => t.file_url);
+    if (currentSearchType === 'viajes') results = results.filter(t => t.travel_id);
+
+    if (results.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:60px; color:var(--text-tertiary);">No se han encontrado resultados.</div>`;
+        summary.style.display = 'none';
+        return;
+    }
+
+    // 3. Renderizar las tarjetas de actividad
+    container.innerHTML = results.map(t => {
+        const isIncome = t.type === 'ingresos';
+        const color = isIncome ? 'var(--green)' : 'var(--red)';
+        const bg = isIncome ? 'var(--green-bg)' : 'var(--red-bg)';
+        const emoji = isIncome ? '💰' : '💸';
+
+        return `
+            <div class="activity-card">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="activity-icon" style="background: ${bg}; color: ${color};">${emoji}</div>
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-primary); font-size: 15px;">${t.description}</div>
+                        <div style="font-size: 11px; color: var(--text-tertiary); display: flex; gap: 6px; margin-top: 2px;">
+                            <span>${formatDate(t.date)}</span>
+                            <span>•</span>
+                            <span style="font-weight: 700; color: var(--primary);">${t.category}</span>
+                            <span>•</span>
+                            <span>${t.account}</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 16px; font-weight: 900; color: ${color};">
+                        ${isIncome ? '+' : '-'}${formatCurrency(t.amount)}
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+                        ${t.file_url ? `<a href="${t.file_url}" target="_blank" style="text-decoration:none; font-size:14px;">📎</a>` : ''}
+                        <button class="action-btn" onclick="editTransaction('${t.id}')" style="padding:0; font-size:11px;">Editar</button>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+
+    // 4. Actualizar el sumario inteligente
+    const total = results.reduce((acc, t) => t.type === 'ingresos' ? acc + t.amount : acc - t.amount, 0);
+    summary.style.display = 'block';
+    summary.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase;">Total de esta selección:</span>
+            <span style="font-size: 20px; font-weight: 900; color: ${total >= 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(total)}</span>
+        </div>`;
+}
+
+function clearSearchDates() {
+    document.getElementById('search-start-date').value = '';
+    document.getElementById('search-end-date').value = '';
+    handleGlobalSearch(); // Refresca los resultados al limpiar
 }
 
 // ============================================================================
@@ -9244,27 +9616,32 @@ async function renderTravelPlans() {
         return;
     }
 
-    const data = await getData(); // Traemos transacciones frescas
+    const data = await getData();
     const allTransactions = data.transactions || [];
 
+    // AYUDANTE DE ICONOS
+    const getTravelIcon = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('vuelo') || n.includes('avión')) return '✈️';
+        if (n.includes('hotel') || n.includes('alojamiento') || n.includes('dormir')) return '🏨';
+        if (n.includes('comida') || n.includes('restaurante') || n.includes('cena')) return '🍽️';
+        if (n.includes('coche') || n.includes('alquiler') || n.includes('transporte')) return '🚗';
+        if (n.includes('ocio') || n.includes('actividad') || n.includes('entrada')) return '🎟️';
+        return '📍';
+    };
+
     container.innerHTML = plans.map(p => {
-        // --- CÁLCULO CORREGIDO: Cerramos el map y devolvemos el objeto ---
         const breakdownWithSpent = (p.breakdown || []).map(cat => {
             const spentInCategory = allTransactions
                 .filter(t => t.travel_id === p.id && t.travel_category_name === cat.category)
-                .reduce((sum, t) => {
-                    // Sumamos solo si es un tipo de gasto
-                    return t.type.includes('gastos') ? sum + Math.abs(t.amount) : sum;
-                }, 0);
-            
-            return { ...cat, spent: spentInCategory }; // Devolvemos la categoría con su gasto
-        }); // <-- AQUÍ SE CIERRA EL MAPA INTERNO
+                .reduce((sum, t) => t.type.includes('gastos') ? sum + Math.abs(t.amount) : sum, 0);
+            return { ...cat, spent: spentInCategory };
+        });
 
         const totalSpent = breakdownWithSpent.reduce((s, c) => s + (c.spent || 0), 0);
         const totalPercent = Math.min((totalSpent / p.total_budget) * 100, 100);
         const remaining = Math.max(0, p.total_budget - totalSpent);
 
-        // Dentro del .map de renderTravelPlans
         return `
             <div class="travel-card" onclick="openTravelDetailDrawer('${p.id}')">
                 <div class="travel-header-map">
@@ -9281,14 +9658,8 @@ async function renderTravelPlans() {
                 </div>
 
                 <div class="travel-metrics-strip">
-                    <div class="metric-box">
-                        <div class="metric-label">Presupuesto</div>
-                        <div class="metric-value">${formatCurrency(p.total_budget)}</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-label">Restante</div>
-                        <div class="metric-value" style="color:${remaining > 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(remaining)}</div>
-                    </div>
+                    <div class="metric-box"><div class="metric-label">Presupuesto</div><div class="metric-value">${formatCurrency(p.total_budget)}</div></div>
+                    <div class="metric-box"><div class="metric-label">Restante</div><div class="metric-value" style="color:${remaining > 0 ? 'var(--green)' : 'var(--red)'}">${formatCurrency(remaining)}</div></div>
                 </div>
 
                 <div style="margin-bottom: 24px;">
@@ -9308,7 +9679,9 @@ async function renderTravelPlans() {
                         return `
                             <div class="travel-cat-row-new">
                                 <div class="travel-cat-meta">
-                                    <span style="color:var(--text-primary); font-size:12px; font-weight:600;">${c.category}</span>
+                                    <span style="color:var(--text-primary); font-size:12px; font-weight:600;">
+                                        ${getTravelIcon(c.category)} ${c.category}
+                                    </span>
                                     <span style="color:${isOver ? 'var(--red)' : 'var(--text-secondary)'}; font-size:12px;">${formatCurrency(c.spent)} <small style="opacity:0.4;">/ ${formatCurrency(c.goal)}</small></span>
                                 </div>
                                 <div style="height:3px; background:rgba(0,0,0,0.03); border-radius:10px; overflow:hidden;">
@@ -9426,6 +9799,202 @@ async function renderActiveTravelWidget() {
             </div>
         `;
         container.style.display = 'block';
+    }
+}
+
+// index.html: Gestión visual de préstamos
+
+function openLoanModal() {
+    editingLoanId = null; // Reset para que el formulario sepa que es NUEVO
+    document.getElementById('loan-form').reset();
+    document.getElementById('loan-modal').classList.add('active');
+}
+
+function closeLoanModal() {
+    document.getElementById('loan-modal').classList.remove('active');
+}
+
+async function saveLoan() {
+    const loanData = {
+        user_id: currentUser.id,
+        name: document.getElementById('loan-name-input').value,
+        total_amount: parseFloat(document.getElementById('loan-total-input').value),
+        current_balance: parseFloat(document.getElementById('loan-current-input').value),
+        monthly_payment: parseFloat(document.getElementById('loan-payment-input').value) || 0,
+        interest_rate: parseFloat(document.getElementById('loan-interest-input').value) || 0,
+        start_date: document.getElementById('loan-start-date').value,
+        duration_months: parseInt(document.getElementById('loan-duration').value) || 48
+    };
+
+    try {
+        let error;
+        if (editingLoanId) {
+            // MODO EDICIÓN
+            ({ error } = await supabaseClient.from('loans').update(loanData).eq('id', editingLoanId));
+        } else {
+            // MODO NUEVO
+            ({ error } = await supabaseClient.from('loans').insert([loanData]));
+        }
+
+        if (error) throw error;
+
+        showToast(editingLoanId ? "Préstamo actualizado ✓" : "Préstamo creado ✓", "success");
+        closeLoanModal();
+        await renderAccountsView();
+    } catch (err) {
+        showToast("Error al guardar", "error");
+    }
+}
+
+async function editLoan(loanId) {
+    editingLoanId = loanId;
+    const { data: loan } = await supabaseClient.from('loans').select('*').eq('id', loanId).single();
+    if (!loan) return;
+
+    // Rellenamos el modal con los datos actuales de la base de datos
+    document.getElementById('loan-name-input').value = loan.name;
+    document.getElementById('loan-start-date').value = loan.start_date || '';
+    document.getElementById('loan-duration').value = loan.duration_months || '';
+    document.getElementById('loan-total-input').value = loan.total_amount;
+    document.getElementById('loan-current-input').value = loan.current_balance;
+    document.getElementById('loan-payment-input').value = loan.monthly_payment || '';
+    document.getElementById('loan-interest-input').value = loan.interest_rate || '';
+
+    document.getElementById('loan-modal').classList.add('active');
+}
+
+// Mantén la función de eliminar pero asegúrate de que llame a renderAccountsView
+async function deleteLoan(id) {
+    if (confirm("¿Seguro que quieres eliminar este préstamo? Se recalculará tu patrimonio neto.")) {
+        const { error } = await supabaseClient.from('loans').delete().eq('id', id);
+        if (error) showToast("Error al eliminar", "error");
+        else {
+            showToast("Préstamo eliminado", "success");
+            await renderAccountsView();
+        }
+    }
+}
+
+// index.html: Función openLoanDetail con protecciones contra valores NULL
+async function openLoanDetail(loanId) {
+    const { data: loan } = await supabaseClient.from('loans').select('*').eq('id', loanId).single();
+    if (!loan) return;
+
+    document.getElementById('detail-loan-name').textContent = loan.name;
+    const calendar = document.getElementById('payment-calendar');
+    calendar.innerHTML = '';
+
+    // PROTECCIÓN: Si el préstamo es antiguo y no tiene estos datos, usamos valores por defecto
+    const startDate = loan.start_date ? new Date(loan.start_date) : new Date('2023-10-01');
+    const duration = loan.duration_months || 48;
+    const paidMonths = loan.paid_months || [];
+    const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    let currentYear = -1;
+    let yearRow;
+
+    // Generamos el calendario basado en la duración real
+    for (let i = 0; i < duration; i++) {
+        const date = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
+        const year = date.getFullYear();
+        const monthIdx = date.getMonth();
+        const monthKey = `${year}-${monthIdx}`; 
+        const isPaid = paidMonths.includes(monthKey);
+
+        if (year !== currentYear) {
+            currentYear = year;
+            const yearLabel = document.createElement('div');
+            yearLabel.style = "font-weight: 800; margin: 20px 0 10px 0; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; display: flex; align-items: center; gap: 8px;";
+            yearLabel.innerHTML = `<span>📅</span> ${year}`;
+            calendar.appendChild(yearLabel);
+
+            yearRow = document.createElement('div');
+            yearRow.style = "display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 15px;";
+            calendar.appendChild(yearRow);
+        }
+
+        const circle = document.createElement('div');
+        circle.style = `
+            height: 42px; border-radius: 12px; border: 2px solid ${isPaid ? 'var(--primary)' : 'var(--border-color)'};
+            background: ${isPaid ? 'var(--primary)' : 'rgba(255,255,255,0.5)'};
+            color: ${isPaid ? 'white' : 'var(--text-tertiary)'};
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; cursor: pointer; font-weight: 700; transition: all 0.2s;
+            box-shadow: ${isPaid ? '0 4px 10px rgba(33,69,137,0.2)' : 'none'};
+        `;
+        circle.innerHTML = mesesNombres[monthIdx];
+        circle.onclick = () => togglePayment(loan, monthKey, isPaid);
+        
+        // Efecto hover visual
+        circle.onmouseover = () => { if(!isPaid) circle.style.borderColor = 'var(--primary)'; };
+        circle.onmouseout = () => { if(!isPaid) circle.style.borderColor = 'var(--border-color)'; };
+
+        yearRow.appendChild(circle);
+    }
+
+    // Aseguramos que el modal se activa después de cargar el contenido
+    document.getElementById('loan-detail-modal').classList.add('active');
+}
+
+async function payQuota(loanId, amount) {
+    if (!confirm(`¿Quieres descontar la cuota de ${formatCurrency(amount)} de la deuda?`)) return;
+
+    // Obtenemos el préstamo actual
+    const { data: loan } = await supabaseClient.from('loans').select('current_balance').eq('id', loanId).single();
+    const newBalance = parseFloat(loan.current_balance) - amount;
+
+    // Actualizamos en Supabase
+    const { error } = await supabaseClient.from('loans').update({ current_balance: newBalance }).eq('id', loanId);
+
+    if (!error) {
+        showToast("¡Cuota pagada! Deuda reducida.", "success");
+        closeLoanDetail();
+        renderAccountsView(); // Para que se actualicen los 3 números de arriba y la barra
+    }
+}
+
+// Funciones de Apertura/Cierre
+function closeLoanDetail() { document.getElementById('loan-detail-modal').classList.remove('active'); }
+
+// PASO 3: Cerrar al clicar fuera
+document.getElementById('loan-detail-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'loan-detail-modal') closeLoanDetail();
+});
+
+async function togglePayment(loan, monthKey, isPaid) {
+  if (isPaid) return; 
+
+  const action = confirm("¿Es un pago NUEVO?\n\nACEPTAR: Descontar cuota del capital.\nCANCELAR: Solo marcar mes (para pagos antiguos).");
+
+  let newBalance = loan.current_balance;
+  let updatedPaidMonths = [...(loan.paid_months || []), monthKey];
+
+  if (action) {
+      // Usamos un valor por defecto si monthly_payment es 0 o null
+      const quota = parseFloat(loan.monthly_payment) || 225.47; 
+      newBalance = parseFloat(loan.current_balance) - quota;
+      showToast(`Cuota de ${formatCurrency(quota)} descontada`, "success");
+  } else {
+      showToast("Mes marcado", "info");
+  }
+
+    const { error } = await supabaseClient.from('loans').update({
+        paid_months: updatedPaidMonths,
+        current_balance: newBalance
+    }).eq('id', loan.id);
+
+    if (!error) {
+        openLoanDetail(loan.id);
+        renderAccountsView();
+    }
+}
+
+async function populateFixedExpenseLoans() {
+    const { data: loans } = await supabaseClient.from('loans').select('id, name');
+    const select = document.getElementById('fixed-expense-loan-id');
+    if (select && loans) {
+        select.innerHTML = '<option value="">-- No vincular --</option>' + 
+            loans.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
     }
 }
 
