@@ -2542,100 +2542,94 @@ body.privacy-mode #dashboard-runway-value {
 
 /* --- 2. CONFIGURACIÓN MÓVIL (Sustituye todo tu @media) --- */
 @media (max-width: 768px) {
+    /* 1. Reset de pantalla para evitar rebotes laterales */
+    body, html { overflow-x: hidden !important; width: 100%; position: relative; }
     .sidebar { display: none !important; }
-    
-    body, html {
-        overflow-x: hidden !important; /* Evita que rebote la web */
-        width: 100%;
-    }
+    .main-content { margin-left: 0 !important; padding: 15px !important; padding-bottom: 120px !important; width: 100%; }
 
-    .main-content {
-        margin-left: 0 !important;
-        padding: 15px !important;
-        padding-bottom: 120px !important;
-        width: 100vw !important;
-        overflow-x: hidden !important;
-    }
-
-    /* EL CARRUSEL "BLINDADO" */
+    /* 2. EL CARRUSEL (Scroll de las 3 tarjetas) */
     .stats-grid {
-        display: flex !important; /* Forzamos flexbox */
+        display: flex !important; /* Forzamos fila */
         flex-direction: row !important;
         flex-wrap: nowrap !important; /* Prohibido bajar de línea */
-        
-        width: 100vw !important;
-        margin-left: -15px !important; /* Anulamos el padding de main-content para que llegue al borde */
-        
-        overflow-x: scroll !important; /* Scroll horizontal obligatorio */
-        overflow-y: hidden !important;
-        
-        scroll-snap-type: x mandatory !important; /* El imán */
-        -webkit-overflow-scrolling: touch !important; 
-        
-        gap: 0 !important; 
-        grid-template-columns: none !important; /* Matamos el grid de escritorio */
-        scrollbar-width: none;
+        overflow-x: auto !important; /* Habilitar scroll lateral */
+        scroll-snap-type: x mandatory !important; /* Efecto imán */
+        gap: 15px !important;
+        padding: 10px 20px 25px 20px !important;
+        margin: 0 -20px !important; /* Para que llegue al borde del móvil */
+        grid-template-columns: none !important; /* Matamos el diseño de PC */
+        -webkit-overflow-scrolling: touch;
     }
-
     .stats-grid::-webkit-scrollbar { display: none; }
 
     .stat-card {
-        /* Cada tarjeta es UNA PANTALLA COMPLETA */
-        flex: 0 0 100vw !important; 
-        min-width: 100vw !important;
-        width: 100vw !important;
-        
-        scroll-snap-align: center !important; /* Se pega al centro */
-        scroll-snap-stop: always !important;
-        
-        margin: 0 !important;
-        padding: 30px !important;
-        background: var(--bg-surface) !important;
-        border: none !important;
-        border-radius: 0 !important; /* Estilo sección completa */
-        box-shadow: none !important;
-        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        flex: 0 0 85% !important; /* Cada tarjeta ocupa el 85% para que se vea la siguiente */
+        min-width: 85% !important;
+        scroll-snap-align: center !important;
+        margin-bottom: 0 !important;
+        background: white !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
     }
 
-    /* --- MENÚ Y ACCIONES (Z-Index Corregidos) --- */
+    /* 3. MENÚ INFERIOR (Diseño Liquid Glass Real) */
     .mobile-nav {
         display: flex !important;
         position: fixed;
         bottom: 20px; left: 15px; right: 15px;
-        height: 70px;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(20px);
-        border-radius: 28px;
-        z-index: 8000; /* Por encima del carrusel */
+        height: 75px;
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 30px !important;
+        z-index: 8000 !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        padding: 0 10px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
     }
 
-    .menu-overlay {
-        display: block !important;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 9000; /* Por debajo de las burbujas */
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
+    .mobile-nav-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #7E8299 !important;
+        flex: 1 !important; /* Esto separa las letras y los iconos */
+        text-decoration: none !important;
     }
-    .menu-overlay.active { opacity: 1; pointer-events: auto; }
 
+    .mobile-nav-item.active { color: #214589 !important; }
+    .mobile-nav-item i { font-size: 20px !important; margin-bottom: 5px !important; display: block !important; }
+    .mobile-nav-item span { font-size: 10px !important; font-weight: 700 !important; text-transform: uppercase !important; }
+
+    /* 4. ACCIONES RÁPIDAS (Burbujas del +) */
     .quick-actions-container {
         display: flex !important;
         position: fixed;
         bottom: 110px; left: 50%;
         transform: translateX(-50%) scale(0);
-        z-index: 9999 !important; /* CAPA MÁXIMA */
-        opacity: 0;
+        z-index: 9999 !important;
+        flex-direction: column;
+        gap: 15px;
         transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        opacity: 0;
+        pointer-events: none;
     }
     .quick-actions-container.active { transform: translateX(-50%) scale(1); opacity: 1; pointer-events: auto; }
-
-    /* Estilo botones acciones */
-    .action-item { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; margin-bottom: 10px; }
-    .action-item span { background: #1A2B4D; color: white; padding: 6px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-    .action-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    
+    .menu-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); z-index: 8500; display: none;
+    }
+    .menu-overlay.active { display: block; }
+    
+    .nav-add-circle {
+        width: 55px; height: 55px; background: #214589; border-radius: 20px;
+        display: flex; align-items: center; justify-content: center; color: white;
+        box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3); border: 3px solid white;
+    }
 }
 
   </style>
