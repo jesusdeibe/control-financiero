@@ -2535,60 +2535,69 @@ body.privacy-mode #dashboard-runway-value {
     transform: scale(1.2) rotate(10deg);
 }
 
+/* ===================================================
+   1. CONFIGURACIÓN GLOBAL (FUERA DE MEDIA QUERY) 
+   =================================================== */
+/* Escondemos los elementos de la App Móvil cuando estés en el ordenador */
+#mobile-root, 
 .mobile-nav, 
 .quick-actions-container, 
 .menu-overlay, 
 .nav-add-btn {
-    display: none !important; /* Escondido por defecto en PC */
+    display: none !important;
 }
 
+/* ===================================================
+   2. MUNDO MÓVIL (DENTRO DE MEDIA QUERY)
+   =================================================== */
 @media (max-width: 768px) {
-    /* --- RESET ESTRUCTURAL --- */
-    .sidebar { display: none !important; } /* Adiós lateral */
+    /* Escondemos el Sidebar y el Main Content de escritorio */
+    .sidebar, .main-content { 
+        display: none !important; 
+    }
     
     body, html { 
         overflow-x: hidden !important; 
         width: 100%; 
-        background-color: #FDFBFA; 
+        background-color: #F8F9FB !important; 
     }
 
-    .main-content {
-        margin-left: 0 !important;
-        padding: 15px !important;
-        padding-bottom: 120px !important; /* Espacio para el menú inferior */
-        width: 100vw !important;
+    /* Muestra el contenedor raíz de la App Móvil */
+    #mobile-root { 
+        display: block !important; 
     }
 
-    /* --- EL DASHBOARD MÓVIL (Carrusel de 3 tarjetas) --- */
-    .stats-grid {
+    /* EL NUEVO CARRUSEL (Nombres nuevos para que no fallen) */
+    .mobile-carousel {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         scroll-snap-type: x mandatory !important;
-        gap: 0 !important;
-        margin: 0 -15px 20px -15px !important; /* Pegado a los bordes */
-        padding: 0 !important;
-        grid-template-columns: none !important;
+        gap: 15px !important;
+        padding: 10px 20px 30px 20px !important;
+        margin: 0 -20px !important;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
     }
-    .stats-grid::-webkit-scrollbar { display: none; }
+    .mobile-carousel::-webkit-scrollbar { display: none; }
 
-    .stat-card {
-        flex: 0 0 100vw !important; /* CADA TARJETA ES UNA PANTALLA */
-        min-width: 100vw !important;
+    .card-snap {
+        flex: 0 0 88% !important;
+        min-width: 88% !important;
         scroll-snap-align: center !important;
-        margin: 0 !important;
-        padding: 30px 25px !important;
-        background: white !important;
-        border: none !important;
-        border-radius: 0 !important;
-        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
-        box-shadow: none !important;
+        background: white;
+        border-radius: 28px;
+        padding: 25px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 180px;
     }
 
-    /* --- NAVEGACIÓN INFERIOR (ESTILO APP) --- */
+    /* NAVEGACIÓN INFERIOR ESTILO APPLE */
     .mobile-nav {
         display: flex !important;
         position: fixed;
@@ -2600,10 +2609,8 @@ body.privacy-mode #dashboard-runway-value {
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 35px !important;
         z-index: 9000 !important;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
         justify-content: space-around !important;
         align-items: center !important;
-        padding: 0 10px !important;
     }
 
     .mobile-nav-item {
@@ -2619,21 +2626,21 @@ body.privacy-mode #dashboard-runway-value {
     .mobile-nav-item i { font-size: 20px !important; }
     .mobile-nav-item span { font-size: 9px !important; font-weight: 800 !important; text-transform: uppercase; }
 
-    /* --- BOTÓN FLOTANTE (+) --- */
+    /* BOTÓN CENTRAL (+) */
     .nav-add-btn {
+        display: flex !important;
         width: 55px; height: 55px;
         background: #214589 !important;
         border-radius: 20px !important;
-        display: flex !important;
         align-items: center; justify-content: center;
         color: white !important;
         font-size: 22px !important;
+        margin-top: -40px;
+        border: 4px solid #F8F9FB !important;
         box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3) !important;
-        margin-top: -40px; /* Elevado */
-        border: 4px solid #FDFBFA !important;
     }
 
-    /* --- BURBUJAS DE ACCIÓN --- */
+    /* BURBUJAS DE ACCIÓN */
     .quick-actions-container {
         display: flex !important;
         position: fixed;
@@ -2645,6 +2652,12 @@ body.privacy-mode #dashboard-runway-value {
         opacity: 0; pointer-events: none;
     }
     .quick-actions-container.active { transform: translateX(-50%) scale(1); opacity: 1; pointer-events: auto; }
+    
+    .menu-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4); z-index: 8500; display: none;
+        backdrop-filter: blur(4px);
+    }
 }
 
   </style>
@@ -10902,46 +10915,75 @@ async function renderMobileDashboard() {
     const container = document.getElementById('mobile-content');
     if (!container) return;
 
-    // Calculamos saldo de cuentas normales para el ejemplo
-    const normalAccounts = data.accounts.filter(a => !a.isShared && a.type !== 'Broker');
-    let total = 0;
-    for (const acc of normalAccounts) {
-        total += await calculateAccountBalance(acc.name);
-    }
+    // A. CÁLCULO PATRIMONIO PERSONAL
+    const personalAccounts = data.accounts.filter(a => !a.isShared && a.type !== 'Broker' && a.includeInPatrimony !== false);
+    const personalTotal = await Promise.all(personalAccounts.map(a => calculateAccountBalance(a.name)))
+                          .then(bal => bal.reduce((a, b) => a + b, 0));
 
-    // Inyectamos el HTML del Dashboard Móvil
+    // B. CÁLCULO CUENTAS COMPARTIDAS
+    const sharedAccounts = data.accounts.filter(a => a.isShared === true || a.is_shared === true);
+    const sharedTotal = await Promise.all(sharedAccounts.map(a => calculateAccountBalance(a.name)))
+                        .then(bal => bal.reduce((a, b) => a + b, 0));
+
+    // C. LÓGICA DE SUPERVIVENCIA (Runway)
+    const runway = await calculateRunway();
+
     container.innerHTML = `
         <header style="padding: 30px 20px 10px 20px;">
-            <div style="font-size: 14px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                Hola, ${currentUser.email.split('@')[0]} 👋
-            </div>
-            <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin-top: 5px;">Tu Dinero</h1>
+            <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Balance actual</div>
+            <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin: 5px 0;">Resumen General</h1>
         </header>
 
-        <div style="padding: 20px;">
-            <div style="background: white; padding: 25px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);">
-                <div style="font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 10px;">
-                    Patrimonio Líquido
+        <div class="mobile-carousel">
+            
+            <div class="card-snap">
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">Patrimonio Personal</div>
+                    <div style="font-size: 32px; font-weight: 900; color: var(--text-primary);">${formatCurrency(personalTotal)}</div>
                 </div>
-                <div style="font-size: 36px; font-weight: 900; color: var(--text-primary);">
-                    ${formatCurrency(total)}
-                </div>
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 13px; font-weight: 700; color: var(--green);">App Independiente Activa</span>
-                    <span style="font-size: 18px;">📱</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F0F2F5; padding-top: 15px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Cuentas e Inversiones</span>
+                    <span style="background: rgba(33, 69, 137, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800;">PRIVADO</span>
                 </div>
             </div>
+
+            <div class="card-snap">
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">Cuentas Compartidas</div>
+                    <div style="font-size: 32px; font-weight: 900; color: var(--primary);">${formatCurrency(sharedTotal)}</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F0F2F5; padding-top: 15px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Fondo común</span>
+                    <span style="background: rgba(16, 185, 129, 0.1); color: var(--green); padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800;">COMPARTIDO</span>
+                </div>
+            </div>
+
+            <div class="card-snap" style="background: var(--primary); color: white;">
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; opacity: 0.7; text-transform: uppercase; margin-bottom: 5px;">Libertad Financiera</div>
+                    <div style="font-size: 32px; font-weight: 900;">${runway.lifestyleMonths.toFixed(1)} meses</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <span style="font-size: 12px; font-weight: 700; opacity: 0.9;">Modo Estilo de Vida</span>
+                    <span style="font-size: 18px;">🚀</span>
+                </div>
+            </div>
+
         </div>
 
-        <div style="padding: 0 20px; font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">
-            Estado del sistema:
-        </div>
-        <div style="padding: 10px 20px; color: var(--text-secondary); font-size: 14px;">
-            Diseñando el carrusel de tarjetas exclusivo para Silvia...
+        <div style="padding: 0 20px;">
+            <div style="font-size: 13px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 15px;">Operaciones rápidas</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button onclick="openTransactionModal('gastos_personales')" style="background: white; border: none; padding: 15px; border-radius: 20px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #FFF0F0; color: #F26464; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">-</span> Nuevo Gasto
+                </button>
+                <button onclick="openTransactionModal('ingresos')" style="background: white; border: none; padding: 15px; border-radius: 20px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #E8F7F0; color: #10B981; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">+</span> Nuevo Ingreso
+                </button>
+            </div>
         </div>
     `;
     
-    // Renderizamos la navegación
     renderMobileNavigation();
 }
 
