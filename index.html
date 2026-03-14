@@ -2535,6 +2535,13 @@ body.privacy-mode #dashboard-runway-value {
     transform: scale(1.2) rotate(10deg);
 }
 
+.mobile-nav, 
+.quick-actions-container, 
+.menu-overlay, 
+.nav-add-btn {
+    display: none !important; /* Escondido por defecto en PC */
+}
+
 @media (max-width: 768px) {
     /* --- RESET ESTRUCTURAL --- */
     .sidebar { display: none !important; } /* Adiós lateral */
@@ -10861,29 +10868,160 @@ function handleQuickAction(type) {
     }
 }
 
+// ==========================================
+// FUNCIONES EXCLUSIVAS PARA MUNDO MÓVIL
+// ==========================================
+
+function setupMobileShell() {
+    // 1. Ocultamos elementos de PC
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) sidebar.style.display = 'none';
+    
+    document.body.style.display = 'block'; 
+    document.body.style.overflow = 'auto'; // Permitir scroll
+    document.body.style.background = '#F8F9FB';
+
+    // 2. Creamos el contenedor raíz móvil si no existe
+    if (!document.getElementById('mobile-root')) {
+        const root = document.createElement('div');
+        root.id = 'mobile-root';
+        root.innerHTML = `
+            <div id="mobile-content" style="padding-bottom: 100px;"></div>
+            <div id="mobile-nav-container"></div> 
+        `;
+        document.body.appendChild(root);
+    }
+    
+    // 3. Escondemos el contenido de escritorio
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) mainContent.style.display = 'none';
+}
+
+async function renderMobileDashboard() {
+    const data = await getData();
+    const container = document.getElementById('mobile-content');
+    if (!container) return;
+
+    // Calculamos saldo de cuentas normales para el ejemplo
+    const normalAccounts = data.accounts.filter(a => !a.isShared && a.type !== 'Broker');
+    let total = 0;
+    for (const acc of normalAccounts) {
+        total += await calculateAccountBalance(acc.name);
+    }
+
+    // Inyectamos el HTML del Dashboard Móvil
+    container.innerHTML = `
+        <header style="padding: 30px 20px 10px 20px;">
+            <div style="font-size: 14px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                Hola, ${currentUser.email.split('@')[0]} 👋
+            </div>
+            <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin-top: 5px;">Tu Dinero</h1>
+        </header>
+
+        <div style="padding: 20px;">
+            <div style="background: white; padding: 25px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);">
+                <div style="font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 10px;">
+                    Patrimonio Líquido
+                </div>
+                <div style="font-size: 36px; font-weight: 900; color: var(--text-primary);">
+                    ${formatCurrency(total)}
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700; color: var(--green);">App Independiente Activa</span>
+                    <span style="font-size: 18px;">📱</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 0 20px; font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">
+            Estado del sistema:
+        </div>
+        <div style="padding: 10px 20px; color: var(--text-secondary); font-size: 14px;">
+            Diseñando el carrusel de tarjetas exclusivo para Silvia...
+        </div>
+    `;
+    
+    // Renderizamos la navegación
+    renderMobileNavigation();
+}
+
+function renderMobileNavigation() {
+  const nav = document.getElementById('mobile-nav-container');
+  if (!nav) return;
+  
+  nav.innerHTML = `
+    <nav class="mobile-nav" style="display: flex !important;">
+      <div class="mobile-nav-item active" onclick="renderMobileDashboard()">
+        <i class="fas fa-th-large"></i><span>Inicio</span>
+      </div>
+      <div class="mobile-nav-item" onclick="showToast('Próximamente', 'info')">
+        <i class="fas fa-calendar-alt"></i><span>Mes</span>
+      </div>
+      <div class="nav-add-btn" onclick="toggleQuickMenu()">
+        <i class="fas fa-plus" id="plus-icon"></i>
+      </div>
+      <div class="mobile-nav-item" onclick="showToast('Próximamente', 'info')">
+        <i class="fas fa-wallet"></i><span>Cartera</span>
+      </div>
+      <div class="mobile-nav-item" onclick="handleSignOut()">
+        <i class="fas fa-sign-out-alt"></i><span>Salir</span>
+      </div>
+    </nav>
+  `;
+}
+
+function setupMobileShell() {
+  // 1. Ocultamos el sidebar y preparamos el cuerpo
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.style.display = 'none';
+  
+  document.body.style.display = 'block'; // Quitamos el flex de escritorio
+  document.body.style.overflow = 'hidden'; 
+  document.body.style.background = '#F8F9FB'; // Fondo App limpia
+
+  // 2. Creamos un contenedor raíz exclusivo para el móvil si no existe
+  if (!document.getElementById('mobile-root')) {
+    const root = document.createElement('div');
+    root.id = 'mobile-root';
+    root.innerHTML = `
+      <div id="mobile-content" style="padding-bottom: 100px;"></div>
+      <div id="mobile-nav-container"></div> 
+    `;
+    document.body.appendChild(root);
+  }
+  
+  // 3. Ocultamos el main-content original para que no estorbe
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) mainContent.style.display = 'none';
+}
+
 // ============================================================================
 // INICIO DE LA APLICACIÓN
 // ============================================================================
 
-    async function initializeApp() {
-        await checkSession();
-      const data = await initData();
-      dataCache = data; // ← Asegurar que el cache tiene datos
-      // 1. Calculamos y aplicamos intereses antes de renderizar nada
-      await applyDailyInterest(); 
-      
-      // 2. Renderizamos el dashboard ya con los nuevos intereses sumados
-      await renderDashboard()
+  // Variable global para saber en qué mundo estamos
+  const isMobile = window.innerWidth <= 768;
 
-      // Registro de Service Worker para PWA
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js').then(reg => {
-            console.log('PWA lista.');
-          }).catch(err => console.log('Error PWA', err));
-        });
-      }
+  async function initializeApp() {
+    await checkSession();
+    
+    // Si no hay usuario, el sistema de sesión ya muestra el muro de login, no hacemos nada más.
+    if (!currentUser) return;
+
+    const data = await initData();
+    dataCache = data;
+    await applyDailyInterest();
+
+    if (isMobile) {
+      // --- MUNDO MÓVIL ---
+      setupMobileShell();     // Crea la estructura limpia de App
+      renderMobileDashboard(); // Pinta el contenido inicial móvil
+    } else {
+      // --- MUNDO ESCRITORIO ---
+      // Tu lógica de siempre
+      await renderDashboard();
     }
+  }
 
   initializeApp();
   </script>
