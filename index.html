@@ -2543,9 +2543,9 @@ body.privacy-mode #dashboard-runway-value {
 /* 2. CONFIGURACIÓN MÓVIL */
 @media (max-width: 768px) {
 
-  /* 1. Evitar que la web entera "baile" hacia los lados */
+  /* Bloqueo total de movimiento lateral de la web */
   body, html {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     position: relative;
     width: 100%;
   }
@@ -2554,7 +2554,8 @@ body.privacy-mode #dashboard-runway-value {
     margin-left: 0 !important;
     padding: 15px !important;
     padding-bottom: 120px !important;
-    overflow-x: hidden; /* Seguridad extra */
+    overflow-x: hidden !important; 
+    width: 100%;
   }
 
   .sidebar { display: none !important; }
@@ -2567,16 +2568,15 @@ body.privacy-mode #dashboard-runway-value {
         left: 15px;
         right: 15px;
         height: 70px;
-        background: rgba(255, 255, 255, 0.6); /* Transparencia */
+        background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid rgba(255, 255, 255, 0.4);
         border-radius: 28px;
         justify-content: space-around;
         align-items: center;
-        z-index: 5000;
+        z-index: 8500; /* Por debajo de las acciones rápidas */
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        padding: 0 10px;
     }
 
     .mobile-nav-item {
@@ -2584,24 +2584,20 @@ body.privacy-mode #dashboard-runway-value {
         flex-direction: column;
         align-items: center;
         color: var(--text-secondary);
-        min-width: 55px;
-        transition: all 0.3s ease;
+        min-width: 50px;
     }
-
     .mobile-nav-item.active { color: var(--primary); }
-    .mobile-nav-item i { font-size: 18px; margin-bottom: 4px; }
-    .mobile-nav-item span { font-size: 9px; font-weight: 700; text-transform: uppercase; }
 
-    /* --- BURBUJAS DE ACCIONES RÁPIDAS --- */
+    /* --- BURBUJAS DE ACCIONES RÁPIDAS (CORREGIDO Z-INDEX) --- */
     .quick-actions-container {
-        display: flex !important; /* Activamos el contenedor */
+        display: flex !important;
         position: fixed;
         bottom: 110px;
         left: 50%;
         transform: translateX(-50%) scale(0);
         flex-direction: column;
         gap: 15px;
-        z-index: 5001;
+        z-index: 9999 !important; /* Capa máxima para que se vea */
         opacity: 0;
         transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         pointer-events: none;
@@ -2621,18 +2617,17 @@ body.privacy-mode #dashboard-runway-value {
     }
 
     .action-item span {
-        background: rgba(26, 43, 77, 0.9);
+        background: rgba(26, 43, 77, 0.95);
         color: white;
         padding: 6px 12px;
         border-radius: 10px;
         font-size: 12px;
         font-weight: 700;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .action-icon {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -2640,85 +2635,77 @@ body.privacy-mode #dashboard-runway-value {
         color: white;
         font-size: 18px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        border: 2px solid rgba(255,255,255,0.4);
+        border: 2px solid white;
     }
 
-    /* --- OVERLAY Y ANIMACIONES --- */
+    /* --- OVERLAY OSCURO --- */
     .menu-overlay {
-        display: block !important; /* Necesario para la transición */
+        display: block !important;
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(5px);
-        z-index: 4500;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        z-index: 8000; /* Entre el dashboard y el menú */
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
     }
-
     .menu-overlay.active {
         opacity: 1;
         pointer-events: auto;
     }
 
     .nav-add-circle {
-        width: 52px;
-        height: 52px;
+        width: 55px;
+        height: 55px;
         background: var(--primary);
-        border-radius: 18px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 20px;
         box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3);
-        border: 3px solid rgba(255,255,255,0.2);
-        transition: transform 0.3s ease;
     }
 
-    .plus-rotate { transform: rotate(135deg); }
+    /* --- EL CARRUSEL (SCROLL HORIZONTAL) --- */
+    .stats-grid {
+        display: flex !important; 
+        flex-direction: row !important;
+        flex-wrap: nowrap !important; /* Obliga a las tarjetas a ir de lado */
+        
+        overflow-x: auto !important; 
+        overflow-y: hidden !important;
+        
+        scroll-snap-type: x mandatory !important; /* Efecto imán */
+        -webkit-overflow-scrolling: touch !important; 
+        
+        gap: 0 !important; /* Eliminamos el gap para controlar el ancho exacto */
+        padding: 10px 0 30px 0 !important;
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+        
+        grid-template-columns: none !important; /* Limpia el grid de escritorio */
+    }
 
-  /* Forzamos que el contenedor sea una fila infinita hacia la derecha */
-  .stats-grid {
-    display: flex !important; 
-    flex-direction: row !important;
-    flex-wrap: nowrap !important; /* Evita que las tarjetas bajen a la siguiente línea */
-    
-    overflow-x: auto !important; /* Habilita el scroll horizontal */
-    overflow-y: hidden !important;
-    
-    scroll-snap-type: x mandatory !important; /* Efecto imán */
-    -webkit-overflow-scrolling: touch !important; /* Scroll ultra suave en iOS/Android */
-    
-    gap: 15px !important;
-    padding: 10px 20px 25px 20px !important;
-    margin-left: -20px !important;
-    margin-right: -20px !important;
-    
-    /* Limpiamos cualquier rastro de Grid anterior */
-    grid-template-columns: none !important;
-  }
+    .stats-grid::-webkit-scrollbar { display: none !important; }
 
-  /* Ocultamos la barra de scroll para que parezca una App */
-  .stats-grid::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  .stat-card {
-    /* Cada tarjeta ocupa el 88% del ancho para que se vea un poco de la siguiente */
-    flex: 0 0 88% !important;
-    min-width: 88% !important;
-    
-    scroll-snap-align: center !important; /* Se imanta al centro */
-    
-    margin-bottom: 0 !important;
-    background: var(--bg-surface) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
-  }
+    .stat-card {
+        /* Cada tarjeta ocupa exactamente el ancho total de la pantalla */
+        flex: 0 0 100% !important;
+        min-width: 100% !important;
+        width: 100% !important;
+        
+        scroll-snap-align: center !important; /* Se imanta al centro de la pantalla */
+        scroll-snap-stop: always !important; /* No permite saltarse tarjetas */
+        
+        margin: 0 !important;
+        padding: 30px 25px !important; /* Padding interno para que el texto respire */
+        background: var(--bg-surface) !important;
+        border-radius: 0 !important; /* Queda mejor sin bordes si ocupan todo el ancho */
+        border: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        box-shadow: none !important;
+    }
 }
 
   </style>
