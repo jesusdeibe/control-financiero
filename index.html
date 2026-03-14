@@ -2433,7 +2433,7 @@ body.privacy-mode #dashboard-runway-value {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 0px;
     gap: 20px;
 }
 
@@ -2844,13 +2844,15 @@ body.privacy-mode #dashboard-runway-value {
           </div>
         </div>
       
-        <div class="kpi-card" style="padding: 24px; border-left: 4px solid var(--orange); display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+        <div class="kpi-card" id="shared-kpi-card" onclick="openSharedAnalysis()" style="padding: 24px; border-left: 4px solid var(--orange); display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; cursor: pointer;">
           <div>
-            <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">👥 Cuentas Compartidas</div>
-            <div style="font-size: 32px; font-weight: 800; color: var(--orange);" id="dashboard-shared-total">0,00 €</div>
+            <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+              👥 Cuentas Compartidas <span style="font-size: 10px; margin-left: 5px; opacity: 0.5;">→</span>
+            </div>
+            <div style="font-size: 32px; font-weight: 800; color: var(--text-primary);" id="dashboard-shared-total">0,00 €</div>
           </div>
           <div id="dashboard-shared-breakdown" style="display: flex; flex-direction: column; gap: 4px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.05);">
-              </div>
+          </div>
         </div>
       
         <div class="kpi-card" id="runway-card" style="padding: 24px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;" onclick="showRunwayDetails()">
@@ -3492,6 +3494,167 @@ body.privacy-mode #dashboard-runway-value {
       </div>
     </section>
   </div>
+
+  <div id="shared-analysis-view" class="view">
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="icon-only-btn" onclick="switchView('dashboard')">←</button>
+            <div>
+                <h1 class="page-title">Análisis Silvia & Jesús</h1>
+                <p class="page-subtitle">Evolución del gasto compartido mensual</p>
+            </div>
+        </div>
+        
+        <button id="toggle-extras-btn" class="filter-pill active" onclick="toggleExtraordinaryExpenses()">
+            ✨ Modo Rutina: <span id="extras-status">Activado</span>
+        </button>
+    </header>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
+
+      <div class="kpi-card" style="border-left: 4px solid var(--primary);">
+        <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">
+          Media Mensual (<span id="shared-months-count">0</span> meses activos)
+        </div>
+        <div style="font-size: 28px; font-weight: 900;" id="shared-avg-value">0,00 €</div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;" id="routine-desc-text">Excluyendo viajes y extras</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid var(--orange);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Aportaciones</div>
+                
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px 6px; border-radius: 8px;">
+                    <button class="icon-only-btn" onclick="changeSharedMonth(-1)" style="width: 20px; height: 20px; font-size: 10px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">←</button>
+                    <div id="shared-current-month-display" style="font-size: 10px; font-weight: 800; color: var(--primary); min-width: 65px; text-align: center;">MES</div>
+                    <button class="icon-only-btn" onclick="changeSharedMonth(1)" style="width: 20px; height: 20px; font-size: 10px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">→</button>
+                </div>
+            </div>
+
+            <div style="font-size: 24px; font-weight: 900;" id="shared-balance-text">0% / 0%</div>
+            
+            <div id="shared-balance-bar" style="height: 6px; background: #eee; border-radius: 10px; margin-top: 10px; overflow: hidden; display: flex;">
+                <div id="bar-jesus" style="width: 50%; background: var(--text-tertiary); opacity: 0.2; transition: all 0.5s ease;"></div>
+                <div id="bar-silvia" style="width: 50%; background: var(--text-tertiary); opacity: 0.2; transition: all 0.5s ease;"></div>
+            </div>
+            
+            <div style="font-size: 9px; color: var(--text-tertiary); margin-top: 10px; line-height: 1.3;" id="shared-balance-note">
+                Selecciona un mes para ver el reparto.
+            </div>
+        </div>
+
+        <div class="kpi-card" id="projection-card" style="border-left: 4px solid var(--text-tertiary); display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Proyección Final Mes</div>
+              <div id="projection-status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--text-tertiary);"></div>
+          </div>
+          
+          <div style="margin: 10px 0;">
+              <div style="font-size: 28px; font-weight: 900; color: var(--text-primary);" id="shared-projection-value">0,00 €</div>
+              <div id="projection-diff-label" style="font-size: 11px; font-weight: 700; margin-top: 2px;">Calculando proyección...</div>
+          </div>
+      
+          <div style="background: rgba(0,0,0,0.03); border-radius: 6px; padding: 8px; font-size: 10px; color: var(--text-secondary);">
+              Día <span id="current-day-num" style="font-weight: 800; color: var(--text-primary);">--</span> de <span id="total-days-num">--</span>
+          </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        <div class="section" style="margin-bottom: 0; padding: 24px;">
+            <div class="section-header">
+                <h3 class="section-title">📈 Evolución Temporal</h3>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="sharedEvolutionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="section" style="margin-bottom: 0; padding: 24px;">
+            <div class="section-header">
+                <h3 class="section-title">🍕 Top Gastos este Mes</h3>
+            </div>
+            <div id="shared-category-list" style="display: flex; flex-direction: column; gap: 12px;">
+                </div>
+        </div>
+    </div>
+
+    <div id="routine-explanation" style="margin-top: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid var(--border-color); font-size: 12px; color: var(--text-primary); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <strong>✨ Modo Rutina</strong>
+            <span id="ignored-cats-tags" style="font-weight: 700; color: var(--primary); font-size: 10px; background: var(--primary-light); padding: 2px 8px; border-radius: 20px;">Filtro Activo</span>
+        </div>
+        <div style="color: var(--text-secondary); line-height: 1.4;">
+            Este modo oculta gastos extraordinarios (viajes, grandes compras o eventos) para mostrar vuestro <strong>coste de vida real</strong> y ayudaros a comparar meses de forma justa.
+        </div>
+    </div>
+</div>
+
+<div id="travel-analysis-view" class="view">
+  <header style="background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%); color: white; padding: 32px; border-radius: 24px; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(33, 69, 137, 0.2);">
+      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+      
+      <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+              <button class="icon-only-btn" onclick="goBackFromTravel()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);">←</button>
+              <div>
+                  <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 4px;">✈️ Centro de Mando</div>
+                  <h1 style="font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1px; line-height: 1.1;" id="ta-title">Cargando viaje...</h1>
+                  <div style="font-size: 13px; opacity: 0.9; margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                      <span>🗓️</span> <span id="ta-date">Sin fecha de inicio</span>
+                  </div>
+              </div>
+          </div>
+          <button class="btn-primary" onclick="openTransactionModal('gastos_personales')" style="background: white !important; color: var(--primary) !important; font-weight: 800 !important; box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;">+ Registrar Gasto</button>
+      </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px;">
+      <div class="kpi-card" style="border-left: 4px solid var(--text-tertiary);">
+          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Presupuesto Total</div>
+          <div style="font-size: 28px; font-weight: 900;" id="ta-budget">0,00 €</div>
+      </div>
+      <div class="kpi-card" style="border-left: 4px solid var(--primary);">
+          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Total Gastado</div>
+          <div style="font-size: 28px; font-weight: 900; color: var(--primary);" id="ta-spent">0,00 €</div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-top: 4px;" id="ta-percent">0% del total</div>
+      </div>
+      <div class="kpi-card" style="border-left: 4px solid var(--green);">
+          <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Disponible</div>
+          <div style="font-size: 28px; font-weight: 900; color: var(--green);" id="ta-remaining">0,00 €</div>
+      </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      <div class="section" style="margin: 0; padding: 24px;">
+          <div class="section-header">
+              <h3 class="section-title">📊 Progreso por Categorías</h3>
+          </div>
+          <div id="ta-categories-list" style="display: flex; flex-direction: column; gap: 16px;">
+              </div>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="section" style="margin: 0; padding: 24px;">
+              <div class="section-header">
+                  <h3 class="section-title">🍩 Distribución</h3>
+              </div>
+              <div style="height: 200px; position: relative;">
+                  <canvas id="ta-donut-chart"></canvas>
+              </div>
+          </div>
+
+          <div class="section" style="margin: 0; padding: 24px; flex-grow: 1;">
+              <div class="section-header">
+                  <h3 class="section-title">💸 Últimos Gastos</h3>
+              </div>
+              <div id="ta-transactions-list" style="display: flex; flex-direction: column; gap: 8px;">
+                  </div>
+          </div>
+      </div>
+  </div>
+</div>
+
 </main>
 
   <!-- Users Modal -->
@@ -3809,19 +3972,41 @@ body.privacy-mode #dashboard-runway-value {
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Nombre de la Cuenta</label>
-            <input type="text" class="form-input" id="account-name" readonly>
+            <input type="text" class="form-input" id="account-name" readonly style="opacity: 0.7; background: #f9f9f9 !important;">
           </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo de Cuenta</label>
+            <select class="form-select" id="account-type-edit">
+              <option value="Cuenta Corriente">Cuenta Corriente</option>
+              <option value="Cuenta Ahorro">Cuenta Ahorro</option>
+              <option value="Broker">Broker</option>
+              <option value="Exchange Crypto">Exchange Crypto</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label class="form-label">Saldo Inicial (€)</label>
             <input type="number" step="0.01" class="form-input" id="account-initial-balance" required>
-            <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 4px; display: block;">
-              Este es el saldo con el que empezaste el año
+            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+              Saldo con el que empezaste el año.
             </small>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                📈 Interés Anual (%)
+            </label>
+            <input type="number" id="account-interest-rate" class="form-input" step="0.01" placeholder="Ej: 1.17">
+            <div style="font-size: 10px; color: var(--text-tertiary); margin-top: 4px;">
+                Para la cuenta de Silvia, introduce <b>1.17</b>. Pon 0 si no aplica.
+            </div>
           </div>
         </div>
         <div class="form-actions">
           <button type="button" class="btn-secondary" onclick="closeAccountModal()">Cancelar</button>
-          <button type="button" class="btn-primary" onclick="saveAccountClick()">Guardar</button>
+          <button type="button" class="btn-primary" onclick="saveAccountClick()">Guardar Cambios</button>
         </div>
       </form>
     </div>
@@ -4465,8 +4650,12 @@ body.privacy-mode #dashboard-runway-value {
     }
 
     async function renderDashboard() {
+    if (!currentUser) return; // Seguridad: Si no hay usuario, no hacemos nada
+
     const data = await getData();
-    const currentMonthIndex = new Date().getMonth();
+    const now = new Date();
+    const currentMonthIndex = now.getMonth();
+    const currentYear = now.getFullYear(); // Declarada solo UNA vez aquí
     
     // 1. CÁLCULOS DE CUENTAS
     const sharedAccounts = data.accounts.filter(a => a.isShared === true || a.is_shared === true);
@@ -4501,7 +4690,6 @@ body.privacy-mode #dashboard-runway-value {
     animateValue('dashboard-investments-total', 0, brokerTotal, 800);
     animateValue('dashboard-shared-total', 0, sharedTotal, 800);
 
-    // Color rojo si el patrimonio total es negativo
     const totalPatEl = document.getElementById('dashboard-total-patrimony');
     if (totalPatEl) {
         totalPatEl.style.setProperty('color', totalPatrimony < 0 ? 'var(--red)' : 'var(--text-primary)', 'important');
@@ -4517,7 +4705,7 @@ body.privacy-mode #dashboard-runway-value {
           </div>`).join('') : '';
     }
 
-    // 3. LÓGICA DE SUPERVIVENCIA (Semáforo)
+    // 3. LÓGICA DE SUPERVIVENCIA
     const runway = await calculateRunway();
     const runwayCard = document.getElementById('runway-card');
     const runwayEl = document.getElementById('dashboard-runway-value');
@@ -4533,11 +4721,11 @@ body.privacy-mode #dashboard-runway-value {
         runwayEl.textContent = runway.lifestyleMonths.toFixed(1).replace('.', ',') + " meses";
 
         if (survivalEl) {
-            survivalEl.innerHTML = `
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.05);">
-                <span style="color: var(--text-secondary); font-weight: 600;">🚀 Modo Pánico</span>
-                <span style="font-weight: 800; color: ${statusColor};">${runway.panicMonths.toFixed(1)} meses</span>
-              </div>`;
+          survivalEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+              <span style="color: var(--text-secondary); font-weight: 600;">🚀 Modo Pánico</span>
+              <span style="font-weight: 800; color: ${statusColor};">${runway.panicMonths.toFixed(1)} meses</span>
+            </div>`;
         }
     }
 
@@ -4560,16 +4748,43 @@ body.privacy-mode #dashboard-runway-value {
       animateValue('dashboard-month-savings', 0, monthSavings, 800);
       savingsEl.style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
     }
-    
-    // 5. RENDER DE GRÁFICOS Y WIDGETS
+
+    // 4.5 INTERESES (Solo usuario actual)
+    const monthInterests = data.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === currentMonthIndex && 
+               d.getFullYear() === currentYear && 
+               t.category === 'Intereses' &&
+               t.user_id === currentUser.id;
+    }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+    // 5. RENDER DE ALERTAS, GRÁFICOS Y TODOS LOS WIDGETS
+    const alertsList = document.getElementById('alerts-list');
+    if (alertsList) {
+        alertsList.innerHTML = ''; 
+        if (monthInterests > 0) {
+            const interestCard = document.createElement('div');
+            interestCard.className = 'kpi-card';
+            interestCard.style.cssText = `background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);`;
+            interestCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; font-weight: 800;">Tu dinero trabajando</div>
+                        <div style="font-size: 26px; font-weight: 900; margin: 5px 0;">+${monthInterests.toFixed(2)} €</div>
+                        <div style="font-size: 11px; opacity: 0.8;">Ganados por intereses en ${MONTHS[currentMonthIndex]} ✨</div>
+                    </div>
+                    <div style="font-size: 24px;">💰</div>
+                </div>`;
+            alertsList.appendChild(interestCard);
+        }
+    }
+
+    // LLAMADAS A TUS GRÁFICOS Y WIDGETS (MANTENIENDO TODOS)
     renderInvestmentEvolutionChart();
     renderDistributionChart(normalTotal, brokerTotal, sharedTotal);
     renderEvolutionChart('personal');
     await renderInvestmentSparkline();
     
-    const alertsList = document.getElementById('alerts-list');
-    if (alertsList) alertsList.innerHTML = ''; 
-
     await checkBudgetAlerts();
     await checkLiquidityAlerts();
     await renderSavingGoals();
@@ -4577,7 +4792,7 @@ body.privacy-mode #dashboard-runway-value {
     await renderSavingsStreak(); 
     await renderActiveTravelWidget();
     
-    // 6. LOGROS
+    // LOGROS
     const { data: loans } = await supabaseClient.from('loans').select('*').eq('user_id', currentUser.id);
     await renderAchievements(data, loans || []);
 }
@@ -4810,23 +5025,38 @@ function renderDistributionChart(normal, investments, shared) {
     }
 
     // 4. ACTUALIZAR KPIs
+    // Busca esta parte dentro de renderMonthlyView()
     const monthlyKpis = document.getElementById('monthly-kpis');
     if (monthlyKpis) {
-      monthlyKpis.innerHTML = `
-        <div class="kpi-card">
-          <div class="kpi-label">Ingresos</div>
-          <div class="kpi-value" style="color:var(--green)">${formatCurrency(ingresos)}</div>
+        monthlyKpis.innerHTML = `
+            <div class="kpi-card">
+                <div class="kpi-label">Ingresos</div>
+                <div class="kpi-value" style="color:var(--green)">${formatCurrency(ingresos)}</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Gastos Pers.</div>
+                <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
+            </div>
+            
+            <div class="kpi-card" onclick="openSharedAnalysis()" style="cursor: pointer; border-left: 4px solid var(--orange); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                  👥 Cuentas Compartidas <span style="font-size: 10px; margin-left: 5px; opacity: 0.5;">→</span>
+                </div>
+                <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
+            </div>
+            
+            <div style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
+                ${cuentasCompartidas.map(acc => `
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
+                        <span style="color: var(--text-secondary);">${acc.name}</span>
+                        <span style="font-weight: 700; color: var(--text-primary);">${formatCurrency(acc.balance)}</span>
+                    </div>
+                `).join('')}
+            </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Gastos Pers.</div>
-          <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
-        </div>
-        <div class="kpi-card" style="border: 1px solid var(--orange); background: rgba(245,158,11,0.05);">
-          <div class="kpi-label">👥 Saldo Compartido</div>
-          <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
-        </div>
-      `;
-    }
+    `;
+}
 
     // 5. RENDERIZADO DE TABLAS Y COMPONENTES
     const setTotal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatCurrency(val); };
@@ -5745,8 +5975,11 @@ async function showPersonalExpensesBreakdown() {
       if (viewName === 'inversiones') renderInvestmentsView();
       if (viewName === 'accounts') renderAccountsView();
       if (viewName === 'settings') renderSettingsView();
-      if (viewName === 'budgets') renderBudgetsView();
       if (viewName === 'search') renderSearchView();
+      if (viewName === 'budgets') {
+        renderBudgetsView();
+        renderTravelPlans();
+      }
     }
 
     // Close modals on overlay click
@@ -6464,32 +6697,53 @@ async function openAccountModal(accountName) {
   const data = await getData();
   const account = data.accounts.find(a => a.name === accountName);
   
-  // 1. Buscamos los elementos en el HTML
   const titleEl = document.getElementById('account-modal-title');
   const nameEl = document.getElementById('account-name');
   const balanceEl = document.getElementById('account-initial-balance');
+  const interestEl = document.getElementById('account-interest-rate');
+  const typeEl = document.getElementById('account-type-edit');
   
-  // Ojo: Busca el id que le pusiste al selector en tu HTML (account-type o account-type-edit)
-  let typeEl = document.getElementById('account-type-edit');
-  if (!typeEl) {
-    typeEl = document.getElementById('account-type'); // Por si usaste el otro nombre
-  }
-  
-  // 2. Solo les damos valor SI los ha encontrado
   if (titleEl) titleEl.textContent = `Editar ${accountName}`;
   if (nameEl) nameEl.value = accountName;
   
-  // Usamos initialBalance que es la variable real que guarda el saldo inicial
+  // Cargamos los valores actuales (usando ?. por si la cuenta no tiene datos)
   if (balanceEl) balanceEl.value = account?.initialBalance || 0; 
+  if (typeEl && account?.type) typeEl.value = account.type;
+  if (interestEl) interestEl.value = account?.interest_rate || 0;
   
-  // Si encontramos el selector de tipo y la cuenta tiene un tipo guardado, lo marcamos
-  if (typeEl && account?.type) {
-    typeEl.value = account.type;
-  }
-  
-  // 3. Abrimos el modal
   const modal = document.getElementById('account-modal');
   if (modal) modal.classList.add('active');
+}
+
+async function saveAccountClick() {
+  const initialBalance = document.getElementById('account-initial-balance').value;
+  const type = document.getElementById('account-type-edit').value;
+  const interestRate = document.getElementById('account-interest-rate').value;
+  
+  if (!initialBalance) {
+    showToast('Por favor introduce el saldo inicial', 'error');
+    return;
+  }
+  
+  try {
+    const { error } = await supabaseClient
+      .from('accounts')
+      .update({ 
+        initial_balance: parseFloat(initialBalance), // Actualizamos el saldo inicial
+        type: type,
+        interest_rate: parseFloat(interestRate) || 0 
+      })
+      .eq('name', editingAccountName);
+
+    if (error) throw error;
+
+    showToast('Cuenta actualizada ✓', 'success');
+    closeAccountModal();
+    invalidateCache(); // Forzamos la limpieza de la caché
+    await initializeApp(); // Recargamos la app para que se apliquen los intereses
+  } catch (error) {
+    showToast('Error al actualizar: ' + error.message, 'error');
+  }
 }
 
 async function handleAccountClick(accountName) {
@@ -6499,34 +6753,6 @@ async function handleAccountClick(accountName) {
 function closeAccountModal() {
   document.getElementById('account-modal').classList.remove('active');
   editingAccountName = null;
-}
-
-async function saveAccountClick() {
-  const initialBalance = document.getElementById('account-initial-balance').value;
-  const type = document.getElementById('account-type-edit').value; // Capturamos el tipo
-  
-  if (!initialBalance) {
-    showToast('Por favor introduce el saldo inicial', 'error');
-    return;
-  }
-  
-  // Actualizamos en Supabase (balance y tipo)
-  const { error } = await supabaseClient
-    .from('accounts')
-    .update({ 
-      balance: parseFloat(initialBalance),
-      type: type 
-    })
-    .eq('name', editingAccountName);
-
-  if (error) {
-    showToast('Error al actualizar: ' + error.message, 'error');
-  } else {
-    showToast('Cuenta actualizada', 'success');
-    closeAccountModal();
-    // Forzamos recarga de datos para que el caché se limpie
-    await initializeApp(); 
-  }
 }
 
 // ============================================================================
@@ -9443,6 +9669,16 @@ async function openTravelModal(id = null) {
                             <label class="form-label">Fecha de Inicio (Opcional)</label>
                             <input type="date" id="travel-start-date" class="form-input">
                         </div>
+
+                        <div class="form-group" style="background: rgba(33, 69, 137, 0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(33, 69, 137, 0.1); margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+                                <input type="checkbox" id="travel-is-shared" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                                <span style="font-weight: 800; color: var(--text-primary);">👥 Viaje de pareja</span>
+                            </label>
+                            <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px; margin-left: 28px;">
+                                Si lo marcas, este viaje aparecerá en ambos perfiles y los gastos contarán para los dos.
+                            </div>
+                        </div>
                         <div id="travel-cats-container">
                             <label class="form-label">Desglose de Gastos</label>
                         </div>
@@ -9457,7 +9693,7 @@ async function openTravelModal(id = null) {
         document.body.insertAdjacentHTML('beforeend', html);
         modal = document.getElementById('travel-modal');
     }
-
+    
     const container = document.getElementById('travel-cats-container');
     container.innerHTML = '<label class="form-label">Desglose de Gastos</label>';
 
@@ -9506,12 +9742,17 @@ async function saveTravelPlan() {
         }
     });
 
+    // --- NUEVO: LEER SI EL VIAJE ES COMPARTIDO ---
+    const sharedCheckbox = document.getElementById('travel-is-shared');
+    const isShared = sharedCheckbox ? sharedCheckbox.checked : false;
+
     const payload = { 
         user_id: currentUser.id, 
         name, 
         total_budget: total, 
         breakdown,
-        start_date: document.getElementById('travel-start-date').value || null // NUEVO
+        start_date: document.getElementById('travel-start-date').value || null,
+        is_shared: isShared // <--- NUEVO: SE AÑADE AL PAYLOAD
     };
     let error;
 
@@ -9528,12 +9769,20 @@ async function saveTravelPlan() {
         invalidateCache();
         await renderTravelPlans();
         showToast(editingTravelId ? 'Viaje actualizado ✓' : 'Viaje creado ✓', 'success');
+    } else {
+        showToast('Error al guardar el viaje', 'error');
+        console.error("Error guardando viaje:", error);
     }
 }
 
 // C. Renderizar tarjetas de viaje
 async function renderTravelPlans() {
-    const { data: plans } = await supabaseClient.from('travel_plans').select('*');
+    // --- NUEVO FILTRO INTELIGENTE: Mis viajes + Viajes Compartidos ---
+    const { data: plans } = await supabaseClient
+        .from('travel_plans')
+        .select('*')
+        .or(`user_id.eq.${currentUser.id},is_shared.eq.true`);
+
     const container = document.getElementById('travel-plans-list');
     if (!container || !plans) return;
 
@@ -9565,16 +9814,17 @@ async function renderTravelPlans() {
         });
 
         const totalSpent = breakdownWithSpent.reduce((s, c) => s + (c.spent || 0), 0);
-        const totalPercent = Math.min((totalSpent / p.total_budget) * 100, 100);
+        const totalPercent = p.total_budget > 0 ? Math.min((totalSpent / p.total_budget) * 100, 100) : 0;
         const remaining = Math.max(0, p.total_budget - totalSpent);
 
         return `
-            <div class="travel-card" onclick="openTravelDetailDrawer('${p.id}')">
+            <div class="travel-card" onclick="openTravelAnalysis('${p.id}')">
                 <div class="travel-header-map">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div class="travel-dest-title">
                             <div class="travel-location-pin">📍</div>
                             ${p.name}
+                            ${p.is_shared ? '<span style="font-size: 12px; margin-left: 8px;" title="Viaje Compartido">👥</span>' : ''}
                         </div>
                         <div style="display:flex; gap:6px; position:relative; z-index:2;">
                             <button class="icon-only-btn" onclick="event.stopPropagation(); openTravelModal('${p.id}')" style="width:30px; height:30px; background:white; font-size:12px;">✏️</button>
@@ -9600,8 +9850,8 @@ async function renderTravelPlans() {
 
                 <div class="travel-category-hub">
                     ${breakdownWithSpent.map(c => {
-                        const catPercent = Math.min((c.spent / c.goal) * 100, 100);
-                        const isOver = (c.spent / c.goal) * 100 > 100;
+                        const catPercent = c.goal > 0 ? Math.min((c.spent / c.goal) * 100, 100) : 0;
+                        const isOver = c.goal > 0 && (c.spent / c.goal) * 100 > 100;
                         return `
                             <div class="travel-cat-row-new">
                                 <div class="travel-cat-meta">
@@ -9631,73 +9881,13 @@ async function updateTravelSubCategories() {
     }
 }
 
-async function openTravelDetailDrawer(travelId) {
-    const data = await getData();
-    const { data: plan } = await supabaseClient.from('travel_plans').select('*').eq('id', travelId).single();
-    
-    const transactions = (data.transactions || [])
-        .filter(t => t.travel_id === travelId)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    const overlay = document.getElementById('transaction-modal'); 
-    const modal = overlay.querySelector('.modal');
-    
-    modal.innerHTML = `
-        <div class="modal-header">
-            <h3 class="modal-title">✈️ ${plan.name}</h3>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body" style="padding: 20px;">
-            <div style="height: 180px; margin-bottom: 24px; position: relative;">
-                <canvas id="travel-donut-chart"></canvas>
-            </div>
-
-            <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; font-weight: 800;">Cronograma de Pagos</h4>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                ${transactions.map(t => `
-                    <div class="transaction-card" style="margin-bottom: 0; padding: 12px; border: 1px solid var(--border-color);">
-                        <div style="flex: 1;">
-                            <div style="font-size: 13px; font-weight: 700;">${t.description}</div>
-                            <div style="font-size: 10px; color: var(--primary); font-weight: 700;">${t.travel_category_name}</div>
-                        </div>
-                        <div style="text-align: right; font-weight: 800; color: var(--red);">-${formatCurrency(t.amount)}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-
-    overlay.classList.add('active');
-
-    // Inicializar gráfico de tarta
-    const catTotals = {};
-    transactions.forEach(t => {
-        catTotals[t.travel_category_name] = (catTotals[t.travel_category_name] || 0) + Math.abs(t.amount);
-    });
-
-    new Chart(document.getElementById('travel-donut-chart'), {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(catTotals),
-            datasets: [{
-                data: Object.values(catTotals),
-                backgroundColor: ['#214589', '#3B82F6', '#10B981', '#F59E0B', '#F26464'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
-        }
-    });
-}
-
 async function renderActiveTravelWidget() {
-    const { data: plans } = await supabaseClient.from('travel_plans').select('*');
-    const container = document.getElementById('dashboard-active-travel');
-    if (!plans || plans.length === 0 || !container) return;
+  const { data: plans } = await supabaseClient
+        .from('travel_plans')
+        .select('*')
+        .or(`user_id.eq.${currentUser.id},is_shared.eq.true`);
+  const container = document.getElementById('dashboard-active-travel');
+  if (!plans || plans.length === 0 || !container) return;
 
     const today = new Date();
     // Buscamos viajes que empiecen pronto o estén en curso
@@ -9721,7 +9911,7 @@ async function renderActiveTravelWidget() {
                     <div style="font-size: 20px; font-weight: 900;">${activeTrip.name}</div>
                     <div style="font-size: 13px; margin-top: 4px; font-weight: 600;">${statusText}</div>
                 </div>
-                <button class="btn-primary" onclick="switchView('budgets')" style="background: white !important; color: var(--primary) !important; font-size: 12px !important; padding: 8px 16px !important;">Ver detalles</button>
+                <button class="btn-primary" onclick="openTravelAnalysis('${activeTrip.id}')" style="background: white !important; color: var(--primary) !important; font-size: 12px !important; padding: 8px 16px !important;">Ver detalles</button>
             </div>
         `;
         container.style.display = 'block';
@@ -10088,6 +10278,537 @@ async function calculateSavingsStreak() {
     return count;
 }
 
+// ==========================================
+// ANÁLISIS DE CUENTAS COMPARTIDAS
+// ==========================================
+let excludeExtraordinary = true;
+let sharedChartInstance = null;
+
+// CONFIGURACIÓN: Escribe aquí los nombres exactos de tus categorías de "extras"
+const EXTRA_CATEGORIES = ['Vacaciones', 'Viajes', 'Hogar', 'Grandes Compras', 'Otros', 'Regalos']; 
+
+async function openSharedAnalysis() {
+    // IMPORTANTE: pasamos 'shared-analysis' porque switchView añade '-view' automáticamente
+    switchView('shared-analysis'); 
+    
+    setTimeout(async () => {
+        await renderSharedAnalysisChart();
+    }, 100);
+}
+
+function toggleExtraordinaryExpenses() {
+    excludeExtraordinary = !excludeExtraordinary;
+    const btn = document.getElementById('toggle-extras-btn');
+    const status = document.getElementById('extras-status');
+    
+    if (excludeExtraordinary) {
+        btn.classList.add('active');
+        status.textContent = "Activado";
+        showToast('Modo Rutina: ON (Sin extras)', 'info');
+    } else {
+        btn.classList.remove('active');
+        status.textContent = "Desactivado";
+        showToast('Modo Rutina: OFF (Todo incluido)', 'info');
+    }
+    
+    renderSharedAnalysisChart();
+}
+
+async function renderSharedAnalysisChart() {
+    const data = await getData();
+    const canvas = document.getElementById('sharedEvolutionChart');
+    if (!canvas) return;
+
+    // 1. ACTUALIZAR NAVEGADOR COMPACTO
+    const monthDisplay = document.getElementById('shared-current-month-display');
+    if (monthDisplay) {
+        monthDisplay.textContent = `${MONTHS[currentMonth].substring(0, 3).toUpperCase()} ${currentYear}`;
+    }
+
+    const ignoredEl = document.getElementById('ignored-cats-tags');
+    if (ignoredEl) ignoredEl.textContent = EXTRA_CATEGORIES.join(', ');
+
+    const labels = [];
+    const values = []; 
+    const jesusValues = []; 
+    const silviaValues = []; 
+    const externalValues = []; 
+    const now = new Date();
+    const categoryTotals = {};
+    
+    // 2. PROCESAR ÚLTIMOS 6 MESES
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const m = d.getMonth();
+        const y = d.getFullYear();
+        labels.push(MONTHS[m].substring(0, 3).toUpperCase());
+
+        const monthTxs = data.transactions.filter(t => {
+            const tDate = new Date(t.date);
+            const matchesDate = tDate.getMonth() === m && tDate.getFullYear() === y;
+            const isShared = t.type === 'gastos_compartidos';
+            
+            if (!matchesDate || !isShared) return false;
+            if (excludeExtraordinary && EXTRA_CATEGORIES.includes(t.category)) return false;
+            
+            return true;
+        });
+
+        const total = monthTxs.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        values.push(total);
+
+        if (m === currentMonth && y === currentYear) {
+            monthTxs.forEach(t => {
+                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + Math.abs(t.amount);
+            });
+        }
+
+        const monthKey = `${m}-${y}`;
+        const contrib = data.contributions.find(c => c.month === monthKey);
+        jesusValues.push(contrib ? parseFloat(contrib.my || 0) : 0);
+        silviaValues.push(contrib ? parseFloat(contrib.partner || 0) : 0);
+        externalValues.push(contrib ? parseFloat(contrib.external || 0) : 0);
+    }
+
+    // 3. ACTUALIZAR KPIs
+    const activeValues = values.filter(v => v > 0);
+    const avg = activeValues.length > 0 
+        ? activeValues.reduce((a, b) => a + b, 0) / activeValues.length 
+        : 0;
+
+    document.getElementById('shared-avg-value').textContent = formatCurrency(avg);
+    const monthsCountEl = document.getElementById('shared-months-count');
+    if (monthsCountEl) monthsCountEl.textContent = activeValues.length;
+    
+    const descText = document.getElementById('routine-desc-text');
+    if (descText) descText.textContent = excludeExtraordinary ? "Excluyendo gastos extraordinarios" : "Incluyendo todos los gastos";
+
+    // 4. BARRA DE SINTONÍA
+    const monthKey = `${currentMonth}-${currentYear}`;
+    const currentContrib = data.contributions.find(c => c.month === monthKey);
+    const balanceTextEl = document.getElementById('shared-balance-text');
+    const barJesus = document.getElementById('bar-jesus');
+    const barSilvia = document.getElementById('bar-silvia');
+    const noteEl = document.getElementById('shared-balance-note');
+
+    if (currentContrib && (currentContrib.my > 0 || currentContrib.partner > 0)) {
+        const totalContrib = currentContrib.my + currentContrib.partner;
+        const pJesus = (currentContrib.my / totalContrib) * 100;
+        const pSilvia = (currentContrib.partner / totalContrib) * 100;
+        balanceTextEl.innerHTML = `<span style="color: var(--primary);">${pJesus.toFixed(0)}% J</span> <span style="color: var(--text-tertiary); font-weight: 400; margin: 0 5px;">/</span> <span style="color: var(--orange);">${pSilvia.toFixed(0)}% S</span>`;
+        barJesus.style.width = pJesus + '%'; barJesus.style.background = 'var(--primary)'; barJesus.style.opacity = '1';
+        barSilvia.style.width = pSilvia + '%'; barSilvia.style.background = 'var(--orange)'; barSilvia.style.opacity = '1';
+        if (noteEl) noteEl.textContent = `Total aportado: ${formatCurrency(totalContrib)}`;
+    } else {
+        balanceTextEl.textContent = "Sin ingresos"; balanceTextEl.style.color = "var(--text-tertiary)";
+        barJesus.style.width = '50%'; barJesus.style.background = 'var(--text-tertiary)'; barJesus.style.opacity = '0.2';
+        barSilvia.style.width = '50%'; barSilvia.style.background = 'var(--text-tertiary)'; barSilvia.style.opacity = '0.2';
+        if (noteEl) noteEl.textContent = "No hay ingresos comunes este mes.";
+    }
+
+    // 5. LISTA DE CATEGORÍAS
+    const catContainer = document.getElementById('shared-category-list');
+    const sortedCats = Object.entries(categoryTotals).sort((a,b) => b[1] - a[1]);
+    catContainer.innerHTML = sortedCats.map(([name, val]) => `<div onclick="showSharedCategoryDetails('${name}')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; border-radius: 8px;"><span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${name}</span><span style="font-size: 13px; font-weight: 800; color: var(--primary);">${formatCurrency(val)}</span></div>`).join('') || '<div style="text-align:center; color:var(--text-tertiary); padding:20px;">Sin gastos este mes</div>';
+
+    // 6. GRÁFICA MULTI-LÍNEA
+    if (sharedChartInstance) sharedChartInstance.destroy();
+    sharedChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Gastos', data: values, borderColor: '#214589', backgroundColor: 'rgba(33, 69, 137, 0.05)', borderWidth: 4, tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#fff' },
+                { label: 'Jesús', data: jesusValues, borderColor: '#3B82F6', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 },
+                { label: 'Silvia', data: silviaValues, borderColor: '#F59E0B', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 },
+                { label: 'Externas', data: externalValues, borderColor: '#10B981', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { size: 10, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+    });
+
+    // ---------------------------------------------------------
+    // 7. PROYECTOR TOTAL (Independiente del Modo Rutina)
+    // ---------------------------------------------------------
+    const projectionValEl = document.getElementById('shared-projection-value');
+    const projectionDiffEl = document.getElementById('projection-diff-label');
+    const projectionCard = document.getElementById('projection-card');
+    const dot = document.getElementById('projection-status-dot');
+    
+    const realDate = new Date();
+    const isCurrentMonth = (currentMonth === realDate.getMonth() && currentYear === realDate.getFullYear());
+
+    if (isCurrentMonth) {
+        const day = realDate.getDate();
+        const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        // Categorías que NO se proyectan linealmente (se pagan una vez)
+        const nonRepeatingCats = ['Alquiler', 'Hipoteca', 'Suministros', 'Internet', 'Seguros', ...EXTRA_CATEGORIES];
+
+        // IMPORTANTE: Aquí cogemos TODAS las transacciones, ignorando el "Modo Rutina"
+        const currentMonthTxs = data.transactions.filter(t => {
+            const d = new Date(t.date);
+            return d.getMonth() === currentMonth && d.getFullYear() === currentYear && t.type === 'gastos_compartidos';
+        });
+
+        let fixedAlreadySpent = 0; 
+        let variableTotal = 0;
+
+        currentMonthTxs.forEach(t => {
+            const amount = Math.abs(t.amount);
+            // Ya no hacemos el "if (excludeExtraordinary) return", proyectamos TODO.
+            if (nonRepeatingCats.includes(t.category)) {
+                fixedAlreadySpent += amount;
+            } else {
+                variableTotal += amount;
+            }
+        });
+
+        // --- LÓGICA DE VIAJES PLANIFICADOS ---
+        let pendingTravelBudget = 0;
+        let activeTravelNames = []; // Para informar al usuario
+
+        // Pedimos los viajes a Supabase
+        const { data: travelPlans } = await supabaseClient.from('travel_plans').select('*').eq('is_shared', true);
+        
+        if (travelPlans) {
+            travelPlans.forEach(plan => {
+                if (!plan.start_date) return;
+                const startDate = new Date(plan.start_date);
+                
+                // Si el viaje empieza en el mes que estamos viendo
+                if (startDate.getMonth() === currentMonth && startDate.getFullYear() === currentYear) {
+                    
+                    // Calculamos cuánto habéis gastado YA de este viaje concreto este mes
+                    const alreadySpentOnThisTravel = currentMonthTxs
+                        .filter(t => t.travel_id === plan.id)
+                        .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+                    
+                    const remaining = Math.max(0, plan.total_budget - alreadySpentOnThisTravel);
+                    
+                    if (remaining > 0) {
+                        pendingTravelBudget += remaining;
+                        activeTravelNames.push(plan.name); // Guardamos el nombre del viaje
+                    }
+                }
+            });
+        }
+
+        // FÓRMULA: Fijo + Variable Proyectada + Resto del presupuesto del viaje
+        const variableDailyAvg = variableTotal / day;
+        const projectedVariable = variableDailyAvg * totalDays;
+        const finalProjection = fixedAlreadySpent + projectedVariable + pendingTravelBudget;
+
+        // ACTUALIZAR INTERFAZ
+        projectionValEl.textContent = formatCurrency(finalProjection);
+        
+        // Informamos de qué viajes se están teniendo en cuenta
+        if (activeTravelNames.length > 0) {
+            projectionDiffEl.innerHTML = `<span style="color:var(--primary); font-size:10px;">✈️ Incluye presupuesto de: <b>${activeTravelNames.join(', ')}</b></span>`;
+        } else {
+            const diffPercent = avg > 0 ? ((finalProjection - avg) / avg) * 100 : 0;
+            if (finalProjection > avg * 1.1) {
+                projectionDiffEl.textContent = `⚠️ +${diffPercent.toFixed(0)}% sobre vuestra media`;
+                projectionDiffEl.style.color = "var(--red)";
+            } else {
+                projectionDiffEl.textContent = `✅ Proyección bajo control`;
+                projectionDiffEl.style.color = "var(--green)";
+            }
+        }
+
+        document.getElementById('current-day-num').textContent = day;
+        document.getElementById('total-days-num').textContent = totalDays;
+
+    } else {
+        // Lógica mes pasado...
+        projectionValEl.textContent = formatCurrency(values[5]);
+        projectionDiffEl.textContent = "Mes finalizado";
+    }
+}
+
+// Función para cambiar de mes directamente desde la vista compartida
+function changeSharedMonth(offset) {
+    // 1. Modificamos el mes global
+    currentMonth += offset;
+    
+    // 2. Controlamos si pasamos de año (de diciembre a enero o viceversa)
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    
+    // 3. Sincronizamos los selectores globales (si existen en tu app) para que al volver a la vista mensual esté en el mes correcto
+    const globalMonthSelect = document.getElementById('month-filter') || document.getElementById('monthSelect');
+    const globalYearSelect = document.getElementById('year-filter') || document.getElementById('yearSelect');
+    if (globalMonthSelect) globalMonthSelect.value = currentMonth;
+    if (globalYearSelect) globalYearSelect.value = currentYear;
+
+    // 4. Volvemos a pintar la vista con los nuevos datos
+    renderSharedAnalysisChart();
+}
+
+async function showSharedCategoryDetails(catName) {
+    const data = await getData();
+    
+    // Filtramos las transacciones: mismo mes, mismo año, tipo compartido y misma categoría
+    const txs = data.transactions.filter(t => {
+        const tDate = new Date(t.date);
+        return tDate.getMonth() === currentMonth && 
+               tDate.getFullYear() === currentYear && 
+               t.type === 'gastos_compartidos' && 
+               t.category === catName;
+    }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordenar por fecha reciente
+
+    // Generamos el contenido del modal
+    const html = `
+        <div class="modal-overlay" id="cat-details-modal" onclick="this.remove()">
+            <div class="modal" onclick="event.stopPropagation()" style="max-width: 450px;">
+                <div class="modal-header">
+                    <h3 class="modal-title">📦 ${catName}</h3>
+                    <button class="close-btn" onclick="document.getElementById('cat-details-modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto; padding: 10px 0;">
+                    <div style="padding: 0 20px 15px 20px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+                        <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; font-weight: 800;">Gasto total en ${MONTHS[currentMonth]}</div>
+                        <div style="font-size: 24px; font-weight: 900; color: var(--primary);">${formatCurrency(txs.reduce((s,t) => s + Math.abs(t.amount), 0))}</div>
+                    </div>
+                    
+                    <div style="padding: 0 10px;">
+                        ${txs.map(t => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 10px; margin-bottom: 5px; background: rgba(0,0,0,0.02);">
+                                <div>
+                                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">${t.description}</div>
+                                    <div style="font-size: 11px; color: var(--text-tertiary);">${formatDate(t.date)}</div>
+                                </div>
+                                <div style="font-size: 14px; font-weight: 800; color: var(--red);">-${formatCurrency(Math.abs(t.amount))}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="form-actions" style="padding: 15px 20px;">
+                    <button class="btn-secondary" style="width: 100%;" onclick="document.getElementById('cat-details-modal').remove()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    // Pequeño delay para la animación si la tienes por CSS
+    setTimeout(() => document.getElementById('cat-details-modal').classList.add('active'), 10);
+}
+
+// ============================================================================
+// LÓGICA: CENTRO DE MANDO DE VIAJES
+// ============================================================================
+let travelAnalysisChart = null;
+
+let previousViewForTravel = 'budgets'; // <-- NUEVO: Memoria de la vista anterior
+
+// --- NUEVA FUNCIÓN PARA VOLVER ATRÁS ---
+function goBackFromTravel() {
+    switchView(previousViewForTravel);
+}
+
+async function openTravelAnalysis(travelId) {
+    // --- NUEVO: RECORDAR DE DÓNDE VENIMOS ---
+    const activeViewEl = document.querySelector('.view.active');
+    if (activeViewEl) {
+        // Le quitamos el "-view" al ID (ej: "dashboard-view" se queda en "dashboard")
+        previousViewForTravel = activeViewEl.id.replace('-view', '');
+    }
+  
+    switchView('travel-analysis'); // Cambiamos a la nueva vista
+    
+    const data = await getData();
+    const { data: plan } = await supabaseClient.from('travel_plans').select('*').eq('id', travelId).single();
+    
+    if (!plan) {
+        showToast('Error al cargar el viaje', 'error');
+        switchView('budgets');
+        return;
+    }
+
+    // Filtramos las transacciones de este viaje
+    const transactions = (data.transactions || [])
+        .filter(t => t.travel_id === travelId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 1. Cabecera
+    document.getElementById('ta-title').textContent = plan.name;
+    document.getElementById('ta-date').textContent = plan.start_date ? `Inicio: ${formatDate(plan.start_date)}` : 'Sin fecha de inicio definida';
+
+    // 2. Cálculos generales
+    const breakdownWithSpent = (plan.breakdown || []).map(cat => {
+        const spentInCategory = transactions
+            .filter(t => t.travel_category_name === cat.category)
+            .reduce((sum, t) => t.type.includes('gastos') ? sum + Math.abs(t.amount) : sum, 0);
+        return { ...cat, spent: spentInCategory };
+    });
+
+    const totalBudget = plan.total_budget || 0;
+    const totalSpent = breakdownWithSpent.reduce((s, c) => s + (c.spent || 0), 0);
+    const remaining = Math.max(0, totalBudget - totalSpent);
+    const percent = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
+
+    // 3. Animamos los KPIs (usando la función animateValue que ya tienes)
+    animateValue('ta-budget', 0, totalBudget, 800);
+    animateValue('ta-spent', 0, totalSpent, 800);
+    animateValue('ta-remaining', 0, remaining, 800);
+    
+    const percentEl = document.getElementById('ta-percent');
+    if (percentEl) {
+        percentEl.textContent = `${percent.toFixed(1)}% consumido`;
+        percentEl.style.color = percent >= 100 ? 'var(--red)' : (percent >= 80 ? 'var(--orange)' : 'var(--text-secondary)');
+    }
+    
+    // Si te pasas del presupuesto global, ponemos el "Disponible" en rojo
+    document.getElementById('ta-remaining').style.color = totalSpent > totalBudget ? 'var(--red)' : 'var(--green)';
+    if (totalSpent > totalBudget) {
+        document.getElementById('ta-remaining').textContent = formatCurrency(totalSpent - totalBudget) + ' (Excedido)';
+    }
+
+    // 4. Progreso por Categorías (Barras horizontales)
+    const catsContainer = document.getElementById('ta-categories-list');
+    catsContainer.innerHTML = breakdownWithSpent.map(c => {
+        const catPercent = c.goal > 0 ? Math.min((c.spent / c.goal) * 100, 100) : 0;
+        const isOver = c.spent > c.goal;
+        const barColor = isOver ? 'var(--red)' : 'var(--primary)';
+        
+        return `
+            <div style="background: rgba(0,0,0,0.02); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.03);">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; margin-bottom: 8px;">
+                    <span style="color: var(--text-primary);">${c.category}</span>
+                    <span style="color: ${isOver ? 'var(--red)' : 'var(--text-primary)'};">${formatCurrency(c.spent)} <span style="color: var(--text-tertiary); font-weight: 500;">/ ${formatCurrency(c.goal)}</span></span>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.06); border-radius: 10px; overflow: hidden;">
+                    <div style="width: ${catPercent}%; height: 100%; background: ${barColor}; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // 5. Transacciones Recientes
+    const txContainer = document.getElementById('ta-transactions-list');
+    if (transactions.length === 0) {
+        txContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-tertiary); font-size: 13px; background: rgba(0,0,0,0.02); border-radius: 12px;">Aún no has gastado nada en este viaje.</div>`;
+    } else {
+        txContainer.innerHTML = transactions.map(t => `
+            <div class="transaction-card" style="margin-bottom: 0; border: 1px solid var(--border-color); cursor: pointer;" onclick="handleEditTransaction('${t.id}')">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--primary-light); color: var(--primary); display: flex; justify-content: center; align-items: center; font-size: 16px;">
+                        ${t.file_url ? '📎' : '💸'}
+                    </div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${t.description}</div>
+                        <div style="font-size: 11px; color: var(--text-tertiary);">${formatDate(t.date)} • <span style="font-weight: 700; color: var(--primary);">${t.travel_category_name || t.category}</span></div>
+                    </div>
+                </div>
+                <div style="font-weight: 900; color: var(--red); font-size: 15px;">-${formatCurrency(Math.abs(t.amount))}</div>
+            </div>
+        `).join('');
+    }
+
+    // 6. Gráfico Donut
+    const canvas = document.getElementById('ta-donut-chart');
+    if (travelAnalysisChart) travelAnalysisChart.destroy();
+    
+    const spentData = breakdownWithSpent.filter(c => c.spent > 0);
+    
+    if (spentData.length > 0) {
+        travelAnalysisChart = new Chart(canvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: spentData.map(c => c.category),
+                datasets: [{
+                    data: spentData.map(c => c.spent),
+                    backgroundColor: ['#214589', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#F26464'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11, family: "'Outfit', sans-serif", weight: '600' } } } }
+            }
+        });
+    } else {
+        // Gráfico vacío si no hay gastos
+        travelAnalysisChart = new Chart(canvas.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Sin gastos'], datasets: [{ data: [1], backgroundColor: ['#E4E6EF'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+        });
+    }
+}
+
+async function applyDailyInterest() {
+    // 1. Pedimos los datos directamente a Supabase (sin pasar por caché) para tener la fecha real
+    const { data: accounts, error } = await supabaseClient
+        .from('accounts')
+        .select('*')
+        .gt('interest_rate', 0);
+    
+    if (error || !accounts || accounts.length === 0) return;
+
+    // Fecha de hoy en formato local YYYY-MM-DD
+    const todayStr = new Date().toLocaleDateString('en-CA'); // Formato ISO local: YYYY-MM-DD
+
+    let interestCreated = false;
+
+    for (const acc of accounts) {
+        // Si la cuenta ya se actualizó hoy, la saltamos
+        if (acc.last_interest_date === todayStr) continue;
+
+        // Calculamos cuántos días han pasado
+        const lastDateStr = acc.last_interest_date || todayStr;
+        const lastDate = new Date(lastDateStr);
+        const todayDate = new Date(todayStr);
+        
+        const diffTime = todayDate - lastDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 0) {
+            const currentBalance = await calculateAccountBalance(acc.name);
+            if (currentBalance <= 0) continue;
+
+            const dailyRate = (acc.interest_rate / 100) / 365;
+            const interestEarned = currentBalance * dailyRate * diffDays;
+
+            if (interestEarned >= 0.01) {
+                // A. Insertar interés
+                await supabaseClient.from('transactions').insert([{
+                    user_id: acc.user_id,
+                    description: `Intereses diarios (${diffDays} d.)`,
+                    amount: interestEarned,
+                    type: 'ingresos',
+                    category: 'Intereses',
+                    date: todayStr,
+                    account: acc.name
+                }]);
+
+                // B. Actualizar la cuenta con la fecha de hoy
+                await supabaseClient.from('accounts')
+                    .update({ last_interest_date: todayStr })
+                    .eq('id', acc.id);
+                
+                interestCreated = true;
+                showToast(`✨ +${interestEarned.toFixed(2)}€ de intereses en ${acc.name}`, 'success');
+            }
+        }
+    }
+
+    // Si hemos sumado dinero, limpiamos la caché para que el Dashboard se entere
+    if (interestCreated) {
+        invalidateCache();
+        await getData(); 
+    }
+}
+
 // ============================================================================
 // INICIO DE LA APLICACIÓN
 // ============================================================================
@@ -10096,7 +10817,11 @@ async function calculateSavingsStreak() {
         await checkSession();
       const data = await initData();
       dataCache = data; // ← Asegurar que el cache tiene datos
-      await renderDashboard();
+      // 1. Calculamos y aplicamos intereses antes de renderizar nada
+      await applyDailyInterest(); 
+      
+      // 2. Renderizamos el dashboard ya con los nuevos intereses sumados
+      await renderDashboard()
     }
 
   initializeApp();
