@@ -2542,13 +2542,22 @@ body.privacy-mode #dashboard-runway-value {
 
 /* 2. CONFIGURACIÓN MÓVIL */
 @media (max-width: 768px) {
-    .sidebar { display: none !important; }
+
+  /* 1. Evitar que la web entera "baile" hacia los lados */
+  body, html {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
     
-    .main-content { 
-        margin-left: 0 !important; 
-        padding: 20px !important;
-        padding-bottom: 110px !important; 
-    }
+  .main-content {
+    margin-left: 0 !important;
+    padding: 15px !important;
+    padding-bottom: 120px !important;
+    overflow-x: hidden; /* Seguridad extra */
+  }
+
+  .sidebar { display: none !important; }
 
     /* --- MENÚ INFERIOR LIQUID GLASS --- */
     .mobile-nav {
@@ -2669,27 +2678,36 @@ body.privacy-mode #dashboard-runway-value {
 
     .plus-rotate { transform: rotate(135deg); }
 
-    /* --- CARRUSEL DE TARJETAS (DASHBOARD) --- */
-    .stats-grid {
-        display: flex !important;
-        overflow-x: auto !important;
-        scroll-snap-type: x mandatory;
-        gap: 15px !important;
-        padding: 10px 20px 25px 20px !important;
-        margin: 0 -20px !important;
-        scrollbar-width: none;
-    }
+  /* 2. El Carrusel de Tarjetas (Liquid Scroll) */
+  .stats-grid {
+    display: flex !important; /* Forzamos fila */
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important; /* Scroll horizontal */
+    scroll-snap-type: x mandatory; /* EL TRUCO: Hace que la tarjeta "salte" y se pegue */
+    gap: 0 !important; /* Quitamos el gap para controlar el ancho nosotros */
+    padding: 10px 0 25px 0 !important;
+    margin-left: -15px !important; /* Ajuste para llegar al borde */
+    margin-right: -15px !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
+  }
 
-    .stats-grid::-webkit-scrollbar { display: none; }
+  .stats-grid::-webkit-scrollbar { display: none; }
 
-    .stat-card {
-        min-width: 82vw !important; /* Ocupa casi todo el ancho */
-        scroll-snap-align: center;
-        margin-bottom: 0 !important;
-        flex-shrink: 0 !important;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
-        border: 1px solid rgba(0,0,0,0.03) !important;
-    }
+  .stat-card {
+    /* Hacemos que la tarjeta ocupe el 90% del ancho del móvil */
+    /* Dejamos un 5% a cada lado para que se vea un poco de la siguiente */
+    flex: 0 0 92% !important; 
+    min-width: 92% !important;
+    margin: 0 4% !important; /* Centrado visual */
+    scroll-snap-align: center; /* Se queda pegada al centro */
+    scroll-snap-stop: always; /* No deja pasar dos tarjetas de un golpe */
+    
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    height: auto !important;
+  }
 }
 
   </style>
