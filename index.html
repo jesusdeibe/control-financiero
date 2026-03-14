@@ -2535,101 +2535,109 @@ body.privacy-mode #dashboard-runway-value {
     transform: scale(1.2) rotate(10deg);
 }
 
-/* --- 1. CONFIGURACIÓN GLOBAL (Fuera de la media query) --- */
-.mobile-nav, .quick-actions-container, .menu-overlay {
-    display: none !important; /* Oculto siempre en PC */
-}
-
-/* --- 2. CONFIGURACIÓN MÓVIL (Sustituye todo tu @media) --- */
 @media (max-width: 768px) {
-    /* 1. Reset de pantalla para evitar rebotes laterales */
-    body, html { overflow-x: hidden !important; width: 100%; position: relative; }
-    .sidebar { display: none !important; }
-    .main-content { margin-left: 0 !important; padding: 15px !important; padding-bottom: 120px !important; width: 100%; }
+    /* --- RESET ESTRUCTURAL --- */
+    .sidebar { display: none !important; } /* Adiós lateral */
+    
+    body, html { 
+        overflow-x: hidden !important; 
+        width: 100%; 
+        background-color: #FDFBFA; 
+    }
 
-    /* 2. EL CARRUSEL (Scroll de las 3 tarjetas) */
+    .main-content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+        padding-bottom: 120px !important; /* Espacio para el menú inferior */
+        width: 100vw !important;
+    }
+
+    /* --- EL DASHBOARD MÓVIL (Carrusel de 3 tarjetas) --- */
     .stats-grid {
-        display: flex !important; /* Forzamos fila */
+        display: flex !important;
         flex-direction: row !important;
-        flex-wrap: nowrap !important; /* Prohibido bajar de línea */
-        overflow-x: auto !important; /* Habilitar scroll lateral */
-        scroll-snap-type: x mandatory !important; /* Efecto imán */
-        gap: 15px !important;
-        padding: 10px 20px 25px 20px !important;
-        margin: 0 -20px !important; /* Para que llegue al borde del móvil */
-        grid-template-columns: none !important; /* Matamos el diseño de PC */
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        gap: 0 !important;
+        margin: 0 -15px 20px -15px !important; /* Pegado a los bordes */
+        padding: 0 !important;
+        grid-template-columns: none !important;
+        scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
     }
     .stats-grid::-webkit-scrollbar { display: none; }
 
     .stat-card {
-        flex: 0 0 85% !important; /* Cada tarjeta ocupa el 85% para que se vea la siguiente */
-        min-width: 85% !important;
+        flex: 0 0 100vw !important; /* CADA TARJETA ES UNA PANTALLA */
+        min-width: 100vw !important;
         scroll-snap-align: center !important;
-        margin-bottom: 0 !important;
+        margin: 0 !important;
+        padding: 30px 25px !important;
         background: white !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        box-shadow: none !important;
     }
 
-    /* 3. MENÚ INFERIOR (Diseño Liquid Glass Real) */
+    /* --- NAVEGACIÓN INFERIOR (ESTILO APP) --- */
     .mobile-nav {
         display: flex !important;
         position: fixed;
-        bottom: 20px; left: 15px; right: 15px;
-        height: 75px;
+        bottom: 25px; left: 20px; right: 20px;
+        height: 70px;
         background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(20px) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        border-radius: 30px !important;
-        z-index: 8000 !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        border-radius: 35px !important;
+        z-index: 9000 !important;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
         justify-content: space-around !important;
         align-items: center !important;
         padding: 0 10px !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
     }
 
     .mobile-nav-item {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: center !important;
-        color: #7E8299 !important;
-        flex: 1 !important; /* Esto separa las letras y los iconos */
-        text-decoration: none !important;
+        color: #A1A5B7 !important;
+        flex: 1 !important;
+        gap: 4px;
     }
 
     .mobile-nav-item.active { color: #214589 !important; }
-    .mobile-nav-item i { font-size: 20px !important; margin-bottom: 5px !important; display: block !important; }
-    .mobile-nav-item span { font-size: 10px !important; font-weight: 700 !important; text-transform: uppercase !important; }
+    .mobile-nav-item i { font-size: 20px !important; }
+    .mobile-nav-item span { font-size: 9px !important; font-weight: 800 !important; text-transform: uppercase; }
 
-    /* 4. ACCIONES RÁPIDAS (Burbujas del +) */
+    /* --- BOTÓN FLOTANTE (+) --- */
+    .nav-add-btn {
+        width: 55px; height: 55px;
+        background: #214589 !important;
+        border-radius: 20px !important;
+        display: flex !important;
+        align-items: center; justify-content: center;
+        color: white !important;
+        font-size: 22px !important;
+        box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3) !important;
+        margin-top: -40px; /* Elevado */
+        border: 4px solid #FDFBFA !important;
+    }
+
+    /* --- BURBUJAS DE ACCIÓN --- */
     .quick-actions-container {
         display: flex !important;
         position: fixed;
         bottom: 110px; left: 50%;
         transform: translateX(-50%) scale(0);
         z-index: 9999 !important;
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: column; gap: 15px;
         transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        opacity: 0;
-        pointer-events: none;
+        opacity: 0; pointer-events: none;
     }
     .quick-actions-container.active { transform: translateX(-50%) scale(1); opacity: 1; pointer-events: auto; }
-    
-    .menu-overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5); z-index: 8500; display: none;
-    }
-    .menu-overlay.active { display: block; }
-    
-    .nav-add-circle {
-        width: 55px; height: 55px; background: #214589; border-radius: 20px;
-        display: flex; align-items: center; justify-content: center; color: white;
-        box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3); border: 3px solid white;
-    }
 }
 
   </style>
@@ -4250,44 +4258,34 @@ body.privacy-mode #dashboard-runway-value {
     </div>
   </div>
 
-  <div class="menu-overlay" id="menu-overlay" onclick="toggleQuickMenu()"></div>
+  <div class="menu-overlay" id="menu-overlay" onclick="toggleQuickMenu()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:8500; display:none; backdrop-filter:blur(4px);"></div>
 
 <div class="quick-actions-container" id="quick-actions">
-  <div class="action-item" onclick="handleQuickAction('gastos_personales')">
-    <span>Gasto</span>
-    <div class="action-icon" style="background: #F26464;"><i class="fas fa-minus"></i></div>
+  <div class="action-item" onclick="handleQuickAction('gastos_personales')" style="display:flex; align-items:center; gap:12px; flex-direction:row-reverse;">
+    <span style="background:#1A2B4D; color:white; padding:6px 12px; border-radius:10px; font-size:12px; font-weight:700;">Gasto</span>
+    <div style="width:48px; height:48px; background:#F26464; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; border:2px solid white;"><i class="fas fa-minus"></i></div>
   </div>
-  <div class="action-item" onclick="handleQuickAction('ingresos')">
-    <span>Ingreso</span>
-    <div class="action-icon" style="background: #10B981;"><i class="fas fa-plus"></i></div>
-  </div>
-  <div class="action-item" onclick="handleQuickAction('transferencia')">
-    <span>Transf.</span>
-    <div class="action-icon" style="background: #6366F1;"><i class="fas fa-exchange-alt"></i></div>
+  <div class="action-item" onclick="handleQuickAction('ingresos')" style="display:flex; align-items:center; gap:12px; flex-direction:row-reverse;">
+    <span style="background:#1A2B4D; color:white; padding:6px 12px; border-radius:10px; font-size:12px; font-weight:700;">Ingreso</span>
+    <div style="width:48px; height:48px; background:#10B981; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; border:2px solid white;"><i class="fas fa-plus"></i></div>
   </div>
 </div>
 
 <nav class="mobile-nav">
   <div class="mobile-nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-    <i class="fas fa-th-large"></i>
-    <span>Inicio</span>
+    <i class="fas fa-th-large"></i><span>Inicio</span>
   </div>
   <div class="mobile-nav-item" data-view="monthly" onclick="switchView('monthly')">
-    <i class="fas fa-calendar-alt"></i>
-    <span>Mes</span>
+    <i class="fas fa-calendar-alt"></i><span>Mes</span>
   </div>
-  <div class="mobile-nav-item" onclick="toggleQuickMenu()">
-    <div class="nav-add-circle" id="main-add-btn">
-       <i class="fas fa-plus" id="plus-icon"></i>
-    </div>
+  <div class="nav-add-btn" onclick="toggleQuickMenu()">
+    <i class="fas fa-plus" id="plus-icon" style="transition: 0.3s;"></i>
   </div>
   <div class="mobile-nav-item" data-view="accounts" onclick="switchView('accounts')">
-    <i class="fas fa-wallet"></i>
-    <span>Cartera</span>
+    <i class="fas fa-wallet"></i><span>Cartera</span>
   </div>
   <div class="mobile-nav-item" data-view="settings" onclick="switchView('settings')">
-    <i class="fas fa-cog"></i>
-    <span>Ajustes</span>
+    <i class="fas fa-cog"></i><span>Ajustes</span>
   </div>
 </nav>
 
