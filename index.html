@@ -2562,6 +2562,12 @@ body.privacy-mode #dashboard-runway-value {
         background-color: #F8F9FB !important; 
     }
 
+    /* Espaciado para que el contenido no quede debajo del menú */
+    #mobile-content {
+        min-height: 100vh;
+        padding-bottom: 120px; /* Crucial para dejar ver el final de la lista */
+    }
+
     /* Muestra el contenedor raíz de la App Móvil */
     #mobile-root { 
         display: block !important; 
@@ -10987,31 +10993,6 @@ async function renderMobileDashboard() {
     renderMobileNavigation();
 }
 
-function renderMobileNavigation() {
-  const nav = document.getElementById('mobile-nav-container');
-  if (!nav) return;
-  
-  nav.innerHTML = `
-    <nav class="mobile-nav" style="display: flex !important;">
-      <div class="mobile-nav-item active" onclick="renderMobileDashboard()">
-        <i class="fas fa-th-large"></i><span>Inicio</span>
-      </div>
-      <div class="mobile-nav-item" onclick="showToast('Próximamente', 'info')">
-        <i class="fas fa-calendar-alt"></i><span>Mes</span>
-      </div>
-      <div class="nav-add-btn" onclick="toggleQuickMenu()">
-        <i class="fas fa-plus" id="plus-icon"></i>
-      </div>
-      <div class="mobile-nav-item" onclick="showToast('Próximamente', 'info')">
-        <i class="fas fa-wallet"></i><span>Cartera</span>
-      </div>
-      <div class="mobile-nav-item" onclick="handleSignOut()">
-        <i class="fas fa-sign-out-alt"></i><span>Salir</span>
-      </div>
-    </nav>
-  `;
-}
-
 function setupMobileShell() {
   // 1. Ocultamos el sidebar y preparamos el cuerpo
   const sidebar = document.querySelector('.sidebar');
@@ -11035,6 +11016,101 @@ function setupMobileShell() {
   // 3. Ocultamos el main-content original para que no estorbe
   const mainContent = document.querySelector('.main-content');
   if (mainContent) mainContent.style.display = 'none';
+}
+
+// 1. CONTROLADOR DE VISTAS MÓVIL
+function switchMobileView(view) {
+    // Actualizar estado activo visual en el menú
+    document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-view') === view) {
+            item.classList.add('active');
+        }
+    });
+
+    // Renderizar la vista
+    if (view === 'dashboard') {
+        renderMobileDashboard();
+    } else if (view === 'accounts') {
+        renderMobileAccounts();
+    } else if (view === 'monthly') {
+        // Por ahora redirige a una función de prueba o a la misma
+        showToast('Vista de Mes en construcción', 'info');
+    } else if (view === 'settings') {
+        showToast('Ajustes en construcción', 'info');
+    }
+    
+    window.scrollTo(0, 0);
+}
+
+// 2. VISTA DE CARTERA (CUENTAS) MÓVIL
+async function renderMobileAccounts() {
+    const data = await getData();
+    const container = document.getElementById('mobile-content');
+    if (!container) return;
+
+    // Filtramos solo cuentas personales para este ejemplo
+    const personal = data.accounts.filter(a => !a.isShared && a.type !== 'Broker');
+    
+    let html = `
+        <header style="padding: 30px 20px 10px 20px;">
+            <h1 style="font-size: 28px; font-weight: 900; color: var(--primary);">Mi Cartera</h1>
+            <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Desglose por entidades</p>
+        </header>
+        <div style="padding: 10px 20px 100px 20px; display: flex; flex-direction: column; gap: 12px;">
+    `;
+
+    for (const acc of personal) {
+        const balance = await calculateAccountBalance(acc.name);
+        html += `
+            <div style="background: white; padding: 20px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #F0F2F5;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 45px; height: 45px; background: #F8F9FB; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        ${acc.icon || '🏦'}
+                    </div>
+                    <div>
+                        <div style="font-weight: 800; color: var(--text-primary); font-size: 15px;">${acc.name}</div>
+                        <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 600;">${acc.type}</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 900; color: var(--text-primary); font-size: 16px;">${formatCurrency(balance)}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+    
+    // Al terminar de pintar el contenido, pintamos/actualizamos la barra de navegación
+    renderMobileNavigation('accounts');
+}
+
+// 3. BARRA DE NAVEGACIÓN MÓVIL
+function renderMobileNavigation(activeView = 'dashboard') {
+    const nav = document.getElementById('mobile-nav-container');
+    if (!nav) return;
+    
+    nav.innerHTML = `
+        <nav class="mobile-nav" style="display: flex !important;">
+            <div class="mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}" data-view="dashboard" onclick="switchMobileView('dashboard')">
+                <i class="fas fa-th-large"></i><span>Inicio</span>
+            </div>
+            <div class="mobile-nav-item ${activeView === 'monthly' ? 'active' : ''}" data-view="monthly" onclick="switchMobileView('monthly')">
+                <i class="fas fa-calendar-alt"></i><span>Mes</span>
+            </div>
+            <div class="nav-add-btn" onclick="toggleQuickMenu()">
+                <i class="fas fa-plus" id="plus-icon"></i>
+            </div>
+            <div class="mobile-nav-item ${activeView === 'accounts' ? 'active' : ''}" data-view="accounts" onclick="switchMobileView('accounts')">
+                <i class="fas fa-wallet"></i><span>Cartera</span>
+            </div>
+            <div class="mobile-nav-item ${activeView === 'settings' ? 'active' : ''}" data-view="settings" onclick="switchMobileView('settings')">
+                <i class="fas fa-cog"></i><span>Ajustes</span>
+            </div>
+        </nav>
+    `;
 }
 
 // ============================================================================
