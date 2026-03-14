@@ -2535,177 +2535,107 @@ body.privacy-mode #dashboard-runway-value {
     transform: scale(1.2) rotate(10deg);
 }
 
-/* 1. CONFIGURACIÓN GLOBAL (Escritorio) */
+/* --- 1. CONFIGURACIÓN GLOBAL (Fuera de la media query) --- */
 .mobile-nav, .quick-actions-container, .menu-overlay {
-    display: none !important; /* Oculto por defecto en PC */
+    display: none !important; /* Oculto siempre en PC */
 }
 
-/* 2. CONFIGURACIÓN MÓVIL */
+/* --- 2. CONFIGURACIÓN MÓVIL (Sustituye todo tu @media) --- */
 @media (max-width: 768px) {
-
-  /* Bloqueo total de movimiento lateral de la web */
-  body, html {
-    overflow-x: hidden !important;
-    position: relative;
-    width: 100%;
-  }
+    .sidebar { display: none !important; }
     
-  .main-content {
-    margin-left: 0 !important;
-    padding: 15px !important;
-    padding-bottom: 120px !important;
-    overflow-x: hidden !important; 
-    width: 100%;
-  }
+    body, html {
+        overflow-x: hidden !important; /* Evita que rebote la web */
+        width: 100%;
+    }
 
-  .sidebar { display: none !important; }
+    .main-content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+        padding-bottom: 120px !important;
+        width: 100vw !important;
+        overflow-x: hidden !important;
+    }
 
-    /* --- MENÚ INFERIOR LIQUID GLASS --- */
+    /* EL CARRUSEL "BLINDADO" */
+    .stats-grid {
+        display: flex !important; /* Forzamos flexbox */
+        flex-direction: row !important;
+        flex-wrap: nowrap !important; /* Prohibido bajar de línea */
+        
+        width: 100vw !important;
+        margin-left: -15px !important; /* Anulamos el padding de main-content para que llegue al borde */
+        
+        overflow-x: scroll !important; /* Scroll horizontal obligatorio */
+        overflow-y: hidden !important;
+        
+        scroll-snap-type: x mandatory !important; /* El imán */
+        -webkit-overflow-scrolling: touch !important; 
+        
+        gap: 0 !important; 
+        grid-template-columns: none !important; /* Matamos el grid de escritorio */
+        scrollbar-width: none;
+    }
+
+    .stats-grid::-webkit-scrollbar { display: none; }
+
+    .stat-card {
+        /* Cada tarjeta es UNA PANTALLA COMPLETA */
+        flex: 0 0 100vw !important; 
+        min-width: 100vw !important;
+        width: 100vw !important;
+        
+        scroll-snap-align: center !important; /* Se pega al centro */
+        scroll-snap-stop: always !important;
+        
+        margin: 0 !important;
+        padding: 30px !important;
+        background: var(--bg-surface) !important;
+        border: none !important;
+        border-radius: 0 !important; /* Estilo sección completa */
+        box-shadow: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+    }
+
+    /* --- MENÚ Y ACCIONES (Z-Index Corregidos) --- */
     .mobile-nav {
         display: flex !important;
         position: fixed;
-        bottom: 20px;
-        left: 15px;
-        right: 15px;
+        bottom: 20px; left: 15px; right: 15px;
         height: 70px;
         background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(20px);
         border-radius: 28px;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 8500; /* Por debajo de las acciones rápidas */
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        z-index: 8000; /* Por encima del carrusel */
     }
 
-    .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: var(--text-secondary);
-        min-width: 50px;
-    }
-    .mobile-nav-item.active { color: var(--primary); }
-
-    /* --- BURBUJAS DE ACCIONES RÁPIDAS (CORREGIDO Z-INDEX) --- */
-    .quick-actions-container {
-        display: flex !important;
-        position: fixed;
-        bottom: 110px;
-        left: 50%;
-        transform: translateX(-50%) scale(0);
-        flex-direction: column;
-        gap: 15px;
-        z-index: 9999 !important; /* Capa máxima para que se vea */
-        opacity: 0;
-        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        pointer-events: none;
-    }
-
-    .quick-actions-container.active {
-        transform: translateX(-50%) scale(1);
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .action-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-direction: row-reverse;
-    }
-
-    .action-item span {
-        background: rgba(26, 43, 77, 0.95);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .action-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 18px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        border: 2px solid white;
-    }
-
-    /* --- OVERLAY OSCURO --- */
     .menu-overlay {
         display: block !important;
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(4px);
-        z-index: 8000; /* Entre el dashboard y el menú */
+        z-index: 9000; /* Por debajo de las burbujas */
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.3s;
     }
-    .menu-overlay.active {
-        opacity: 1;
-        pointer-events: auto;
-    }
+    .menu-overlay.active { opacity: 1; pointer-events: auto; }
 
-    .nav-add-circle {
-        width: 55px;
-        height: 55px;
-        background: var(--primary);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3);
+    .quick-actions-container {
+        display: flex !important;
+        position: fixed;
+        bottom: 110px; left: 50%;
+        transform: translateX(-50%) scale(0);
+        z-index: 9999 !important; /* CAPA MÁXIMA */
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
+    .quick-actions-container.active { transform: translateX(-50%) scale(1); opacity: 1; pointer-events: auto; }
 
-    /* --- EL CARRUSEL (SCROLL HORIZONTAL) --- */
-    .stats-grid {
-        display: flex !important; 
-        flex-direction: row !important;
-        flex-wrap: nowrap !important; /* Obliga a las tarjetas a ir de lado */
-        
-        overflow-x: auto !important; 
-        overflow-y: hidden !important;
-        
-        scroll-snap-type: x mandatory !important; /* Efecto imán */
-        -webkit-overflow-scrolling: touch !important; 
-        
-        gap: 0 !important; /* Eliminamos el gap para controlar el ancho exacto */
-        padding: 10px 0 30px 0 !important;
-        margin-left: -15px !important;
-        margin-right: -15px !important;
-        
-        grid-template-columns: none !important; /* Limpia el grid de escritorio */
-    }
-
-    .stats-grid::-webkit-scrollbar { display: none !important; }
-
-    .stat-card {
-        /* Cada tarjeta ocupa exactamente el ancho total de la pantalla */
-        flex: 0 0 100% !important;
-        min-width: 100% !important;
-        width: 100% !important;
-        
-        scroll-snap-align: center !important; /* Se imanta al centro de la pantalla */
-        scroll-snap-stop: always !important; /* No permite saltarse tarjetas */
-        
-        margin: 0 !important;
-        padding: 30px 25px !important; /* Padding interno para que el texto respire */
-        background: var(--bg-surface) !important;
-        border-radius: 0 !important; /* Queda mejor sin bordes si ocupan todo el ancho */
-        border: none !important;
-        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
-        box-shadow: none !important;
-    }
+    /* Estilo botones acciones */
+    .action-item { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; margin-bottom: 10px; }
+    .action-item span { background: #1A2B4D; color: white; padding: 6px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+    .action-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 }
 
   </style>
