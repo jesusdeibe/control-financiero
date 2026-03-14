@@ -2535,67 +2535,174 @@ body.privacy-mode #dashboard-runway-value {
     transform: scale(1.2) rotate(10deg);
 }
 
-/* --- ADAPTACIÓN MÓVIL Y MENÚ INFERIOR --- */
+/* --- ESTILO LIQUID GLASS MÓVIL --- */
 .mobile-nav { display: none; }
 
 @media (max-width: 768px) {
-    /* Ocultar sidebar y ajustar contenido */
     .sidebar { display: none !important; }
     .main-content { 
         margin-left: 0 !important; 
-        padding: 15px !important;
-        padding-bottom: 100px !important; /* Espacio para el menú */
+        padding: 20px !important;
+        padding-bottom: 120px !important; 
     }
 
-    /* Navbar inferior estilo App */
     .mobile-nav {
         display: flex;
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 20px; /* Flota sobre el contenido */
+        left: 15px;
+        right: 15px;
         height: 70px;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(0,0,0,0.05);
+        background: rgba(255, 255, 255, 0.5); /* Muy translúcido */
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 28px;
         justify-content: space-around;
         align-items: center;
-        z-index: 1000;
-        padding-bottom: env(safe-area-inset-bottom);
+        z-index: 5000;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        padding: 0 10px;
+        /* Permitir scroll horizontal si hay muchos items */
+        overflow-x: auto;
+        scrollbar-width: none;
     }
+    .mobile-nav::-webkit-scrollbar { display: none; }
 
     .mobile-nav-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
         color: var(--text-secondary);
-        cursor: pointer;
-        flex: 1;
+        min-width: 60px;
+        height: 100%;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
     }
 
-    .mobile-nav-item i { font-size: 20px; }
-    .mobile-nav-item span { font-size: 10px; font-weight: 700; }
-    .mobile-nav-item.active { color: var(--primary); }
-
-    /* Botón flotante central */
-    .mobile-nav-add {
-        margin-top: -35px;
+    /* Iconos y textos */
+    .mobile-nav-item svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.2;
+        margin-bottom: 4px;
+        transition: transform 0.3s ease;
     }
-    .nav-add-circle {
-        width: 50px;
-        height: 50px;
+    .mobile-nav-item span { 
+        font-size: 9px; 
+        font-weight: 700; 
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        opacity: 0.7;
+    }
+
+    /* Estado Activo - El efecto Liquid */
+    .mobile-nav-item.active {
+        color: var(--primary);
+    }
+    .mobile-nav-item.active svg {
+        transform: translateY(-2px);
+        stroke-width: 2.5;
+    }
+    .mobile-nav-item.active span { opacity: 1; }
+
+    /* Indicador flotante (La gota de líquido) */
+    .mobile-nav-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 8px;
+        width: 4px;
+        height: 4px;
         background: var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary);
+    }
+
+    /* Botón añadir especial */
+    .mobile-nav-add {
+        background: var(--primary);
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
         border-radius: 18px;
+        margin-bottom: 0;
+        box-shadow: 0 8px 20px rgba(33, 69, 137, 0.3);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+    .mobile-nav-add svg { color: white; margin: 0; }
+
+    /* --- ANIMACIONES QUICK MENU --- */
+    .mobile-nav-add-container {
+        position: relative;
+        overflow: visible !important; /* Para que las burbujas salgan del menú */
+    }
+
+    .quick-actions-menu {
+        position: absolute;
+        bottom: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform: scale(0) translateY(40px);
+        opacity: 0;
+    }
+
+    .quick-actions-menu.active {
+        visibility: visible;
+        pointer-events: auto;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-direction: row-reverse; /* Texto a la izquierda del icono */
+    }
+
+    .action-item span {
+        background: rgba(26, 43, 77, 0.8);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        backdrop-filter: blur(5px);
+    }
+
+    .action-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(33, 69, 137, 0.3);
-        border: 4px solid var(--bg-body);
+        font-size: 18px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
     }
+
+    /* Rotación del icono + al abrir */
+    #plus-icon { transition: transform 0.4s ease; }
+    .menu-open #plus-icon { transform: rotate(135deg); }
+
+    /* Overlay oscuro para enfocar el menú */
+    .menu-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.3);
+        backdrop-filter: blur(4px);
+        z-index: 4000;
+        display: none;
+    }
+    .menu-overlay.active { display: block; }
 }
 
   </style>
@@ -4217,24 +4324,53 @@ body.privacy-mode #dashboard-runway-value {
   </div>
 
   <nav class="mobile-nav">
-    <div class="mobile-nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
-      <i class="fas fa-th-large"></i>
+    <div class="mobile-nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       <span>Inicio</span>
     </div>
-    <div class="mobile-nav-item" data-section="shared-analysis" onclick="showSection('shared-analysis')">
-      <i class="fas fa-users"></i>
-      <span>Común</span>
+    
+    <div class="mobile-nav-item" data-view="monthly" onclick="switchView('monthly')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <span>Mes</span>
     </div>
-    <div class="mobile-nav-item mobile-nav-add" onclick="openTransactionModal()">
-      <div class="nav-add-circle"><i class="fas fa-plus"></i></div>
+  
+    <div class="mobile-nav-item mobile-nav-add-container">
+      <div class="quick-actions-menu" id="quick-actions">
+        <div class="action-item" onclick="handleQuickAction('gastos_personales')">
+          <span>Gasto</span>
+          <div class="action-icon" style="background: #F26464;"><i class="fas fa-minus"></i></div>
+        </div>
+        <div class="action-item" onclick="handleQuickAction('ingresos')">
+          <span>Ingreso</span>
+          <div class="action-icon" style="background: #10B981;"><i class="fas fa-plus"></i></div>
+        </div>
+        <div class="action-item" onclick="handleQuickAction('transferencia')">
+          <span>Transf.</span>
+          <div class="action-icon" style="background: #6366F1;"><i class="fas fa-exchange-alt"></i></div>
+        </div>
+      </div>
+      
+      <div class="nav-add-circle" id="main-add-btn" onclick="toggleQuickMenu()">
+        <svg id="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </div>
     </div>
-    <div class="mobile-nav-item" data-section="accounts" onclick="showSection('accounts')">
-      <i class="fas fa-wallet"></i>
-      <span>Cuentas</span>
+  
+    <div class="mobile-nav-item" data-view="inversiones" onclick="switchView('inversiones')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+      <span>Inv.</span>
     </div>
-    <div class="mobile-nav-item" data-section="settings" onclick="showSection('settings')">
-      <i class="fas fa-cog"></i>
-      <span>Ajustes</span>
+  
+    <div class="mobile-nav-item" data-view="accounts" onclick="switchView('accounts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+      <span>Cartera</span>
+    </div>
+  
+    <div class="mobile-nav-item" data-view="search" onclick="switchView('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Busca</span>
     </div>
   </nav>
 
@@ -5884,30 +6020,40 @@ async function showPersonalExpensesBreakdown() {
     });
 
     function switchView(viewName) {
-      // Update active nav button
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.view === viewName) {
-          btn.classList.add('active');
-        }
-      });
+  currentView = viewName;
 
-      // Show view
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById(`${viewName}-view`).classList.add('active');
+  // 1. Actualizar botones del Sidebar (Escritorio)
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.view === viewName) btn.classList.add('active');
+  });
 
-      // Render view
-      if (viewName === 'dashboard') renderDashboard();
-      if (viewName === 'monthly') renderMonthlyView();
-      if (viewName === 'inversiones') renderInvestmentsView();
-      if (viewName === 'accounts') renderAccountsView();
-      if (viewName === 'settings') renderSettingsView();
-      if (viewName === 'search') renderSearchView();
-      if (viewName === 'budgets') {
-        renderBudgetsView();
-        renderTravelPlans();
-      }
-    }
+  // 2. Actualizar botones del Menú Inferior (Móvil)
+  document.querySelectorAll('.mobile-nav-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.dataset.view === viewName) item.classList.add('active');
+  });
+
+  // 3. Mostrar la vista correspondiente
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const targetView = document.getElementById(`${viewName}-view`);
+  if (targetView) targetView.classList.add('active');
+
+  // 4. Ejecutar renderizado según la vista
+  if (viewName === 'dashboard') renderDashboard();
+  if (viewName === 'monthly') renderMonthlyView();
+  if (viewName === 'inversiones') renderInvestmentsView();
+  if (viewName === 'accounts') renderAccountsView();
+  if (viewName === 'settings') renderSettingsView();
+  if (viewName === 'search') renderSearchView();
+  if (viewName === 'budgets') {
+    renderBudgetsView();
+    renderTravelPlans();
+  }
+  
+  // Hacer scroll al inicio de la página al cambiar de vista
+  document.querySelector('.main-content').scrollTop = 0;
+}
 
     // Close modals on overlay click
     document.getElementById('transaction-modal').addEventListener('click', (e) => {
@@ -10766,6 +10912,47 @@ function showSection(sectionId) {
   if (window.innerWidth <= 768) {
       // Si usas algún menú hamburguesa extra, ciérralo aquí
   }
+}
+
+// Variable para controlar el estado
+let isQuickMenuOpen = false;
+
+function toggleQuickMenu() {
+    const menu = document.getElementById('quick-actions');
+    const mainBtn = document.getElementById('main-add-btn');
+    const container = document.querySelector('.mobile-nav-add-container');
+    
+    isQuickMenuOpen = !isQuickMenuOpen;
+    
+    if (isQuickMenuOpen) {
+        menu.classList.add('active');
+        container.classList.add('menu-open');
+        // Crear un overlay si no existe para cerrar al tocar fuera
+        if (!document.querySelector('.menu-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'menu-overlay';
+            overlay.onclick = toggleQuickMenu;
+            document.body.appendChild(overlay);
+        }
+        document.querySelector('.menu-overlay').classList.add('active');
+    } else {
+        menu.classList.remove('active');
+        container.classList.remove('menu-open');
+        document.querySelector('.menu-overlay').classList.remove('active');
+    }
+}
+
+function handleQuickAction(type) {
+    // 1. Cerramos el menú
+    toggleQuickMenu();
+    
+    // 2. Abrimos el modal con el tipo pre-seleccionado
+    if (type === 'transferencia') {
+        // Aquí podrías llamar a tu función de transferencias si tienes una específica
+        showToast('Función de transferencia en desarrollo', 'info');
+    } else {
+        openTransactionModal(type);
+    }
 }
 
 // ============================================================================
