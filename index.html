@@ -2694,22 +2694,65 @@ body.privacy-mode #dashboard-runway-value {
     box-shadow: 0 3px 8px rgba(0,0,0,0.12);
 }
 
-/* Mejora de los avisos */
+/* Animación para el desglose de cuentas */
+.account-breakdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.account-breakdown.active {
+    max-height: 600px; /* Suficiente para varias cuentas */
+    opacity: 1;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #F0F2F5;
+}
+
+/* Item de cuenta dentro del desglose */
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.breakdown-item span:first-child {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.breakdown-item span:last-child {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Estilo de alerta tipo Notificación */
 .mobile-alert {
     background: #FFF2F2;
-    border-left: 4px solid #F26464;
+    border-radius: 18px;
     padding: 15px;
-    border-radius: 12px;
     margin-bottom: 20px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
-    box-shadow: 0 4px 12px rgba(242, 100, 100, 0.08);
+    border: 1px solid #FFDADA;
+    animation: slideIn 0.5s ease;
 }
 .mobile-alert i { color: #F26464; margin-top: 2px; }
 .mobile-alert-text { font-size: 13px; color: #444; line-height: 1.4; }
 .mobile-alert-text b { color: #000; }
+
+
+@keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
+}
+
 
   </style>
 </head>
@@ -10968,47 +11011,60 @@ async function renderMobileDashboard() {
     const container = document.getElementById('mobile-content');
     if (!container) return;
 
-    // 1. REVISIÓN DE AVISOS (Cualquier cuenta en negativo)
+    // 1. LÓGICA DE AVISOS (Saldo < 50€ o Negativo)
     let alertsHtml = '';
-    const allAccounts = data.accounts;
-    for (const acc of allAccounts) {
+    for (const acc of data.accounts) {
         const bal = await calculateAccountBalance(acc.name);
-        if (bal < 0) {
+        if (bal < 50) { // Umbral de aviso
             alertsHtml += `
                 <div class="mobile-alert">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="mobile-alert-text">
-                        La cuenta <b>${acc.name}</b> está en negativo: <b>${formatCurrency(bal)}</b>.
+                    <div style="background: #F26464; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 11px; font-weight: 800; color: #F26464; text-transform: uppercase;">Aviso de Saldo</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #444;">${acc.name}: <span style="color: #000;">${formatCurrency(bal)}</span></div>
                     </div>
                 </div>
             `;
         }
     }
 
-    // 2. LÓGICA DE DATOS SEGÚN MODO (Blindada)
+    // 2. FILTRADO Y CÁLCULO DE CUENTAS
     const isPersonalMode = (mobileDashboardMode === 'personal');
-    
-    // Filtramos asegurando que pillamos todos los flags posibles de compartido
     const filteredAccounts = data.accounts.filter(a => {
         const isShared = a.isShared === true || a.is_shared === true || a.type === 'Compartida';
         return isPersonalMode ? !isShared : isShared;
     });
 
-    // Sumamos saldos (Incluimos Brokers en personal si así lo deseas, o ajusta el filtro)
     let total = 0;
+    let breakdownHtml = ''; // Aquí guardaremos la lista para el desplegable
+
     for (const acc of filteredAccounts) {
-        total += await calculateAccountBalance(acc.name);
+        const bal = await calculateAccountBalance(acc.name);
+        total += bal;
+        breakdownHtml += `
+            <div class="breakdown-item">
+                <span>${acc.name}</span>
+                <span>${formatCurrency(bal)}</span>
+            </div>
+        `;
     }
 
-    // 3. RENDERIZADO DE LA UI
+    // 3. RENDERIZADO
     container.innerHTML = `
         <div style="padding: 20px 20px 100px 20px;">
             
             ${alertsHtml}
 
-            <header style="margin-bottom: 25px;">
-                <h1 style="font-size: 28px; font-weight: 900; color: var(--primary);">Resumen</h1>
-                <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Estado de tu patrimonio</p>
+            <header style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 26px; font-weight: 900; color: var(--primary);">Resumen</h1>
+                    <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600;">Estado de tus finanzas</p>
+                </div>
+                <div style="width: 45px; height: 45px; background: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <i class="fas fa-bell" style="color: var(--primary); opacity: 0.3;"></i>
+                </div>
             </header>
 
             <div style="background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);">
@@ -11018,19 +11074,23 @@ async function renderMobileDashboard() {
                     <button class="toggle-btn ${!isPersonalMode ? 'active' : ''}" onclick="updateMobileDashboardMode('shared')">Compartido</button>
                 </div>
 
-                <div style="text-align: center; margin: 20px 0;">
+                <div style="text-align: center; margin: 25px 0;">
                     <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-                        ${isPersonalMode ? 'Mi Patrimonio Líquido' : 'Fondo Común Compartido'}
+                        ${isPersonalMode ? 'Mi Patrimonio Líquido' : 'Fondo Común'}
                     </div>
-                    <div style="font-size: 40px; font-weight: 900; color: var(--text-primary); letter-spacing: -1px;">
+                    <div style="font-size: 42px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;">
                         ${formatCurrency(total)}
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;">
-                    <span style="background: ${isPersonalMode ? '#EBF2FF' : '#E8F7F0'}; color: ${isPersonalMode ? '#214589' : '#10B981'}; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase;">
-                        ${filteredAccounts.length} Cuentas activas
+                <div onclick="toggleAccountBreakdown()" style="display: flex; justify-content: center;">
+                    <span id="breakdown-badge" style="background: ${isPersonalMode ? '#EBF2FF' : '#E8F7F0'}; color: ${isPersonalMode ? '#214589' : '#10B981'}; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        ${filteredAccounts.length} Cuentas activas <i class="fas fa-chevron-down" id="breakdown-chevron"></i>
                     </span>
+                </div>
+
+                <div id="account-breakdown" class="account-breakdown">
+                    ${breakdownHtml}
                 </div>
             </div>
 
@@ -11039,12 +11099,26 @@ async function renderMobileDashboard() {
     `;
 
     renderMobileNavigation('dashboard');
-    renderMobileRunway(); // Función que inyectará la tarjeta de supervivencia
+    renderMobileRunway();
 }
 
 function updateMobileDashboardMode(mode) {
     mobileDashboardMode = mode;
     renderMobileDashboard();
+}
+
+//Despliegue cuentas en dashboard
+function toggleAccountBreakdown() {
+  const breakdown = document.getElementById('account-breakdown');
+  const chevron = document.getElementById('breakdown-chevron');
+  const badge = document.getElementById('breakdown-badge');
+
+  const isActive = breakdown.classList.toggle('active');
+  
+  // Rotamos el icono y cambiamos el estilo del badge para que Silvia sepa que está abierto
+  chevron.style.transform = isActive ? 'rotate(180deg)' : 'rotate(0deg)';
+  chevron.style.transition = 'transform 0.3s ease';
+  badge.style.transform = isActive ? 'scale(1.05)' : 'scale(1)';
 }
 
 async function renderMobileRunway() {
