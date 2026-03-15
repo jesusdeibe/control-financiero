@@ -11122,29 +11122,48 @@ function updateMobileDashboardMode(mode) {
 async function getFixedExpensesAlerts() {
     const data = await getData();
     const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
     
-    // 1. Buscamos gastos fijos pendientes este mes
-    const pendingFixed = data.transactions.filter(t => {
+    // 1. Buscamos gastos fijos que deberían ocurrir este mes (según tus transacciones)
+    // Nota: Filtramos por categoría 'Gastos Fijos'
+    const fixedExpenses = data.transactions.filter(t => {
         const tDate = new Date(t.date);
         return t.category === 'Gastos Fijos' && 
                t.type === 'Gasto' &&
-               tDate.getMonth() === now.getMonth() &&
-               tDate.getFullYear() === now.getFullYear();
+               tDate.getMonth() === currentMonth &&
+               tDate.getFullYear() === currentYear;
     });
 
-    const totalFixedPending = pendingFixed.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const totalFixedNeeded = fixedExpenses.reduce((sum, t) => sum + Math.abs(t.amount), 0);
     
-    // 2. Saldo de la cuenta principal (ajusta el nombre a tu cuenta real)
-    const mainAccBalance = await calculateAccountBalance('Cuenta Corriente'); 
+    // 2. Calculamos el saldo de TODAS tus cuentas personales (donde sueles pagar los recibos)
+    const personalAccounts = data.accounts.filter(a => !a.isShared && !a.is_shared && a.type !== 'Broker');
+    let totalPersonalBalance = 0;
+    for (const acc of personalAccounts) {
+        totalPersonalBalance += await calculateAccountBalance(acc.name);
+    }
     
     let alerts = [];
-    if (mainAccBalance < totalFixedPending) {
+    // Si lo que necesitas pagar es más de lo que tienes en líquido personal...
+    if (totalPersonalBalance < totalFixedNeeded && totalFixedNeeded > 0) {
         alerts.push({
-            title: "Falta saldo para fijos",
-            text: `Te quedan <b>${formatCurrency(totalFixedPending)}</b> en gastos fijos y solo tienes <b>${formatCurrency(mainAccBalance)}</b>.`
+            title: "Riesgo de Descubierto",
+            text: `Tienes <b>${formatCurrency(totalFixedNeeded)}</b> en recibos este mes y tu saldo total personal es de <b>${formatCurrency(totalPersonalBalance)}</b>.`
         });
     }
+
+    // Aviso extra: Cuentas en negativo (esto siempre es útil)
+    for (const acc of data.accounts) {
+        const bal = await calculateAccountBalance(acc.name);
+        if (bal < 0) {
+            alerts.push({
+                title: "Saldo Negativo",
+                text: `La cuenta <b>${acc.name}</b> está en <b>${formatCurrency(bal)}</b>.`
+            });
+        }
+    }
+
     return alerts;
 }
 
@@ -11226,8 +11245,7 @@ function switchMobileView(view) {
     } else if (view === 'accounts') {
         renderMobileAccounts();
     } else if (view === 'monthly') {
-        // Por ahora redirige a una función de prueba o a la misma
-        showToast('Vista de Mes en construcción', 'info');
+        renderMobileMonthly();
     } else if (view === 'settings') {
         showToast('Ajustes en construcción', 'info');
     }
@@ -11277,6 +11295,86 @@ async function renderMobileAccounts() {
     
     // Al terminar de pintar el contenido, pintamos/actualizamos la barra de navegación
     renderMobileNavigation('accounts');
+}
+
+async function renderMobileMonthly() {
+    const data = await getData();
+    const container = document.getElementById('mobile-content');
+    if (!container) return;
+
+    const now = new Date();
+    const monthTransactions = data.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+
+    const totalIn = monthTransactions.filter(t => t.type === 'Ingreso').reduce((s, t) => s + t.amount, 0);
+    const totalOut = monthTransactions.filter(t => t.type === 'Gasto').reduce((s, t) => s + Math.abs(t.amount), 0);
+    const ahorro = totalIn - totalOut;
+    const ahorroPerc = totalIn > 0 ? (ahorro / totalIn) * 100 : 0;
+
+    container.innerHTML = `
+        <div style="padding: 20px 20px 100px 20px;">
+            <header style="margin-bottom: 25px;">
+                <h1 style="font-size: 26px; font-weight: 900; color: var(--primary);">Resumen de ${now.toLocaleString('es-ES', { month: 'long' })}</h1>
+                <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600;">Tu actividad este mes</p>
+            </header>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <div style="background: white; padding: 20px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border: 1px solid #E8F7F0;">
+                    <div style="color: #10B981; font-size: 18px; margin-bottom: 10px;"><i class="fas fa-arrow-down"></i></div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Ingresos</div>
+                    <div style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-top: 5px;">${formatCurrency(totalIn)}</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border: 1px solid #FFF5F5;">
+                    <div style="color: #F26464; font-size: 18px; margin-bottom: 10px;"><i class="fas fa-arrow-up"></i></div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Gastos</div>
+                    <div style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-top: 5px;">${formatCurrency(totalOut)}</div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 25px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Ahorro Neto</span>
+                    <span style="background: ${ahorro >= 0 ? '#E8F7F0' : '#FFF0F0'}; color: ${ahorro >= 0 ? '#10B981' : '#F26464'}; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800;">
+                        ${ahorroPerc.toFixed(1)}% de ingresos
+                    </span>
+                </div>
+                <div style="font-size: 32px; font-weight: 900; color: ${ahorro >= 0 ? 'var(--text-primary)' : '#F26464'};">
+                    ${formatCurrency(ahorro)}
+                </div>
+                <div style="height: 8px; background: #F1F4F9; border-radius: 4px; margin-top: 20px; overflow: hidden;">
+                    <div style="width: ${Math.min(Math.max(ahorroPerc, 0), 100)}%; height: 100%; background: #10B981; transition: width 1s ease;"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Últimos movimientos</h3>
+                <span style="font-size: 12px; font-weight: 700; color: var(--primary);">Ver todos</span>
+            </div>
+            
+            <div id="mobile-recent-list">
+                ${monthTransactions.slice(0, 5).map(t => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F2F5;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: #F8F9FB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                ${t.type === 'Ingreso' ? '💰' : '🛒'}
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">${t.description}</div>
+                                <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">${new Date(t.date).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 14px; font-weight: 800; color: ${t.type === 'Ingreso' ? '#10B981' : 'var(--text-primary)'};">
+                            ${t.type === 'Gasto' ? '-' : '+'}${formatCurrency(Math.abs(t.amount))}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    renderMobileNavigation('monthly');
 }
 
 // 3. BARRA DE NAVEGACIÓN MÓVIL
