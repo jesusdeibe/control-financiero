@@ -11011,26 +11011,18 @@ async function renderMobileDashboard() {
     const container = document.getElementById('mobile-content');
     if (!container) return;
 
-    // 1. LÓGICA DE AVISOS (Saldo < 50€ o Negativo)
-    let alertsHtml = '';
-    for (const acc of data.accounts) {
-        const bal = await calculateAccountBalance(acc.name);
-        if (bal < 50) { // Umbral de aviso
-            alertsHtml += `
-                <div class="mobile-alert">
-                    <div style="background: #F26464; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 11px; font-weight: 800; color: #F26464; text-transform: uppercase;">Aviso de Saldo</div>
-                        <div style="font-size: 13px; font-weight: 700; color: #444;">${acc.name}: <span style="color: #000;">${formatCurrency(bal)}</span></div>
-                    </div>
-                </div>
-            `;
-        }
-    }
+    // 1. PREPARAR AVISOS
+    const alerts = await getFixedExpensesAlerts();
+    let alertsHtml = alerts.map(a => `
+        <div style="margin-bottom: 15px; border-bottom: 1px solid #FEE2E2; padding-bottom: 10px;">
+            <div style="font-size: 11px; font-weight: 800; color: #F26464; text-transform: uppercase;">${a.title}</div>
+            <div style="font-size: 13px; color: #444; margin-top: 4px;">${a.text}</div>
+        </div>
+    `).join('');
 
-    // 2. FILTRADO Y CÁLCULO DE CUENTAS
+    if (alerts.length === 0) alertsHtml = '<div style="font-size: 13px; color: var(--text-tertiary); text-align: center;">No hay avisos pendientes ✨</div>';
+
+    // 2. LÓGICA DE CUENTAS (Personal/Compartido)
     const isPersonalMode = (mobileDashboardMode === 'personal');
     const filteredAccounts = data.accounts.filter(a => {
         const isShared = a.isShared === true || a.is_shared === true || a.type === 'Compartida';
@@ -11038,37 +11030,36 @@ async function renderMobileDashboard() {
     });
 
     let total = 0;
-    let breakdownHtml = ''; // Aquí guardaremos la lista para el desplegable
-
+    let breakdownHtml = '';
     for (const acc of filteredAccounts) {
         const bal = await calculateAccountBalance(acc.name);
         total += bal;
-        breakdownHtml += `
-            <div class="breakdown-item">
-                <span>${acc.name}</span>
-                <span>${formatCurrency(bal)}</span>
-            </div>
-        `;
+        breakdownHtml += `<div class="breakdown-item"><span>${acc.name}</span><span>${formatCurrency(bal)}</span></div>`;
     }
 
-    // 3. RENDERIZADO
+    // 3. RENDER UI
     container.innerHTML = `
-        <div style="padding: 20px 20px 100px 20px;">
-            
+        <div id="alerts-panel" class="alerts-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <b style="font-size: 16px;">Avisos</b>
+                <i class="fas fa-times" onclick="toggleMobileAlerts()"></i>
+            </div>
             ${alertsHtml}
+        </div>
 
-            <header style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 style="font-size: 26px; font-weight: 900; color: var(--primary);">Resumen</h1>
-                    <p style="color: var(--text-secondary); font-size: 13px; font-weight: 600;">Estado de tus finanzas</p>
+        <div style="padding: 20px 20px 0 20px;">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <div class="alert-trigger" onclick="toggleMobileAlerts()">
+                    <i class="fas fa-bell" style="color: ${alerts.length > 0 ? '#F26464' : '#A1A5B7'};"></i>
+                    ${alerts.length > 0 ? `<div class="alert-badge">${alerts.length}</div>` : ''}
                 </div>
-                <div style="width: 45px; height: 45px; background: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <i class="fas fa-bell" style="color: var(--primary); opacity: 0.3;"></i>
+                <div style="text-align: right;">
+                    <h1 style="font-size: 24px; font-weight: 900; color: var(--primary);">Resumen</h1>
+                    <p style="color: var(--text-secondary); font-size: 12px; font-weight: 600;">Estado financiero</p>
                 </div>
             </header>
 
             <div style="background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);">
-                
                 <div class="toggle-wrapper">
                     <button class="toggle-btn ${isPersonalMode ? 'active' : ''}" onclick="updateMobileDashboardMode('personal')">Personal</button>
                     <button class="toggle-btn ${!isPersonalMode ? 'active' : ''}" onclick="updateMobileDashboardMode('shared')">Compartido</button>
@@ -11078,14 +11069,14 @@ async function renderMobileDashboard() {
                     <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
                         ${isPersonalMode ? 'Mi Patrimonio Líquido' : 'Fondo Común'}
                     </div>
-                    <div style="font-size: 42px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;">
+                    <div style="font-size: 40px; font-weight: 900; color: var(--text-primary); letter-spacing: -1.5px;">
                         ${formatCurrency(total)}
                     </div>
                 </div>
 
                 <div onclick="toggleAccountBreakdown()" style="display: flex; justify-content: center;">
                     <span id="breakdown-badge" style="background: ${isPersonalMode ? '#EBF2FF' : '#E8F7F0'}; color: ${isPersonalMode ? '#214589' : '#10B981'}; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        ${filteredAccounts.length} Cuentas activas <i class="fas fa-chevron-down" id="breakdown-chevron"></i>
+                        ${filteredAccounts.length} Cuentas <i class="fas fa-chevron-down" id="breakdown-chevron"></i>
                     </span>
                 </div>
 
@@ -11105,6 +11096,40 @@ async function renderMobileDashboard() {
 function updateMobileDashboardMode(mode) {
     mobileDashboardMode = mode;
     renderMobileDashboard();
+}
+
+// Función para detectar avisos de gastos fijos (Igual que en PC)
+async function getFixedExpensesAlerts() {
+    const data = await getData();
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    
+    // 1. Buscamos gastos fijos pendientes este mes
+    const pendingFixed = data.transactions.filter(t => {
+        const tDate = new Date(t.date);
+        return t.category === 'Gastos Fijos' && 
+               t.type === 'Gasto' &&
+               tDate.getMonth() === now.getMonth() &&
+               tDate.getFullYear() === now.getFullYear();
+    });
+
+    const totalFixedPending = pendingFixed.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    // 2. Saldo de la cuenta principal (ajusta el nombre a tu cuenta real)
+    const mainAccBalance = await calculateAccountBalance('Cuenta Corriente'); 
+    
+    let alerts = [];
+    if (mainAccBalance < totalFixedPending) {
+        alerts.push({
+            title: "Falta saldo para fijos",
+            text: `Te quedan <b>${formatCurrency(totalFixedPending)}</b> en gastos fijos y solo tienes <b>${formatCurrency(mainAccBalance)}</b>.`
+        });
+    }
+    return alerts;
+}
+
+function toggleMobileAlerts() {
+    document.getElementById('alerts-panel').classList.toggle('active');
 }
 
 //Despliegue cuentas en dashboard
