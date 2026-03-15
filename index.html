@@ -2664,6 +2664,47 @@ body.privacy-mode #dashboard-runway-value {
         background: rgba(0,0,0,0.4); z-index: 8500; display: none;
         backdrop-filter: blur(4px);
     }
+
+  /* Estilo para los avisos de alerta */
+  .mobile-alert {
+    background: #FFF5F5;
+    border: 1px solid #FEB2B2;
+    color: #C53030;
+    padding: 12px 16px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* El conmutador (Pill selector) */
+  .toggle-container {
+    display: inline-flex;
+    background: #F1F4F9;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+  }
+
+  .toggle-btn {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+  }
+
+  .toggle-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
 }
 
   </style>
@@ -10891,6 +10932,8 @@ function handleQuickAction(type) {
 // FUNCIONES EXCLUSIVAS PARA MUNDO MÓVIL
 // ==========================================
 
+let mobileDashboardMode = 'personal';
+
 function setupMobileShell() {
     // 1. Ocultamos elementos de PC
     const sidebar = document.querySelector('.sidebar');
@@ -10921,76 +10964,75 @@ async function renderMobileDashboard() {
     const container = document.getElementById('mobile-content');
     if (!container) return;
 
-    // A. CÁLCULO PATRIMONIO PERSONAL
-    const personalAccounts = data.accounts.filter(a => !a.isShared && a.type !== 'Broker' && a.includeInPatrimony !== false);
-    const personalTotal = await Promise.all(personalAccounts.map(a => calculateAccountBalance(a.name)))
-                          .then(bal => bal.reduce((a, b) => a + b, 0));
-
-    // B. CÁLCULO CUENTAS COMPARTIDAS
-    const sharedAccounts = data.accounts.filter(a => a.isShared === true || a.is_shared === true);
-    const sharedTotal = await Promise.all(sharedAccounts.map(a => calculateAccountBalance(a.name)))
-                        .then(bal => bal.reduce((a, b) => a + b, 0));
-
-    // C. LÓGICA DE SUPERVIVENCIA (Runway)
-    const runway = await calculateRunway();
-
-    container.innerHTML = `
-        <header style="padding: 30px 20px 10px 20px;">
-            <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Balance actual</div>
-            <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin: 5px 0;">Resumen General</h1>
-        </header>
-
-        <div class="mobile-carousel">
-            
-            <div class="card-snap">
-                <div>
-                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">Patrimonio Personal</div>
-                    <div style="font-size: 32px; font-weight: 900; color: var(--text-primary);">${formatCurrency(personalTotal)}</div>
+    // 1. LÓGICA DE AVISOS (Saldo negativo o bajo)
+    let alertsHtml = '';
+    const allAccounts = data.accounts;
+    for (const acc of allAccounts) {
+        const bal = await calculateAccountBalance(acc.name);
+        if (bal < 0) {
+            alertsHtml += `
+                <div class="mobile-alert">
+                    <span>⚠️</span> 
+                    <span>¡Atención! <b>${acc.name}</b> está en negativo (${formatCurrency(bal)})</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F0F2F5; padding-top: 15px;">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Cuentas e Inversiones</span>
-                    <span style="background: rgba(33, 69, 137, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800;">PRIVADO</span>
-                </div>
-            </div>
+            `;
+        }
+    }
 
-            <div class="card-snap">
-                <div>
-                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">Cuentas Compartidas</div>
-                    <div style="font-size: 32px; font-weight: 900; color: var(--primary);">${formatCurrency(sharedTotal)}</div>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F0F2F5; padding-top: 15px;">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Fondo común</span>
-                    <span style="background: rgba(16, 185, 129, 0.1); color: var(--green); padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800;">COMPARTIDO</span>
-                </div>
-            </div>
-
-            <div class="card-snap" style="background: var(--primary); color: white;">
-                <div>
-                    <div style="font-size: 11px; font-weight: 800; opacity: 0.7; text-transform: uppercase; margin-bottom: 5px;">Libertad Financiera</div>
-                    <div style="font-size: 32px; font-weight: 900;">${runway.lifestyleMonths.toFixed(1)} meses</div>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                    <span style="font-size: 12px; font-weight: 700; opacity: 0.9;">Modo Estilo de Vida</span>
-                    <span style="font-size: 18px;">🚀</span>
-                </div>
-            </div>
-
-        </div>
-
-        <div style="padding: 0 20px;">
-            <div style="font-size: 13px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 15px;">Operaciones rápidas</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <button onclick="openTransactionModal('gastos_personales')" style="background: white; border: none; padding: 15px; border-radius: 20px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 10px;">
-                    <span style="background: #FFF0F0; color: #F26464; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">-</span> Nuevo Gasto
-                </button>
-                <button onclick="openTransactionModal('ingresos')" style="background: white; border: none; padding: 15px; border-radius: 20px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 10px;">
-                    <span style="background: #E8F7F0; color: #10B981; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">+</span> Nuevo Ingreso
-                </button>
-            </div>
-        </div>
-    `;
+    // 2. LÓGICA DE DATOS SEGÚN MODO
+    const isPersonal = (mobileDashboardMode === 'personal');
+    const filteredAccounts = data.accounts.filter(a => 
+        isPersonal ? (!a.isShared && a.type !== 'Broker') : (a.isShared)
+    );
     
-    renderMobileNavigation();
+    const total = await Promise.all(filteredAccounts.map(a => calculateAccountBalance(a.name)))
+                        .then(balances => balances.reduce((a, b) => a + b, 0));
+
+    // 3. RENDERIZADO
+    container.innerHTML = `
+        <div style="padding: 20px 20px 10px 20px;">
+            <div id="mobile-alerts-container">${alertsHtml}</div>
+
+            <header style="margin-bottom: 20px;">
+                <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Balance General</div>
+                <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin: 5px 0;">Resumen</h1>
+            </header>
+
+            <div style="background: white; padding: 25px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);">
+                
+                <div class="toggle-container">
+                    <button class="toggle-btn ${isPersonal ? 'active' : ''}" onclick="updateMobileDashboardMode('personal')">Personal</button>
+                    <button class="toggle-btn ${!isPersonal ? 'active' : ''}" onclick="updateMobileDashboardMode('shared')">Compartido</button>
+                </div>
+
+                <div style="font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">
+                    ${isPersonal ? 'Mi Patrimonio Líquido' : 'Fondo Común Compartido'}
+                </div>
+                <div style="font-size: 36px; font-weight: 900; color: var(--text-primary); transition: all 0.3s ease;">
+                    ${formatCurrency(total)}
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                        ${filteredAccounts.length} cuentas conectadas
+                    </span>
+                    <i class="fas ${isPersonal ? 'fa-user' : 'fa-users'}" style="color: var(--primary); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 20px 20px 0 20px; font-size: 13px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Libertad Financiera</div>
+        <div id="runway-container-mobile"></div>
+    `;
+
+    renderMobileNavigation('dashboard');
+    renderMobileRunway(); // Función pequeña para la tarjeta de meses de vida
+}
+
+// Función para cambiar el modo y refrescar
+function updateMobileDashboardMode(mode) {
+    mobileDashboardMode = mode;
+    renderMobileDashboard();
 }
 
 function setupMobileShell() {
