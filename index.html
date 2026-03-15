@@ -2665,46 +2665,50 @@ body.privacy-mode #dashboard-runway-value {
         backdrop-filter: blur(4px);
     }
 
-  /* Estilo para los avisos de alerta */
-  .mobile-alert {
-    background: #FFF5F5;
-    border: 1px solid #FEB2B2;
-    color: #C53030;
-    padding: 12px 16px;
-    border-radius: 16px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  /* El conmutador (Pill selector) */
-  .toggle-container {
-    display: inline-flex;
-    background: #F1F4F9;
-    padding: 4px;
+  /* Selector estilo Segmented Control (iOS) */
+.toggle-wrapper {
+    background: #EEEEF0;
     border-radius: 12px;
-    margin-bottom: 15px;
-  }
+    display: flex;
+    padding: 2px;
+    margin-bottom: 20px;
+    position: relative;
+}
 
-  .toggle-btn {
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 800;
+.toggle-btn {
+    flex: 1;
     border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-  }
+    background: none;
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #636366;
+    z-index: 1;
+    transition: color 0.3s;
+    border-radius: 10px;
+}
 
-  .toggle-btn.active {
+.toggle-btn.active {
+    color: #000;
     background: white;
-    color: var(--primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+/* Mejora de los avisos */
+.mobile-alert {
+    background: #FFF2F2;
+    border-left: 4px solid #F26464;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(242, 100, 100, 0.08);
+}
+.mobile-alert i { color: #F26464; margin-top: 2px; }
+.mobile-alert-text { font-size: 13px; color: #444; line-height: 1.4; }
+.mobile-alert-text b { color: #000; }
 }
 
   </style>
@@ -10932,8 +10936,6 @@ function handleQuickAction(type) {
 // FUNCIONES EXCLUSIVAS PARA MUNDO MÓVIL
 // ==========================================
 
-let mobileDashboardMode = 'personal';
-
 function setupMobileShell() {
     // 1. Ocultamos elementos de PC
     const sidebar = document.querySelector('.sidebar');
@@ -10959,12 +10961,14 @@ function setupMobileShell() {
     if (mainContent) mainContent.style.display = 'none';
 }
 
+let mobileDashboardMode = 'personal'; // 'personal' o 'shared'
+
 async function renderMobileDashboard() {
     const data = await getData();
     const container = document.getElementById('mobile-content');
     if (!container) return;
 
-    // 1. LÓGICA DE AVISOS (Saldo negativo o bajo)
+    // 1. REVISIÓN DE AVISOS (Cualquier cuenta en negativo)
     let alertsHtml = '';
     const allAccounts = data.accounts;
     for (const acc of allAccounts) {
@@ -10972,67 +10976,94 @@ async function renderMobileDashboard() {
         if (bal < 0) {
             alertsHtml += `
                 <div class="mobile-alert">
-                    <span>⚠️</span> 
-                    <span>¡Atención! <b>${acc.name}</b> está en negativo (${formatCurrency(bal)})</span>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="mobile-alert-text">
+                        La cuenta <b>${acc.name}</b> está en negativo: <b>${formatCurrency(bal)}</b>.
+                    </div>
                 </div>
             `;
         }
     }
 
-    // 2. LÓGICA DE DATOS SEGÚN MODO
-    const isPersonal = (mobileDashboardMode === 'personal');
-    const filteredAccounts = data.accounts.filter(a => 
-        isPersonal ? (!a.isShared && a.type !== 'Broker') : (a.isShared)
-    );
+    // 2. LÓGICA DE DATOS SEGÚN MODO (Blindada)
+    const isPersonalMode = (mobileDashboardMode === 'personal');
     
-    const total = await Promise.all(filteredAccounts.map(a => calculateAccountBalance(a.name)))
-                        .then(balances => balances.reduce((a, b) => a + b, 0));
+    // Filtramos asegurando que pillamos todos los flags posibles de compartido
+    const filteredAccounts = data.accounts.filter(a => {
+        const isShared = a.isShared === true || a.is_shared === true || a.type === 'Compartida';
+        return isPersonalMode ? !isShared : isShared;
+    });
 
-    // 3. RENDERIZADO
+    // Sumamos saldos (Incluimos Brokers en personal si así lo deseas, o ajusta el filtro)
+    let total = 0;
+    for (const acc of filteredAccounts) {
+        total += await calculateAccountBalance(acc.name);
+    }
+
+    // 3. RENDERIZADO DE LA UI
     container.innerHTML = `
-        <div style="padding: 20px 20px 10px 20px;">
-            <div id="mobile-alerts-container">${alertsHtml}</div>
+        <div style="padding: 20px 20px 100px 20px;">
+            
+            ${alertsHtml}
 
-            <header style="margin-bottom: 20px;">
-                <div style="font-size: 13px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Balance General</div>
-                <h1 style="font-size: 28px; font-weight: 900; color: var(--primary); margin: 5px 0;">Resumen</h1>
+            <header style="margin-bottom: 25px;">
+                <h1 style="font-size: 28px; font-weight: 900; color: var(--primary);">Resumen</h1>
+                <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Estado de tu patrimonio</p>
             </header>
 
-            <div style="background: white; padding: 25px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);">
+            <div style="background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);">
                 
-                <div class="toggle-container">
-                    <button class="toggle-btn ${isPersonal ? 'active' : ''}" onclick="updateMobileDashboardMode('personal')">Personal</button>
-                    <button class="toggle-btn ${!isPersonal ? 'active' : ''}" onclick="updateMobileDashboardMode('shared')">Compartido</button>
+                <div class="toggle-wrapper">
+                    <button class="toggle-btn ${isPersonalMode ? 'active' : ''}" onclick="updateMobileDashboardMode('personal')">Personal</button>
+                    <button class="toggle-btn ${!isPersonalMode ? 'active' : ''}" onclick="updateMobileDashboardMode('shared')">Compartido</button>
                 </div>
 
-                <div style="font-size: 12px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px;">
-                    ${isPersonal ? 'Mi Patrimonio Líquido' : 'Fondo Común Compartido'}
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                        ${isPersonalMode ? 'Mi Patrimonio Líquido' : 'Fondo Común Compartido'}
+                    </div>
+                    <div style="font-size: 40px; font-weight: 900; color: var(--text-primary); letter-spacing: -1px;">
+                        ${formatCurrency(total)}
+                    </div>
                 </div>
-                <div style="font-size: 36px; font-weight: 900; color: var(--text-primary); transition: all 0.3s ease;">
-                    ${formatCurrency(total)}
-                </div>
-                
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
-                        ${filteredAccounts.length} cuentas conectadas
+
+                <div style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;">
+                    <span style="background: ${isPersonalMode ? '#EBF2FF' : '#E8F7F0'}; color: ${isPersonalMode ? '#214589' : '#10B981'}; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase;">
+                        ${filteredAccounts.length} Cuentas activas
                     </span>
-                    <i class="fas ${isPersonal ? 'fa-user' : 'fa-users'}" style="color: var(--primary); opacity: 0.5;"></i>
                 </div>
             </div>
-        </div>
 
-        <div style="padding: 20px 20px 0 20px; font-size: 13px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Libertad Financiera</div>
-        <div id="runway-container-mobile"></div>
+            <div id="mobile-runway-container" style="margin-top: 25px;"></div>
+        </div>
     `;
 
     renderMobileNavigation('dashboard');
-    renderMobileRunway(); // Función pequeña para la tarjeta de meses de vida
+    renderMobileRunway(); // Función que inyectará la tarjeta de supervivencia
 }
 
-// Función para cambiar el modo y refrescar
 function updateMobileDashboardMode(mode) {
     mobileDashboardMode = mode;
     renderMobileDashboard();
+}
+
+async function renderMobileRunway() {
+    const runway = await calculateRunway();
+    const container = document.getElementById('mobile-runway-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="background: var(--primary); color: white; padding: 25px; border-radius: 30px; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1;">🚀</div>
+            <div style="position: relative; z-index: 1;">
+                <div style="font-size: 11px; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Libertad Financiera</div>
+                <div style="font-size: 32px; font-weight: 900; margin: 10px 0;">${runway.lifestyleMonths.toFixed(1)} meses</div>
+                <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">
+                    Cubriendo tu estilo de vida actual
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function setupMobileShell() {
