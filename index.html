@@ -6,6 +6,7 @@
   <title>Control Financiero - App Completa</title>
   <link rel="icon" type="image/png" sizes="any" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Finanzas">
@@ -2539,11 +2540,7 @@ body.privacy-mode #dashboard-runway-value {
    1. CONFIGURACIÓN GLOBAL (FUERA DE MEDIA QUERY) 
    =================================================== */
 /* Escondemos los elementos de la App Móvil cuando estés en el ordenador */
-#mobile-root, 
-.mobile-nav, 
-.quick-actions-container, 
-.menu-overlay, 
-.nav-add-btn {
+#mobile-root, .mobile-nav, .quick-actions-container, .menu-overlay, .nav-add-btn {
     display: none !important;
 }
 
@@ -2552,25 +2549,31 @@ body.privacy-mode #dashboard-runway-value {
    =================================================== */
 @media (max-width: 768px) {
     /* Escondemos el Sidebar y el Main Content de escritorio */
+    /* --- A. ESTRUCTURA Y FIX DE SCROLL --- */
     .sidebar, .main-content { 
         display: none !important; 
     }
-    
+
     body, html { 
-        overflow-x: hidden !important; 
-        width: 100%; 
-        background-color: #F8F9FB !important; 
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden !important; 
+        background-color: #F8F9FB;
     }
 
-    /* Espaciado para que el contenido no quede debajo del menú */
-    #mobile-content {
-        min-height: 100vh;
-        padding-bottom: 120px; /* Crucial para dejar ver el final de la lista */
-    }
-
-    /* Muestra el contenedor raíz de la App Móvil */
     #mobile-root { 
-        display: block !important; 
+        display: block !important;
+        /* Usamos dvh para que el navegador móvil no corte la parte de abajo */
+        height: 100dvh; 
+        width: 100vw;
+        overflow-y: auto !important; 
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+    }
+
+    #mobile-content {
+        padding-bottom: 160px; /* Aumentamos el margen para que la tarjeta de abajo respire */
     }
 
     /* EL NUEVO CARRUSEL (Nombres nuevos para que no fallen) */
@@ -2745,6 +2748,23 @@ body.privacy-mode #dashboard-runway-value {
 .mobile-alert i { color: #F26464; margin-top: 2px; }
 .mobile-alert-text { font-size: 13px; color: #444; line-height: 1.4; }
 .mobile-alert-text b { color: #000; }
+
+.alerts-panel {
+    position: absolute;
+    top: 85px; left: 20px; right: 20px;
+    background: white;
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    z-index: 10001;
+    display: none; /* Por defecto oculto */
+    border: 1px solid #FEE2E2;
+}
+
+.alerts-panel.active { 
+    display: block !important; /* Forzamos que se vea al activarse */
+    animation: slideDown 0.3s ease; 
+}
 
 
 @keyframes slideIn {
