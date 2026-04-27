@@ -12722,49 +12722,44 @@ function renderMobileNavigation(activeView = 'dashboard') {
 // ============================================================================
 
 async function renderPublicView(userId) {
-    // 1. Limpiar el HTML para la vista de invitado
+    // Estructura básica de la página de invitado
     document.body.innerHTML = `
-        <div style="background: var(--bg-body); min-height: 100vh; padding: 40px 20px; font-family: 'Outfit', sans-serif;">
-            <div id="public-container" style="max-width: 900px; margin: 0 auto;">
-                <p style="text-align:center; color: var(--text-tertiary);">Cargando wishlist compartida...</p>
+        <div style="background: #FDFBFA; min-height: 100vh; padding: 40px 20px; font-family: 'Outfit', sans-serif;">
+            <div id="public-content" style="max-width: 800px; margin: 0 auto;">
+                <p style="text-align:center;">Cargando lista de deseos...</p>
             </div>
-        </div>`;
+        </div>
+    `;
 
-    // 2. Traer solo los deseos de ese usuario desde Supabase
-    const { data: wishes, error } = await supabaseClient
+    // Pedimos los datos a Supabase del usuario dueño de la lista
+    const { data: wishes } = await supabaseClient
         .from('wishlist')
         .select('*')
         .eq('user_id', userId);
 
-    const container = document.getElementById('public-container');
+    const container = document.getElementById('public-content');
 
-    if (error || !wishes) {
-        container.innerHTML = `<h1>Ups, no se encuentra esta lista</h1>`;
+    if (!wishes || wishes.length === 0) {
+        container.innerHTML = `<h2 style="text-align:center;">Esta lista de deseos está vacía o no existe.</h2>`;
         return;
     }
 
-    // 3. Pintar la lista (Versión simplificada, sin botones de borrar/ahorrar)
+    // Pintamos los deseos
     container.innerHTML = `
-        <h1 style="text-align:center; color: var(--text-primary); margin-bottom: 10px;">🎁 Mi Wishlist</h1>
-        <p style="text-align:center; color: var(--text-tertiary); margin-bottom: 40px;">Actualizada en tiempo real</p>
-        
-        <div class="wishlist-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <h1 style="text-align:center; color: #1A2B4D; margin-bottom: 40px;">🎁 Mi Wishlist</h1>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
             ${wishes.map(w => `
-                <div class="wish-card" style="background:white; padding:20px; border-radius:24px; border:1px solid #eee;">
-                    <span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">${w.category}</span>
-                    <h3 style="margin:12px 0; color:var(--text-primary);">${w.name}</h3>
-                    <p style="font-weight:800; color:var(--primary); font-size:18px;">${formatCurrency(w.target)}</p>
-                    
+                <div style="background:white; padding:25px; border-radius:24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #eee;">
+                    <span style="font-size:10px; font-weight:800; color:#999; text-transform:uppercase;">${w.category}</span>
+                    <h3 style="margin:10px 0; color:#1A2B4D;">${w.name}</h3>
+                    <p style="font-weight:800; color:#4F46E5; font-size:20px; margin-bottom:20px;">${formatCurrency(w.target)}</p>
                     ${w.link ? `
-                        <a href="${w.link}" target="_blank" style="display:block; margin-top:20px; text-align:center; padding:12px; background:var(--text-primary); color:white; border-radius:14px; text-decoration:none; font-weight:700;">
+                        <a href="${w.link}" target="_blank" style="display:block; text-align:center; padding:14px; background:#1A2B4D; color:white; border-radius:12px; text-decoration:none; font-weight:700;">
                             Ver artículo
                         </a>
                     ` : ''}
                 </div>
             `).join('')}
-        </div>
-        <div style="text-align:center; margin-top:60px;">
-            <a href="${window.location.origin}${window.location.pathname}" style="color:var(--text-tertiary); text-decoration:none; font-size:12px;">Crear mi propia Wishlist →</a>
         </div>
     `;
 }
@@ -12773,31 +12768,31 @@ async function renderPublicView(userId) {
   const isMobile = window.innerWidth <= 768;
 
   async function initializeApp() {
-    // 1. Detectar si es una visita pública
+    // 1. Miramos si en la URL viene el parámetro de compartir
     const urlParams = new URLSearchParams(window.location.search);
     const publicUserId = urlParams.get('public_wishlist');
 
     if (publicUserId) {
-        renderPublicView(publicUserId);
-        return; // No cargamos el resto de la app (sidebar, dashboard, etc.)
+      console.log("👀 Modo Invitado: Viendo wishlist de", publicUserId);
+      renderPublicView(publicUserId); // Función que crearemos ahora
+      return; // DETENEMOS el resto de la carga (no hace falta login)
     }
-    
+
+    // 2. Si NO es modo invitado, seguimos con la carga normal de TU app
     await checkSession();
-    
     if (!currentUser) return;
 
     const data = await initData();
     dataCache = data;
     await applyDailyInterest();
 
-    // --- CAMBIO CLAVE AQUÍ ---
-    // En lugar de llamar a renderDashboard() a piñón fijo,
-    // usamos switchView para que pinte la vista que toca.
-    // Si no hay ninguna guardada, irá al dashboard.
-    const vistaAInterrumpir = currentView || 'dashboard';
-    switchView(vistaAInterrumpir);
-    
-    console.log("App iniciada en vista:", vistaAInterrumpir);
+    const startView = currentView || 'dashboard';
+    if (isMobile) {
+      setupMobileShell();
+      switchMobileView(startView);
+    } else {
+      switchView(startView);
+    }
   }
 
   initializeApp();
