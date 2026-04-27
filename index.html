@@ -2592,57 +2592,81 @@ body.privacy-mode #dashboard-runway-value {
 }
 
 /* ===================================================
-       PRÓXIMOS RECIBOS (VERSIÓN COMPACTA/MINIMALISTA)
+       PRÓXIMOS RECIBOS (VERSIÓN PREMIUM BENTO)
        =================================================== */
        .upcoming-list-compact {
         display: flex;
         flex-direction: column;
-        gap: 8px; /* Menos espacio entre ellos */
+        gap: 12px; /* Más aire para que respiren las tarjetas */
     }
 
     .upcoming-item-compact {
-        background: transparent;
-        border-bottom: 1px solid rgba(0,0,0,0.03); /* Solo una fina línea separadora */
-        padding: 10px 4px;
+        background: var(--bg-secondary); /* Fondo gris muy clarito */
+        border: 1px solid var(--border-color);
+        padding: 12px 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: background 0.2s ease;
-        border-radius: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        border-radius: 16px; /* Bordes más suaves */
     }
 
+    /* Efecto al pasar el ratón */
     .upcoming-item-compact:hover {
-        background: rgba(0,0,0,0.01);
+        background: var(--bg-surface); /* Se vuelve blanco puro al iluminarse */
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border-color: var(--border-medium);
     }
 
-    /* Si falta saldo, le damos un ligerísimo toque rojo */
+    /* Alerta de saldo insuficiente */
     .upcoming-item-compact.alert-row {
-        background: #FFF5F5;
-        border-left: 3px solid var(--red);
-        padding-left: 12px;
-        border-bottom: none;
+        background: var(--red-bg);
+        border-color: rgba(239, 68, 68, 0.2);
     }
 
-    .ui-left { display: flex; align-items: center; gap: 12px; }
+    .ui-left { display: flex; align-items: center; gap: 14px; }
     
-    .ui-date {
-        font-size: 13px; font-weight: 800; color: var(--text-tertiary);
-        width: 24px; text-align: center;
+    /* Contenedor del logo del recibo */
+    .ui-logo-wrap {
+        width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-light);
+        font-size: 20px; /* Tamaño del icono */
+        color: var(--text-secondary);
+        flex-shrink: 0;
+        overflow: hidden; /* Por si en el futuro pones imágenes reales (<img>) */
     }
 
-    .ui-info { display: flex; align-items: center; gap: 8px; }
-    .ui-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    /* Colores automáticos para marcas conocidas */
+    .brand-netflix { color: #E50914; background: rgba(229, 9, 20, 0.1); border-color: rgba(229, 9, 20, 0.2); }
+    .brand-spotify { color: #1DB954; background: rgba(29, 185, 84, 0.1); border-color: rgba(29, 185, 84, 0.2); }
+    .brand-amazon { color: #FF9900; background: rgba(255, 153, 0, 0.1); border-color: rgba(255, 153, 0, 0.2); }
+    .brand-gym { color: var(--primary); background: var(--primary-light); }
+
+    .alert-row .ui-date {
+        background: white;
+        color: var(--red);
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+    }
+
+    .ui-info { display: flex; flex-direction: column; gap: 2px; }
+    .ui-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
     
     .ui-account {
-        font-size: 9px; font-weight: 700; text-transform: uppercase;
-        padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px;
+        font-size: 10px; font-weight: 800; text-transform: uppercase;
+        display: inline-block;
+        letter-spacing: 0.5px;
     }
-    .ui-account.personal { background: var(--bg-body); color: var(--text-secondary); }
-    .ui-account.shared { background: var(--orange-bg); color: var(--orange); }
+    
+    .ui-account.personal { color: var(--text-tertiary); }
+    .ui-account.shared { color: var(--orange); }
 
-    .ui-right { text-align: right; display: flex; align-items: center; gap: 16px; }
-    .ui-time { font-size: 11px; font-weight: 600; color: var(--text-tertiary); }
-    .ui-amount { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .ui-right { text-align: right; display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+    .ui-time { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
+    .ui-amount { font-size: 15px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
     
     .text-red { color: var(--red) !important; }
 
@@ -2714,6 +2738,98 @@ body.privacy-mode #dashboard-runway-value {
     gap: 32px;
     align-items: start;
 }
+
+
+/* ===================================================
+       TARJETAS HERO (Ultra-Limpias, sin degradados)
+       =================================================== */
+       .hero-bento-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 28px; 
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 4px 24px -8px rgba(0,0,0,0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hero-bento-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px -8px rgba(0,0,0,0.08);
+    }
+
+    /* Iconos flotantes con animación suave */
+    .hero-icon-wrap {
+        width: 44px; height: 44px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; margin-bottom: 20px;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .hero-bento-card:hover .hero-icon-wrap {
+        transform: scale(1.08) translateY(-2px);
+    }
+
+    .hero-icon-personal { background: var(--bg-surface); color: var(--primary); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+    .hero-icon-shared { background: var(--bg-surface); color: var(--orange); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+
+    /* Tipografía pulida */
+    .hero-title { font-size: 15px; font-weight: 700; color: var(--text-secondary); }
+    .hero-value { font-size: 46px; font-weight: 800; color: var(--text-primary); margin: 8px 0 0 0; letter-spacing: -1.5px; line-height: 1; }
+
+    /* ===================================================
+       EL DESGLOSE TIPO "CÁPSULA" (Punto 1)
+       =================================================== */
+    .master-bento-breakdown {
+        display: flex; gap: 32px; margin-top: 32px; 
+        padding: 16px 24px; 
+        background: var(--bg-secondary); /* Fondo gris súper sutil */
+        border: 1px solid var(--border-color); /* Borde fino contenedor */
+        border-radius: 16px; 
+    }
+
+    /* Adaptación a móvil para que no se rompa */
+    @media (max-width: 768px) {
+        .hero-bento-card { padding: 24px !important; }
+        .hero-value { font-size: 36px !important; }
+        .master-bento-breakdown { flex-direction: column; gap: 12px; margin-top: 24px; }
+    }
+
+/* ===================================================
+       TARJETAS MAESTRAS (SIMETRÍA PERFECTA)
+       =================================================== */
+       .master-bento-header {
+        font-size: 13px; font-weight: 700; color: var(--text-tertiary); 
+        text-transform: uppercase; letter-spacing: 0.5px; display: flex; 
+        align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    
+    .master-bento-value {
+        font-size: 42px; font-weight: 800; color: var(--text-primary); 
+        margin: 0 0 20px 0; font-variant-numeric: tabular-nums; 
+        line-height: 1; letter-spacing: -1px;
+    }
+    
+    /* ===================================================
+       1. EL DESGLOSE TIPO "CÁPSULA"
+       =================================================== */
+       .master-bento-breakdown {
+        display: flex; 
+        gap: 32px; 
+        margin-top: 32px; /* Empuja la cápsula hacia abajo separándola del número gigante */
+        padding: 16px 24px; 
+        background: var(--bg-secondary); /* Le da el fondo gris clarito */
+        border: 1px solid var(--border-color); /* Borde súper fino para contenerlo */
+        border-radius: 16px; /* Bordes internos redondeados */
+    }
+    
+    .mb-col { display: flex; flex-direction: column; gap: 4px; }
+    
+    .mb-label { font-size: 11px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .mb-val { font-size: 16px; color: var(--text-primary); font-weight: 800; font-variant-numeric: tabular-nums; }
 
 /* ===================================================
        MASTER KPI CARD (ULTRA-PREMIUM REVOLUT STYLE)
@@ -3026,6 +3142,138 @@ body.privacy-mode #dashboard-runway-value {
         font-variant-numeric: tabular-nums;
     }
 
+    /* ===================================================
+       LAYOUT BENTO BOX (DASHBOARD)
+       =================================================== */
+       .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 24px; /* Separación perfecta y uniforme entre tarjetas */
+        margin-bottom: 32px;
+    }
+
+    /* Estilo base para todas las "cajas" del bento (Limpias y sin animación) */
+    .bento-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Tamaños de las piezas (Desktop) */
+    .bento-full     { grid-column: span 12; } /* Ocupa todo el ancho (Patrimonio) */
+    .bento-quarter  { grid-column: span 3; }  /* Ocupa 1/4 (Ingresos, Gastos, etc.) */
+    .bento-twothirds{ grid-column: span 8; }  /* Ocupa 2/3 (Gráfica grande) */
+    .bento-onethird { grid-column: span 4; }  /* Ocupa 1/3 (Gráfica circular) */
+
+    /* Adaptación automática para Tablet/Móvil (Responsive) */
+    @media (max-width: 1024px) {
+        .bento-quarter   { grid-column: span 6; } /* Pasan a ser 2x2 en tablet */
+        .bento-twothirds { grid-column: span 12; }
+        .bento-onethird  { grid-column: span 12; }
+    }
+    @media (max-width: 768px) {
+        .bento-quarter   { grid-column: span 12; } /* 1 sola columna en móvil */
+        .bento-grid      { gap: 16px; } /* Menos separación en pantallas pequeñas */
+    }
+
+/* ===================================================
+       LAYOUT "APP CANVAS" (Estilo Isla)
+       =================================================== */
+    
+    /* El fondo de toda la pantalla ahora es gris clarito */
+    body, #app-container {
+        background-color: var(--bg-body) !important;
+    }
+
+    /* 1. Quitamos la "burbuja" al menú lateral para que se funda con el fondo */
+    .sidebar {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 24px;
+        /* Si tu sidebar tiene un margin o border-radius previo, esto lo anula: */
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    /* 2. El contenedor derecho (abarca la cabecera y la caja blanca) */
+    .right-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* 3. La nueva Barra Superior (Fondo transparente) */
+    .global-topbar {
+        height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px 0 0; /* Relleno derecho para alinear con la caja */
+        flex-shrink: 0;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    /* Icono de notificaciones */
+    .notif-bell {
+        position: relative;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-size: 20px;
+        transition: color 0.2s;
+    }
+    .notif-bell:hover { color: var(--text-primary); }
+    .notif-badge {
+        position: absolute; top: -2px; right: -2px;
+        background: var(--red); width: 8px; height: 8px; border-radius: 50%;
+        border: 2px solid var(--bg-body);
+    }
+
+    /* Botón de Perfil */
+    .user-profile-btn {
+        display: flex; align-items: center; gap: 12px; cursor: pointer;
+        padding: 6px 16px 6px 6px; border-radius: 100px;
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    .user-profile-btn:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-1px); }
+    .user-avatar { 
+        width: 32px; height: 32px; border-radius: 50%; 
+        background: var(--primary-light); color: var(--primary); 
+        display: flex; align-items: center; justify-content: center; 
+        font-weight: 800; font-size: 14px;
+    }
+
+    /* 4. EL LIENZO DE LA APP (El recuadro blanco principal) */
+    #main-content {
+        flex: 1;
+        background: var(--bg-surface); /* Fondo blanco */
+        border-radius: 32px; /* Esquinas súper redondeadas */
+        margin: 0 32px 32px 0; /* Margen derecho y abajo para que se vea el fondo */
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); /* Sombra elegante */
+        border: 1px solid var(--border-light);
+        overflow-y: auto;
+        padding: 32px; /* Espacio interior de la app */
+    }
+
+    /* Desactivar en móvil para que vuelva a pantalla completa */
+    @media (max-width: 768px) {
+        #main-content { border-radius: 0; margin: 0; border: none; padding: 16px; }
+        .global-topbar { display: none; }
+    }
+
 /* ===================================================
    1. CONFIGURACIÓN GLOBAL (FUERA DE MEDIA QUERY) 
    =================================================== */
@@ -3263,6 +3511,139 @@ body.privacy-mode #dashboard-runway-value {
 }
 }
 
+/* ===================================================
+       WISHLIST PRO (DISEÑO BENTO) - LIMPIO
+       =================================================== */
+       .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-auto-flow: dense;
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    /* Tarjeta Bento Premium */
+    .wish-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 28px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .wish-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+        border-color: var(--primary-light);
+    }
+
+    /* Tarjeta Destacada (Esencial o muy cara) */
+    .wish-card.size-large {
+        grid-column: span 2;
+        background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+    }
+
+    @media (max-width: 768px) { .wish-card.size-large { grid-column: span 1; } }
+
+    /* Cabecera de la Tarjeta */
+    .wish-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    /* Badges de Prioridad */
+    .wish-badge {
+        font-size: 10px; font-weight: 800; text-transform: uppercase;
+        padding: 6px 12px; border-radius: 100px; letter-spacing: 0.8px;
+    }
+    
+    .prio-esencial { background: #E6FFFA; color: #2C7A7B; border: 1px solid #B2F5EA; }
+    .prio-capricho { background: #FFF5F5; color: #E53E3E; border: 1px solid #FED7D7; }
+    .prio-inversion { background: #EBF8FF; color: #2B6CB0; border: 1px solid #BEE3F8; }
+
+    /* Barra de progreso de la tarjeta */
+    .wish-progress-container {
+        background: var(--bg-secondary);
+        height: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .wish-progress-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+
+    /* ===================================================
+       WISHLIST - FILTROS Y CATEGORÍAS (DISEÑO PREMIUM)
+       =================================================== */
+       .wish-tabs-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none; /* Oculta scrollbar en Firefox */
+    }
+    
+    .wish-tabs-container::-webkit-scrollbar { display: none; } /* Oculta scrollbar en Chrome/Safari */
+
+    .wish-tab {
+        padding: 8px 18px;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .wish-tab:hover:not(.active) {
+        background: var(--bg-secondary);
+        border-color: #D2D6DC;
+    }
+
+    .wish-tab.active {
+        background: var(--text-primary);
+        color: white;
+        border-color: var(--text-primary);
+    }
+
+    /* Botón sutil de borrar categoría (la "X") */
+    .wish-tab-delete {
+        display: flex; align-items: center; justify-content: center;
+        width: 18px; height: 18px; border-radius: 50%;
+        font-size: 10px; color: #A0AEC0; transition: all 0.2s;
+    }
+    
+    .wish-tab.active .wish-tab-delete { color: rgba(255,255,255,0.6); }
+    .wish-tab.active .wish-tab-delete:hover { background: rgba(255,255,255,0.2); color: white; }
+    .wish-tab:not(.active) .wish-tab-delete:hover { background: #FFF5F5; color: #E53E3E; }
+
+    /* Botón de añadir nueva categoría */
+    .wish-tab-add {
+        border: 1px dashed #CBD5E0;
+        color: var(--text-tertiary);
+    }
+    .wish-tab-add:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(var(--primary-rgb), 0.05);
+    }
 
   </style>
 </head>
@@ -3296,244 +3677,194 @@ body.privacy-mode #dashboard-runway-value {
   
       <aside class="sidebar">
         <div class="sidebar-logo">
-          <img src="favicon.png" alt="Logo" class="sidebar-logo-img">
+            <img src="favicon.png" alt="Logo" class="sidebar-logo-img">
         </div>
     
         <div class="nav-section-title">Principal</div>
-        
-        <button class="nav-item nav-btn active" data-view="dashboard">
+        <button class="nav-item nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             <span>Resumen</span>
         </button>
-        
-        <button class="nav-item nav-btn" data-view="monthly">
+        <button class="nav-item nav-btn" data-view="monthly" onclick="switchView('monthly')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             <span>Mes actual</span>
         </button>
-        
-        <button class="nav-item nav-btn" data-view="accounts">
+        <button class="nav-item nav-btn" data-view="accounts" onclick="switchView('accounts')">
             <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             <span>Mis Cuentas</span>
         </button>
         
-        <button class="nav-item nav-btn" data-view="budgets">
-            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-            <span>Presupuestos y Metas</span>
+        <button class="nav-item nav-btn" data-view="wishlist" onclick="switchView('wishlist')">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11h10M7 7h10M7 15h10"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+            <span>Wishlist</span>
         </button>
-        
-        <button class="nav-item nav-btn" data-view="search">
+    
+        <button class="nav-item nav-btn" data-view="travels" onclick="switchView('travels')">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3.5S19 4 17.5 5.5L14 9l-8.2-1.8L3 10l7.5 3L13.5 21l3-2.8z"></path></svg>
+            <span>Viajes</span>
+        </button>
+    
+        <button class="nav-item nav-btn" data-view="search" onclick="switchView('search')">
             <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <span>Buscador</span>
         </button>
     
         <div class="nav-section-title">Patrimonio</div>
-        
-        <button class="nav-item nav-btn" data-view="inversiones">
+        <button class="nav-item nav-btn" data-view="inversiones" onclick="switchView('inversiones')">
             <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
             <span>Inversiones</span>
         </button>
     
         <div class="settings-dock">
-            
             <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-              
-              <button class="icon-action-btn" onclick="toggleDarkMode()" title="Modo Oscuro">
-                  <svg class="nav-icon" viewBox="0 0 24 24" id="dark-mode-icon-svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-              </button>
-              
-              <button class="icon-action-btn" onclick="switchView('settings')" title="Ajustes">
-                  <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              </button>
-              
-              <button class="icon-action-btn" onclick="togglePrivacyMode()" title="Modo Privacidad">
-                <svg id="privacy-icon-svg" class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
-
-            <div id="user-profile-btn" onclick="openAuthModal()" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px; border-radius: 12px; transition: background 0.2s;">
-                <div class="sidebar-avatar">
-                    <span id="sidebar-initials">J</span>
-                </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 2px;" id="sidebar-name">Jesús</div>
-                    <div style="font-size: 11px; font-weight: 500; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="sidebar-email">jesus@sunday.com</div>
-                </div>
+              <button class="icon-action-btn" onclick="toggleDarkMode()" title="Modo Oscuro"><svg class="nav-icon" viewBox="0 0 24 24" id="dark-mode-icon-svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+              <button class="icon-action-btn" onclick="switchView('settings')" title="Ajustes"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+              <button class="icon-action-btn" onclick="togglePrivacyMode()" title="Modo Privacidad"><svg id="privacy-icon-svg" class="nav-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
             </div>
         </div>
     </aside>
+
+      <div class="right-wrapper">
+
+          <header class="global-topbar">
+              
+              <div id="dashboard-achievements" style="margin-right: auto;"></div>
+              
+              <div class="notif-bell">
+                  <i class="fas fa-bell"></i>
+                  <div class="notif-badge"></div>
+              </div>
+
+              <div class="topbar-profile-btn" onclick="openAuthModal()">
+                  <div class="sidebar-avatar" style="width: 34px; height: 34px;">
+                      <span id="sidebar-initials">J</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column;">
+                      <span style="font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2;" id="sidebar-name">Mi Cuenta</span>
+                      <span style="font-size: 10px; font-weight: 500; color: var(--text-tertiary);" id="sidebar-email">jesus@sunday.com</span>
+                  </div>
+                  <i class="fas fa-chevron-down" style="font-size: 11px; color: var(--text-tertiary); margin-left: 6px;"></i>
+              </div>
+          </header>
     
       <main class="main-content">
 
-    <!-- Dashboard View -->
-    <div id="dashboard-view" class="view active">
-      <header class="header">
-        <div class="dashboard-header-row" style="width: 100%;">
-          <div>
-            <h1 class="page-title" style="margin:0;">Sunday Money Club</h1>
-            <p class="page-subtitle" style="margin-top: 4px;">Tu resumen financiero</p>
-          </div>
-          
-          <div id="dashboard-achievements"></div>
-        </div>
-      </header>
-
-      <div id="dashboard-budget-alerts" style="margin-bottom: 24px; display: none;">
-        <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
-            ⚠️ Avisos de Control
-        </div>
-        <div id="alerts-list"></div>
-      </div>
-
-      <div id="dashboard-active-travel" style="margin-bottom: 24px; display: none;"></div>
-
-      <div id="dashboard-upcoming-expenses" style="margin-bottom: 32px; display: none;">
-        <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-left: 4px;">
-            Próximos Recibos
-        </div>
-        <div id="upcoming-list" class="upcoming-list-compact"></div>
-      </div>
-
-      <div class="master-kpi-card">
-        
-        <div class="mk-section">
-          <div>
-            <div class="mk-header">
-              <div class="mk-icon-wrap blue">
-                <i class="fas fa-wallet"></i>
-              </div>
-              <div class="mk-title">
-                Patrimonio Personal
-                <span class="tooltip">ⓘ<span class="tooltip-text">Tus ahorros e inversiones individuales.</span></span>
+        <div id="dashboard-view" class="view active">
+          <header class="header">
+            <div class="dashboard-header-row" style="width: 100%;">
+              <div>
+                <h1 class="page-title" style="margin:0;">Sunday Money Club</h1>
+                <p class="page-subtitle" style="margin-top: 4px;">Tu resumen financiero</p>
               </div>
             </div>
-            <div class="mk-value" id="dashboard-total-patrimony">0,00 €</div>
-          </div>
-          <div class="mk-footer">
-            <div class="mk-footer-row">
-              <span class="mk-footer-label">Cuentas corrientes</span>
-              <span class="mk-footer-val" id="dashboard-normal-total">0,00 €</span>
+          </header>
+    
+          <div id="dashboard-budget-alerts" style="margin-bottom: 24px; display: none;">
+            <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; padding-left: 8px;">
+                ⚠️ Avisos de Control
             </div>
-            <div class="mk-footer-row">
-              <span class="mk-footer-label">Cartera de inversión</span>
-              <span class="mk-footer-val" id="dashboard-investments-total">0,00 €</span>
-            </div>
+            <div id="alerts-list"></div>
           </div>
-        </div>
-
-        <div class="mk-section clickable" id="shared-kpi-card" onclick="openSharedAnalysis()">
-          <div>
-            <div class="mk-header">
-              <div class="mk-icon-wrap orange">
-                <i class="fas fa-users"></i>
+    
+          <div id="dashboard-active-travel" style="margin-bottom: 24px; display: none;"></div>
+    
+          <div class="bento-grid">
+    
+            <div class="bento-full" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                
+              <div class="hero-bento-card hero-personal">
+                  <div>
+                      <div class="hero-icon-wrap hero-icon-personal">
+                          <i class="fas fa-wallet"></i>
+                      </div>
+                      <div class="hero-title">Patrimonio Personal</div>
+                      <div id="dashboard-total-patrimony" class="hero-value">0,00 €</div>
+                  </div>
+                  
+                  <div class="master-bento-breakdown">
+                      <div class="mb-col">
+                          <div class="mb-label">Cuentas Corrientes</div>
+                          <div id="dashboard-normal-total" class="mb-val">0,00 €</div>
+                      </div>
+                      <div class="mb-col">
+                          <div class="mb-label">Inversiones</div>
+                          <div id="dashboard-investments-total" class="mb-val">0,00 €</div>
+                      </div>
+                  </div>
               </div>
-              <div class="mk-title">Cuentas Compartidas</div>
-            </div>
-            <div class="mk-value" id="dashboard-shared-total">0,00 €</div>
-          </div>
-          <div class="mk-footer" id="dashboard-shared-breakdown">
-            </div>
-        </div>
-
-        <div class="mk-section clickable" id="runway-card" onclick="showRunwayDetails()">
-          <div>
-            <div class="mk-header">
-              <div class="mk-icon-wrap green">
-                <i class="fas fa-shield-alt"></i>
+  
+              <div class="hero-bento-card hero-shared clickable" onclick="openSharedAnalysis()">
+                  <div>
+                      <div class="hero-icon-wrap hero-icon-shared">
+                          <i class="fas fa-users"></i>
+                      </div>
+                      <div class="hero-title">Cuentas Compartidas</div>
+                      <div id="dashboard-shared-total" class="hero-value">0,00 €</div>
+                  </div>
+                  
+                  <div id="dashboard-shared-breakdown" class="master-bento-breakdown"></div>
               </div>
-              <div class="mk-title">
-                Fondo Supervivencia
-                <span class="tooltip">ⓘ<span class="tooltip-text">Meses que podrías vivir manteniendo tu gasto medio.</span></span>
+          </div>
+    
+            <div class="bento-card bento-quarter">
+              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Ingresos Mes</div>
+              <div class="kpi-value" style="color: var(--green); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-income">0,00 €</div>
+            </div>
+            
+            <div class="bento-card bento-quarter">
+              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Gastos Mes</div>
+              <div class="kpi-value" style="color: var(--red); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-expenses">0,00 €</div>
+            </div>
+            
+            <div class="bento-card bento-quarter">
+              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Inversiones</div>
+              <div class="kpi-value" style="color: var(--primary); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-investments">0,00 €</div>
+            </div>
+            
+            <div class="bento-card bento-quarter">
+              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Ahorro Neto <span class="tooltip">ⓘ<span class="tooltip-text">Ingresos menos gastos e inversiones.</span></span></div>
+              <div class="kpi-value" style="color: var(--text-primary); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-savings">0,00 €</div>
+            </div>
+    
+            <div class="bento-card bento-twothirds">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                  <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-secondary);">Evolución de Gastos</h3>
+                  <div class="tabs" style="margin: 0;">
+                    <button onclick="updateEvolutionChart('personal')" id="btn-ev-personal" class="active">Personales</button>
+                    <button onclick="updateEvolutionChart('shared')" id="btn-ev-shared">Compartidos</button>
+                  </div>
+                </div>
+                <div style="height: 300px; position: relative;">
+                  <canvas id="evolutionChart"></canvas>
+                </div>
+                <div id="chart-legend" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px;"></div>
+            </div>
+    
+            <div class="bento-card bento-onethird">
+                <h3 style="margin: 0 0 24px 0; font-size: 16px; font-weight: 700; color: var(--text-secondary);">Distribución Actual</h3>
+                <div style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;">
+                  <canvas id="distribution-chart"></canvas>
+                </div>
+            </div>
+    
+            <div class="bento-card bento-twothirds">
+                <h3 style="margin: 0 0 24px 0; font-size: 16px; font-weight: 700; color: var(--text-secondary);">Evolución de Inversiones</h3>
+                <div style="height: 250px; position: relative;">
+                  <canvas id="patrimony-chart"></canvas>
+                </div>
+            </div>
+    
+            <div id="dashboard-upcoming-expenses" class="bento-card bento-onethird" style="display: flex; flex-direction: column; justify-content: flex-start; padding: 28px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                  <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-secondary);">Próximos Recibos</h3>
+                  <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-tertiary);">
+                      <i class="fas fa-calendar-alt"></i>
+                  </div>
               </div>
-            </div>
-            <div class="mk-value" id="dashboard-runway-value">0 meses</div>
+              <div id="upcoming-list" class="upcoming-list-compact" style="flex-grow: 1; overflow-y: auto; max-height: 250px; padding-right: 8px;"></div>
           </div>
-          <div class="mk-footer">
-            <div id="runway-survival-mode" class="mk-footer-row" style="margin-bottom: 4px; color: var(--text-secondary); font-weight: 500;"></div>
-            <div style="font-size: 11px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">
-              Ver desglose <span class="mk-arrow">→</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Gasto por categorias -->
-      <div class="section" style="margin-top: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <h3 class="modal-title" style="margin: 0; font-size: 18px;">Evolución de Gastos</h3>
-          <div class="tabs">
-            <button onclick="updateEvolutionChart('personal')" id="btn-ev-personal" class="active">Personales</button>
-            <button onclick="updateEvolutionChart('shared')" id="btn-ev-shared">Compartidos</button>
-          </div>
-        </div>
-        <div style="height: 300px; position: relative;">
-          <canvas id="evolutionChart"></canvas>
-        </div>
-        <div id="chart-legend" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px;"></div>
-      </div>
-
-      <!-- Evolución del Mes Actual -->
-      <div class="section" style="margin-bottom: 32px;">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>📊</span>
-            Evolución del Mes Actual
-          </h2>
-          <span id="dashboard-current-month" style="font-size: 14px; color: var(--text-tertiary);"></span>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div class="kpi-card">
-            <div class="kpi-label">Ingresos</div>
-            <div class="kpi-value" style="color: var(--green);" id="dashboard-month-income">0,00 €</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Gastos</div>
-            <div class="kpi-value" style="color: var(--red);" id="dashboard-month-expenses">0,00 €</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Inversiones</div>
-            <div class="kpi-value" style="color: var(--purple);" id="dashboard-month-investments">0,00 €</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">
-              Ahorro Neto
-              <span class="tooltip">ⓘ
-                <span class="tooltip-text">Tus ingresos menos tus gastos totales e inversiones de este mes.</span>
-              </span>
-            </div>
-            <div class="kpi-value" id="dashboard-month-savings">0,00 €</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Gráficos en Grid -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-        
-        <!-- Evolución Anual -->
-        <div class="section">
-            <div class="section-header">
-              <h2 class="section-title">Evolución de Inversiones 2026</h2>
-            </div>
-            <div style="height: 250px; position: relative;">
-              <canvas id="patrimony-chart"></canvas>
-            </div>
-          </div>
-
-        <!-- Distribución -->
-        <div class="section">
-            <div class="section-header">
-              <h2 class="section-title">Distribución del Patrimonio</h2>
-            </div>
-            <div style="height: 250px; position: relative;">
-              <canvas id="distribution-chart"></canvas>
-            </div>
-          </div>
-
-      </div>
-    </div>
+    
+          </div> </div>
 
     <!-- Monthly View -->
     <div id="monthly-view" class="view">
@@ -3874,42 +4205,42 @@ body.privacy-mode #dashboard-runway-value {
       </section>
     </div>
 
-    <div id="budgets-view" class="view">
-      <header class="header">
-        <div>
-          <h1 class="page-title">Metas y Control</h1>
-          <p class="page-subtitle">Gestiona tus límites mensuales y tus proyectos de ahorro</p>
-        </div>
-      </header>
-
-      <section>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
-          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">📉 Presupuestos por Categoría</div>
-          <button class="add-btn" onclick="openBudgetModal()">+ Nuevo Límite</button>
-        </div>
-        <div id="budgets-list" class="budget-grid"></div>
-      </section>
-
-      <section class="section" style="margin-top: 60px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 48px;">        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 8px;">
-          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">✈️ Planificador de Viajes</div>
-          <button class="add-btn" onclick="openTravelModal()">+ Nuevo Viaje</button>
-        </div>
-        <div id="travel-plans-list" class="budget-grid">
-            </div>
-      </section>
-    
-      <section class="section" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 48px;">
-        <div class="savings-header">
-          <div style="font-size: 12px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">
-            🎯 Mis Proyectos de Ahorro
+    <div id="wishlist-view" class="view">
+      <header class="header" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 16px; flex-wrap: wrap;">
+              <div>
+                  <h1 class="page-title">Wishlist</h1>
+                  <p class="page-subtitle">Tus deseos filtrados por prioridad</p>
+              </div>
+              
+              <div style="display: flex; gap: 12px; align-items: center;">
+                  <button id="btn-share-wishlist" onclick="shareWishlist('todos')" style="background: white; border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 16px; border-radius: 100px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                      <i class="fas fa-arrow-up-from-bracket"></i> <span id="share-text">Compartir Todo</span>
+                  </button>
+                  <button class="add-btn" onclick="openWishModal()" style="border-radius: 100px;">
+                      + Nuevo Deseo
+                  </button>
+              </div>
           </div>
-          <button class="add-btn" onclick="openGoalModal()">+ Nuevo Proyecto</button>
-        </div>
-        
-        <div id="goals-list-container" class="savings-grid"></div>
-      </section>
-      
-    </div>
+      </header>
+  
+      <div id="wishlist-container"></div>
+  </div>
+  
+  <div id="travels-view" class="view">
+      <header class="header">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div>
+                  <h1 class="page-title">Mis Viajes</h1>
+                  <p class="page-subtitle">Planifica y ahorra para tus próximas aventuras</p>
+              </div>
+              <button class="add-btn" onclick="openTravelModal()">+ Nuevo Viaje</button>
+          </div>
+      </header>
+  
+      <div id="travel-plans-list" class="budget-grid">
+          </div>
+  </div>
 
     <div id="search-view" class="view">
       <header class="header">
@@ -4284,6 +4615,52 @@ body.privacy-mode #dashboard-runway-value {
 
     </div>
   </div>
+
+  <div class="modal-overlay" id="wish-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Nuevo Deseo Estratégico</h3>
+            <button class="close-btn" onclick="closeWishModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label>¿Qué quieres comprar?</label>
+                    <input type="text" id="wish-name" class="modal-input" placeholder="Ej: PlayStation 6, Sofá nuevo...">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label>Precio (€)</label>
+                        <input type="number" id="wish-target" class="modal-input" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="wish-category" class="modal-input">
+                            </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Link del producto (opcional)</label>
+                      <input type="url" id="wish-link" placeholder="https://amazon.es/..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Prioridad Estratégica</label>
+                    <select id="wish-priority" class="modal-input">
+                        <option value="Esencial">Esencial (Necesidad real)</option>
+                        <option value="Capricho">Capricho (Deseo personal)</option>
+                        <option value="Inversion">Inversión (Productividad)</option>
+                    </select>
+                </div>
+                
+                <button onclick="saveNewWish()" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                    Guardar en la Wishlist
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
   <!-- Loan Modal -->
@@ -4987,112 +5364,147 @@ body.privacy-mode #dashboard-runway-value {
 
     // Initialize data structure
     async function initData() {
-      try {
-        // Solo obtenemos los datos, sin intentar crear nada si está vacío
-        const data = await getData();
-        return data;
-      } catch (error) {
-        console.error('Error initializing data:', error);
-        showToast('Error al inicializar datos', 'error');
-        return { 
-          accounts: [], transactions: [], holdings: [], transfers: [], 
-          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
-          monthlyPatrimony: {}, customCategories: {} 
-        };
+      const cached = localStorage.getItem('dataCache');
+      if (cached) {
+          dataCache = JSON.parse(cached);
+          
+          // --- CORRECCIÓN: Pasamos 'true' para forzar la descarga real ---
+          getData(true).then(freshData => {
+              if (freshData) {
+                  dataCache = freshData;
+                  localStorage.setItem('dataCache', JSON.stringify(freshData));
+                  
+                  // Forzamos el repintado si el usuario está en la Wishlist
+                  if (currentView === 'wishlist') {
+                      renderWishlist();
+                  }
+              }
+          });
+          return dataCache;
       }
+      return await getData();
     }
 
-    async function getData() {
-      if (dataCache) return dataCache;
+    async function getData(forceRefresh = false) {
+      // Si ya hay datos y NO estamos forzando un refresco, devolvemos el caché
+      if (dataCache && !forceRefresh) return dataCache;
+
       if (!currentUser) {
         return { 
           accounts: [], transactions: [], holdings: [], transfers: [], 
           contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
-          monthlyPatrimony: {}, customCategories: {}, budgets: [], 
-          holdingsHistory: [], savingGoals: [] 
+          monthlyPatrimony: {}, customCategories: [], budgets: [], 
+          holdingsHistory: [], savingGoals: [], wishlist: [] 
         };
       }
       
       try {
-        // 1. AÑADIMOS 'saving_goals' A LA CONSULTA MULTIPLE
-        const [
-          accountsRes, transactionsRes, holdingsRes, transfersRes, 
-          contributionsRes, fixedExpensesRes, fixedExpensesPaidRes, 
-          monthlyPatrimonyRes, customCategoriesRes, budgetsRes, 
-          holdingsHistoryRes, savingGoalsRes
-        ] = await Promise.all([
-          supabaseClient.from('accounts').select('*').order('name'),
-          supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
-          supabaseClient.from('holdings').select('*').order('name'),
-          supabaseClient.from('transfers').select('*').order('date', { ascending: false }),
-          supabaseClient.from('contributions').select('*'),
-          supabaseClient.from('fixed_expenses').select('*').order('name'),
-          supabaseClient.from('fixed_expenses_paid').select('*'),
-          supabaseClient.from('monthly_patrimony').select('*'),
-          supabaseClient.from('custom_categories').select('*'),
-          supabaseClient.from('budgets').select('*'),
-          supabaseClient.from('holdings_history').select('*').order('date', { ascending: true }),
-          supabaseClient.from('saving_goals').select('*') // <-- NUEVA TABLA
-        ]);
+        // 1. CARGA INTELIGENTE (Tu lógica robusta de promesas)
+        const queries = {
+          accounts: supabaseClient.from('accounts').select('*').order('name'),
+          transactions: supabaseClient.from('transactions').select('*').order('date', { ascending: false }),
+          holdings: supabaseClient.from('holdings').select('*').order('name'),
+          transfers: supabaseClient.from('transfers').select('*').order('date', { ascending: false }),
+          contributions: supabaseClient.from('contributions').select('*'),
+          fixedExpenses: supabaseClient.from('fixed_expenses').select('*').order('name'),
+          fixedExpensesPaid: supabaseClient.from('fixed_expenses_paid').select('*'),
+          monthlyPatrimony: supabaseClient.from('monthly_patrimony').select('*'),
+          customCategories: supabaseClient.from('custom_categories').select('*'),
+          budgets: supabaseClient.from('budgets').select('*'),
+          holdingsHistory: supabaseClient.from('holdings_history').select('*').order('date', { ascending: true }),
+          wishlist: supabaseClient.from('wishlist').select('*')
+        };
 
-        // 2. FILTRADO DE SEGURIDAD (Cuentas propias o compartidas)
-        const validAccounts = (accountsRes.data || []).filter(a => 
+        const results = {};
+        const keys = Object.keys(queries);
+        
+        const responses = await Promise.all(keys.map(async (key) => {
+          try {
+            const res = await queries[key];
+            return res;
+          } catch (e) {
+            return { error: e };
+          }
+        }));
+
+        responses.forEach((res, index) => {
+          if (res.error || !res.data) {
+            console.warn(`⚠️ Aviso: No se pudo cargar la tabla '${keys[index]}'. Motivo:`, res.error);
+            results[keys[index]] = [];
+          } else {
+            results[keys[index]] = res.data;
+          }
+        });
+
+        // 2. FILTRADOS DE SEGURIDAD (Mantenemos tus filtros originales)
+        const validAccounts = results.accounts.filter(a => 
           a.user_id === currentUser.id || a.is_shared === true || a.is_shared === 'true' || a.isShared === true
         );
-
         const validAccountNames = validAccounts.map(a => a.name);
 
-        // 3. FILTRADO DE MOVIMIENTOS (MODIFICADO PARA VER INGRESOS DE AMBOS)
-        const validTransactions = (transactionsRes.data || []).filter(t => 
-          // Permitimos la transacción si:
-          validAccountNames.includes(t.account) || // Es de una cuenta que puedo ver
-          t.type === 'ingresos'                   // O es un ingreso (para calcular el esfuerzo)
+        const validTransactions = results.transactions.filter(t => 
+          validAccountNames.includes(t.account) || t.type === 'ingresos'
         );
-        const validHoldings = (holdingsRes.data || []).filter(h => validAccountNames.includes(h.account));
-        const validTransfers = (transfersRes.data || []).filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
-        const validFixedExpenses = (fixedExpensesRes.data || []).filter(f => validAccountNames.includes(f.account));
-        const validCategories = (customCategoriesRes.data || []).filter(c => c.user_id === currentUser.id);
-        const validBudgets = (budgetsRes.data || []).filter(b => b.user_id === currentUser.id);
-        const validSavingGoals = (savingGoalsRes.data || []).filter(g => g.user_id === currentUser.id); // <-- FILTRO METAS
+        const validHoldings = results.holdings.filter(h => validAccountNames.includes(h.account));
+        const validTransfers = results.transfers.filter(t => validAccountNames.includes(t.from_account) || validAccountNames.includes(t.to_account));
+        const validFixedExpenses = results.fixedExpenses.filter(f => validAccountNames.includes(f.account));
+        
+        const validCategories = results.customCategories.filter(c => c.user_id === currentUser.id);
+        const validBudgets = results.budgets.filter(b => b.user_id === currentUser.id);
+        const validWishlist = results.wishlist.filter(w => w.user_id === currentUser.id);
 
-        // 4. CONSTRUCCIÓN DEL OBJETO DE DATOS
+        // 3. CONSTRUCCIÓN DEL OBJETO DE DATOS
         const data = {
           accounts: validAccounts.map(a => ({ 
             id: a.id, name: a.name, type: a.type, color: a.color, 
             initialBalance: parseFloat(a.initial_balance), balance: parseFloat(a.initial_balance), 
             includeInPatrimony: a.include_in_patrimony, isDisposable: a.is_disposable, isShared: a.is_shared
           })),
-          transactions: validTransactions.map(t => ({ id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, file_url: t.file_url, travel_id: t.travel_id, travel_category_name: t.travel_category_name, user_id: t.user_id })),
-          holdings: validHoldings.map(h => ({ id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) })),
-          transfers: validTransfers.map(t => ({ id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept })),
-          contributions: (contributionsRes.data || []).map(c => ({ month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) })),
-          fixedExpenses: validFixedExpenses.map(f => ({ id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months, day: f.day, loan_id: f.loan_id })),
+          transactions: validTransactions.map(t => ({ 
+            id: t.id, type: t.type, date: t.date, description: t.description, category: t.category, 
+            account: t.account, amount: parseFloat(t.amount), fixedExpenseId: t.fixed_expense_id, 
+            file_url: t.file_url, travel_id: t.travel_id, travel_category_name: t.travel_category_name, user_id: t.user_id 
+          })),
+          holdings: validHoldings.map(h => ({ 
+            id: h.id, name: h.name, type: h.type, account: h.account, capital: parseFloat(h.capital), currentValue: parseFloat(h.current_value) 
+          })),
+          transfers: validTransfers.map(t => ({ 
+            id: t.id, date: t.date, from: t.from_account, to: t.to_account, amount: parseFloat(t.amount), concept: t.concept 
+          })),
+          contributions: results.contributions.map(c => ({ 
+            month: c.month_key, my: parseFloat(c.my), partner: parseFloat(c.partner), external: parseFloat(c.external) 
+          })),
+          fixedExpenses: validFixedExpenses.map(f => ({ 
+            id: f.id, name: f.name, type: f.type, category: f.category, account: f.account, amount: parseFloat(f.amount), months: f.months, day: f.day, loan_id: f.loan_id 
+          })),
           fixedExpensesPaid: {}, 
           monthlyPatrimony: {}, 
-          customCategories: {},
+          customCategories: validCategories,
           budgets: validBudgets, 
-          holdingsHistory: holdingsHistoryRes.data || [],
-          savingGoals: validSavingGoals // <-- INYECTAR METAS EN CACHÉ
+          holdingsHistory: results.holdingsHistory,
+          wishlist: validWishlist, 
+          savingGoals: [] 
         };
 
-        // 5. MAPEO DE TABLAS AUXILIARES
-        (fixedExpensesPaidRes.data || []).forEach(item => { 
+        // 4. MAPEO DE TABLAS AUXILIARES
+        results.fixedExpensesPaid.forEach(item => { 
           if (!data.fixedExpensesPaid[item.month_key]) data.fixedExpensesPaid[item.month_key] = []; 
           data.fixedExpensesPaid[item.month_key].push(item.fixed_expense_id); 
         });
 
-        (monthlyPatrimonyRes.data || []).forEach(item => { 
+        results.monthlyPatrimony.forEach(item => { 
           data.monthlyPatrimony[item.month_key] = parseFloat(item.value); 
         });
 
-        // Cargar categorías personalizadas
-        (customCategoriesRes.data || []).forEach(item => {
-          if (item.categories && CATEGORIES[item.type]) {
+        // 5. SINCRONIZACIÓN DE CATEGORÍAS (Corregido para que no ignore la wishlist)
+        validCategories.forEach(item => {
+          // Si el tipo no existe en el objeto global, lo creamos dinámicamente
+          if (item.categories) {
             CATEGORIES[item.type] = item.categories;
           }
         });
 
-        // Actualizar globales
+        // 6. ACTUALIZAR VARIABLES GLOBALES DE CUENTAS
         if (data.accounts.length > 0) { 
           ACCOUNTS.length = 0; 
           data.accounts.forEach(acc => { 
@@ -5103,16 +5515,11 @@ body.privacy-mode #dashboard-runway-value {
         }
 
         dataCache = data;
+        localStorage.setItem('dataCache', JSON.stringify(data)); 
         return data;
       } catch (error) {
         console.error('Error loading data:', error);
-        showToast('Error al cargar datos', 'error');
-        return { 
-          accounts: [], transactions: [], holdings: [], transfers: [], 
-          contributions: [], fixedExpenses: [], fixedExpensesPaid: {}, 
-          monthlyPatrimony: {}, customCategories: {}, budgets: [], 
-          holdingsHistory: [], savingGoals: [] 
-        };
+        return { accounts: [], transactions: [], wishlist: [] /* ... */ };
       }
     }
 
@@ -5314,9 +5721,9 @@ body.privacy-mode #dashboard-runway-value {
     if (sharedBreakdownEl) {
       sharedBreakdownEl.innerHTML = sharedBalances.length > 0 ? 
         sharedBalances.map(item => `
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-secondary);">${item.name}</span>
-            <span style="font-weight: 700;">${formatCurrency(item.balance)}</span>
+          <div class="mb-col">
+            <div class="mb-label">${item.name}</div>
+            <div class="mb-val">${formatCurrency(item.balance)}</div>
           </div>`).join('') : '';
     }
 
@@ -6562,7 +6969,7 @@ async function showPersonalExpensesBreakdown() {
         if (view === 'accounts') await renderAccountsView();
         if (view === 'settings') await renderSettingsView();
         if (view === 'accounts') await renderAccountsView();
-        if (view === 'budgets') {
+        if (view === 'budgets') renderWishlist();{
           await renderBudgetsView();
           await renderSavingGoals();
           await renderTravelPlans(); // NUEVO: Carga los viajes
@@ -6572,39 +6979,99 @@ async function showPersonalExpensesBreakdown() {
     });
 
     function switchView(viewName) {
-  currentView = viewName;
+    console.log("🚀 [DEBUG 1] Entrando en switchView. Objetivo:", viewName);
+    
+    currentView = viewName;
 
-  // 1. Actualizar botones del Sidebar (Escritorio)
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.view === viewName) btn.classList.add('active');
-  });
+    try {
+        // 1. Actualizar botones del Sidebar (Escritorio)
+        console.log("🔍 [DEBUG 2] Actualizando clases active de los botones...");
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.view === viewName) {
+                btn.classList.add('active');
+                console.log("✅ [DEBUG 3] Botón activado:", viewName);
+            }
+        });
 
-  // 2. Actualizar botones del Menú Inferior (Móvil)
-  document.querySelectorAll('.mobile-nav-item').forEach(item => {
-    item.classList.remove('active');
-    if (item.dataset.view === viewName) item.classList.add('active');
-  });
+        // 2. Actualizar botones del Menú Inferior (Móvil) - Lo dejamos por si acaso
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.view === viewName) item.classList.add('active');
+        });
 
-  // 3. Mostrar la vista correspondiente
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const targetView = document.getElementById(`${viewName}-view`);
-  if (targetView) targetView.classList.add('active');
+        // 3. Mostrar la vista correspondiente
+        console.log("🖼️ [DEBUG 4] Cambiando visibilidad de contenedores...");
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        
+        const targetView = document.getElementById(`${viewName}-view`);
+        if (targetView) {
+            targetView.classList.add('active');
+            console.log("✅ [DEBUG 5] Contenedor HTML encontrado y activado:", `${viewName}-view`);
+        } else {
+            console.error("❌ [DEBUG 5-ERROR] No se encontró el elemento:", `${viewName}-view`);
+        }
 
-  // 4. Ejecutar renderizado según la vista
-  if (viewName === 'dashboard') renderDashboard();
-  if (viewName === 'monthly') renderMonthlyView();
-  if (viewName === 'inversiones') renderInvestmentsView();
-  if (viewName === 'accounts') renderAccountsView();
-  if (viewName === 'settings') renderSettingsView();
-  if (viewName === 'search') renderSearchView();
-  if (viewName === 'budgets') {
-    renderBudgetsView();
-    renderTravelPlans();
-  }
-  
-  // Hacer scroll al inicio de la página al cambiar de vista
-  document.querySelector('.main-content').scrollTop = 0;
+        // 4. EJECUTAR RENDERIZADO SEGÚN LA VISTA
+        console.log("🎨 [DEBUG 6] Iniciando lógica de renderizado para:", viewName);
+
+        if (viewName === 'dashboard') {
+            console.log("➡️ Ejecutando renderDashboard...");
+            renderDashboard();
+        }
+        
+        if (viewName === 'monthly') {
+            console.log("➡️ Ejecutando renderMonthlyView...");
+            renderMonthlyView();
+        }
+        
+        if (viewName === 'inversiones') {
+            console.log("➡️ Ejecutando renderInvestmentsView...");
+            renderInvestmentsView();
+        }
+        
+        if (viewName === 'accounts') {
+            console.log("➡️ Ejecutando renderAccountsView...");
+            renderAccountsView();
+        }
+        
+        if (viewName === 'settings') {
+            console.log("➡️ Ejecutando renderSettingsView...");
+            renderSettingsView();
+        }
+        
+        if (viewName === 'search') {
+            console.log("➡️ Ejecutando renderSearchView...");
+            renderSearchView();
+        }
+
+        // EL PUNTO CLAVE
+        if (viewName === 'wishlist') {
+            console.log("🎯 [DEBUG 7] ¡DIANA! Detectada vista wishlist. Llamando a renderWishlist()...");
+            
+            // Verificamos si la función existe antes de llamarla
+            if (typeof renderWishlist === 'function') {
+                renderWishlist();
+                console.log("✅ [DEBUG 8] La llamada a renderWishlist() se ha completado.");
+            } else {
+                console.error("❌ [DEBUG 8-ERROR] La función renderWishlist NO ESTÁ DEFINIDA.");
+            }
+        }
+
+        if (viewName === 'travels') {
+            console.log("➡️ Ejecutando renderTravelPlans...");
+            renderTravelPlans();
+        }
+
+        // Scroll al inicio
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) mainContent.scrollTop = 0;
+
+        console.log("🏁 [DEBUG 9] switchView ha terminado con éxito.");
+
+    } catch (error) {
+        console.error("💥 [DEBUG FATAL] Se ha producido un error dentro de switchView:", error);
+    }
 }
 
     // Close modals on overlay click
@@ -9750,7 +10217,7 @@ async function checkBudgetAlerts() {
 async function renderSavingGoals() {
     const data = await getData();
     const goals = data.savingGoals || [];
-    const container = document.getElementById('goals-list-container');
+    const container = document.getElementById('travel-plans-list');
     if (!container) return;
 
     if (goals.length === 0) {
@@ -9975,7 +10442,7 @@ async function checkLiquidityAlerts() {
     }
 }
 
-// ALERTA 12: Próximos recibos (VERSIÓN COMPACTA)
+// ALERTA 12: Próximos recibos (VERSIÓN PREMIUM BENTO CON LOGOS)
 async function renderUpcomingExpenses() {
     const data = await getData();
     const container = document.getElementById('dashboard-upcoming-expenses');
@@ -10007,7 +10474,36 @@ async function renderUpcomingExpenses() {
     });
 
     upcoming.sort((a, b) => a.nextDate - b.nextDate);
-    const top3 = upcoming.slice(0, 3);
+    const top3 = upcoming.slice(0, 5); // He subido a 5 para que la lista se vea más completa en el diseño Bento
+
+    // --- EL "BUSCADOR DE LOGOS" (Con Imágenes Reales) ---
+    const getLogoForBill = (name) => {
+        const lowerName = name.toLowerCase();
+        
+        // Función mágica que extrae el logo real de la web de la marca
+        const createLogo = (domain) => `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=128" style="width: 24px; height: 24px; border-radius: 4px; object-fit: contain;">`;
+
+        // 1. Marcas conocidas (Usa el logo real)
+        if (lowerName.includes('netflix')) return { html: createLogo('netflix.com'), class: '' };
+        if (lowerName.includes('dazn')) return { html: createLogo('dazn.com'), class: '' };
+        if (lowerName.includes('spotify')) return { html: createLogo('spotify.com'), class: '' };
+        if (lowerName.includes('amazon') || lowerName.includes('prime')) return { html: createLogo('amazon.es'), class: '' };
+        if (lowerName.includes('hbo') || lowerName.includes('max')) return { html: createLogo('max.com'), class: '' };
+        if (lowerName.includes('disney')) return { html: createLogo('disneyplus.com'), class: '' };
+        if (lowerName.includes('apple')) return { html: createLogo('apple.com'), class: '' };
+        if (lowerName.includes('icloud')) return { html: createLogo('icloud.com'), class: '' };
+        if (lowerName.includes('youtube')) return { html: createLogo('youtube.com'), class: '' };
+
+        // 2. Recibos genéricos (Sigue usando FontAwesome)
+        if (lowerName.includes('gimnasio') || lowerName.includes('gym')) return { html: '<i class="fas fa-dumbbell"></i>', class: 'brand-gym' };
+        if (lowerName.includes('internet') || lowerName.includes('movil') || lowerName.includes('fibra')) return { html: '<i class="fas fa-wifi"></i>', class: '' };
+        if (lowerName.includes('agua') || lowerName.includes('luz') || lowerName.includes('gas') || lowerName.includes('electricidad')) return { html: '<i class="fas fa-bolt"></i>', class: '' };
+        if (lowerName.includes('seguro')) return { html: '<i class="fas fa-shield-alt"></i>', class: '' };
+        if (lowerName.includes('alquiler') || lowerName.includes('hipoteca')) return { html: '<i class="fas fa-home"></i>', class: '' };
+        
+        // 3. Icono por defecto
+        return { html: '<i class="fas fa-file-invoice-dollar"></i>', class: '' };
+    };
 
     if (top3.length > 0) {
         let html = '';
@@ -10019,22 +10515,30 @@ async function renderUpcomingExpenses() {
             let timeLabel = diffDays === 0 ? 'Hoy' : (diffDays === 1 ? 'Mañana' : `En ${diffDays} d.`);
             
             const isShared = exp.account.toLowerCase().includes('pareja') || exp.account.toLowerCase().includes('compartida');
+            
+            // Buscamos el logo según el nombre que le hayas puesto al recibo
+            const logoData = getLogoForBill(exp.name);
 
             html += `
                 <div class="upcoming-item-compact ${isInsufficient ? 'alert-row' : ''}">
                     <div class="ui-left">
-                        <div class="ui-date ${isInsufficient ? 'text-red' : ''}">${exp.day || '1'}</div>
+                        
+                        <div class="ui-logo-wrap ${isInsufficient ? 'text-red' : logoData.class}" style="${isInsufficient ? 'background: white; border: none;' : ''}">
+                            ${logoData.html} </div>
+                        
                         <div class="ui-info">
                             <div class="ui-name">${exp.name}</div>
                             <div class="ui-account ${isShared ? 'shared' : 'personal'}">
-                                ${isShared ? '👥' : '👤'}
+                                ${isShared ? '👥 COMPARTIDO' : '👤 PERSONAL'}
                             </div>
                         </div>
                     </div>
                     <div class="ui-right">
+                        
                         <div class="ui-time ${isInsufficient ? 'text-red' : ''}">
-                            ${isInsufficient ? '⚠️ Falta saldo' : timeLabel}
+                            ${isInsufficient ? '⚠️ Faltan fondos' : timeLabel}
                         </div>
+                        
                         <div class="ui-amount ${isInsufficient ? 'text-red' : ''}">${formatCurrency(exp.amount)}</div>
                     </div>
                 </div>
@@ -11517,6 +12021,293 @@ function handleQuickAction(type) {
     }
 }
 
+function renderWishlist(filter = 'todos') {
+    console.log("Intentando renderizar Wishlist..."); // Debug para ver si la función se llama
+    const container = document.getElementById('wishlist-container');
+    if (!container) return;
+
+    try {
+        // 1. OBTENCIÓN DE CATEGORÍAS (Directamente de los datos de Supabase)
+        // Buscamos en dataCache.customCategories la fila de tipo 'wishlist'
+        let categories = ['Tecnología', 'Hogar', 'Viajes', 'Ropa', 'Otros']; // Fallback
+        
+        if (dataCache && dataCache.customCategories && Array.isArray(dataCache.customCategories)) {
+            // Cogemos la fila de wishlist (si hay varias, la última)
+            const wishRows = dataCache.customCategories.filter(c => c.type === 'wishlist');
+            if (wishRows.length > 0) {
+                categories = wishRows[wishRows.length - 1].categories;
+            }
+        }
+
+        // 2. OBTENCIÓN DE DESEOS
+        const wishes = (dataCache && dataCache.wishlist) ? dataCache.wishlist : [];
+        const filteredWishes = filter === 'todos' ? wishes : wishes.filter(w => w.category === filter);
+
+        // 3. GENERAR HTML DE LAS PESTAÑAS (Las pintamos SIEMPRE)
+        let tabsHtml = `
+            <div class="wish-tabs-container">
+                <button class="wish-tab ${filter === 'todos' ? 'active' : ''}" onclick="renderWishlist('todos')">
+                    Todos
+                </button>
+                ${categories.map(cat => `
+                    <button class="wish-tab ${filter === cat ? 'active' : ''}" onclick="renderWishlist('${cat}')">
+                        ${cat}
+                        ${cat !== 'Otros' ? `
+                            <span class="wish-tab-delete" onclick="event.stopPropagation(); deleteCategory('${cat}')">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        ` : ''}
+                    </button>
+                `).join('')}
+                <button class="wish-tab wish-tab-add" onclick="addCategory()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        `;
+
+        // 4. GENERAR HTML DEL GRID (Con protección total de datos)
+        let gridHtml = '';
+        if (filteredWishes.length === 0) {
+            gridHtml = `
+                <div style="text-align: center; padding: 60px 20px; border: 1px dashed var(--border-color); border-radius: 24px; margin-top: 20px;">
+                    <div style="font-size: 32px; margin-bottom: 16px;">✨</div>
+                    <h3 style="color: var(--text-secondary); margin-bottom: 8px;">No hay deseos aquí</h3>
+                    <p style="color: var(--text-tertiary); font-size: 13px;">Añade algo nuevo para empezar.</p>
+                </div>`;
+        } else {
+            gridHtml = `<div class="wishlist-grid">` + filteredWishes.map(wish => {
+                // Protegemos cada valor por si viene nulo de Supabase
+                const target = parseFloat(wish.target) || 0;
+                const saved = parseFloat(wish.saved) || 0;
+                const progress = target > 0 ? Math.min((saved / target) * 100, 100) : 0;
+                const priority = wish.priority || 'Capricho';
+                const name = wish.name || 'Sin nombre';
+                
+                // Determinamos si es tarjeta grande
+                const isLarge = (priority === 'Esencial' || target > 1000) ? 'size-large' : '';
+
+                return `
+                <div class="wish-card ${isLarge}">
+                    <div class="wish-header">
+                        <span class="wish-badge prio-${priority.toLowerCase()}">${priority}</span>
+                        <span class="wish-cat-label">${wish.category || 'Otros'}</span>
+                    </div>
+                    <div class="wish-body">
+                        <h4 class="wish-title">${name}</h4>
+                        
+                        ${wish.link ? `
+                            <a href="${wish.link}" target="_blank" rel="noopener noreferrer" 
+                              style="display: inline-flex; align-items: center; gap: 6px; color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 700; margin-bottom: 10px;">
+                                <i class="fas fa-external-link-alt"></i> Ver artículo
+                            </a>
+                        ` : ''}
+
+                        <div class="wish-price">${formatCurrency(target)}</div>
+                    </div>
+                    <div class="wish-progress-bar">
+                        <div class="wish-progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="wish-meta">
+                        <span>${progress.toFixed(0)}% ahorrado</span>
+                        <span>${formatCurrency(saved)}</span>
+                    </div>
+                    <div class="wish-actions">
+                        <button onclick="addSavingToWish('${wish.id}')" class="btn-save">+ Ahorrar</button>
+                        <button onclick="deleteWish('${wish.id}')" class="btn-delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+            }).join('') + `</div>`;
+        }
+
+        // 5. INYECCIÓN FINAL
+        container.innerHTML = tabsHtml + gridHtml;
+
+    } catch (error) {
+        // Si la función falla, ahora sabremos POR QUÉ
+        console.error("CRASH en renderWishlist:", error);
+        container.innerHTML = `<p style="color:red; padding:20px;">Error al cargar la vista. Revisa la consola (F12).</p>`;
+    }
+}
+
+// --- 3. ABRIR MODAL (Leyendo categorías reales) ---
+function openWishModal() {
+    let wishCatsRow = dataCache.customCategories.find(c => c.type === 'wishlist');
+    let wishCats = wishCatsRow ? wishCatsRow.categories : ['Tecnología', 'Hogar', 'Viajes', 'Ropa', 'Otros'];
+
+    const select = document.getElementById('wish-category');
+    if (select) {
+        select.innerHTML = wishCats.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    }
+
+    const modal = document.getElementById('wish-modal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeWishModal() {
+    const modal = document.getElementById('wish-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+// --- 1. AÑADIR UN DESEO A SUPABASE ---
+async function saveNewWish() {
+    // 1. Capturamos los valores del modal
+    const name = document.getElementById('wish-name').value;
+    const target = document.getElementById('wish-target').value;
+    const category = document.getElementById('wish-category').value;
+    const priority = document.getElementById('wish-priority').value;
+    
+    // Capturamos el nuevo campo del link
+    const linkInput = document.getElementById('wish-link');
+    const link = linkInput ? linkInput.value : '';
+
+    if (!name || !target) {
+        showToast("Por favor, rellena nombre y precio", "error");
+        return;
+    }
+
+    // 2. Creamos el objeto para Supabase
+    const newWish = {
+        user_id: currentUser.id,
+        name: name,
+        target: parseFloat(target),
+        category: category,
+        priority: priority,
+        link: link, // <--- Aquí es donde se enviaba el dato que daba error
+        saved: 0
+    };
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('wishlist')
+            .insert(newWish)
+            .select();
+
+        if (error) throw error;
+
+        // 3. Actualizamos la memoria local y cerramos modal
+        if (!dataCache.wishlist) dataCache.wishlist = [];
+        dataCache.wishlist.push(data[0]);
+        
+        closeModal('wish-modal');
+        renderWishlist();
+        showToast("✨ Deseo guardado correctamente");
+
+    } catch (error) {
+        console.error("Error al guardar deseo:", error);
+        showToast("Error al guardar en la base de datos", "error");
+    }
+}
+
+// --- 2. ELIMINAR O AÑADIR AHORRO ---
+async function deleteWish(id) {
+    if (confirm('¿Seguro que quieres eliminar este deseo?')) {
+        const { error } = await supabaseClient.from('wishlist').delete().eq('id', id);
+        
+        if (!error) {
+            dataCache.wishlist = dataCache.wishlist.filter(w => w.id !== id);
+            renderWishlist();
+            showToast('Deseo eliminado', 'success');
+        }
+    }
+}
+
+async function addSavingToWish(id) {
+    const amount = parseFloat(prompt("¿Cuánto quieres añadir a este deseo?"));
+    if (isNaN(amount) || amount <= 0) return;
+
+    const wish = dataCache.wishlist.find(w => w.id === id);
+    if (wish) {
+        const newSaved = parseFloat(wish.saved) + amount;
+        
+        // Actualizamos Supabase
+        const { error } = await supabaseClient.from('wishlist').update({ saved: newSaved }).eq('id', id);
+        
+        if (!error) {
+            wish.saved = newSaved;
+            renderWishlist();
+            showToast(`¡${formatCurrency(amount)} añadidos!`, 'success');
+        }
+    }
+}
+
+// Haz que tu función antigua llame a la nueva Wishlist
+function renderSavingsGoals() {
+    renderWishlist();
+}
+
+// --- 4. GESTIÓN DE CATEGORÍAS (Usando tu tabla custom_categories) ---
+async function addCategory() {
+    const name = prompt("Nombre de la nueva categoría:");
+    if (!name) return;
+    
+    // 1. Buscamos si ya existe la fila en el cache local
+    let wishRow = dataCache.customCategories.find(c => c.type === 'wishlist');
+    let categories = wishRow ? [...wishRow.categories] : ['Tecnología', 'Hogar', 'Viajes', 'Ropa', 'Otros'];
+    
+    if (categories.includes(name)) return showToast("La categoría ya existe", "error");
+    
+    categories.push(name);
+    
+    // 2. Guardamos en Supabase
+    if (wishRow) {
+        // Si la fila ya existe, ACTUALIZAMOS (evita crear filas infinitas)
+        const { error } = await supabaseClient
+            .from('custom_categories')
+            .update({ categories: categories })
+            .eq('id', wishRow.id);
+            
+        if (!error) wishRow.categories = categories;
+    } else {
+        // Si no existe ninguna fila, CREAMOS la primera
+        const { data, error } = await supabaseClient
+            .from('custom_categories')
+            .insert({ user_id: currentUser.id, type: 'wishlist', categories: categories })
+            .select();
+            
+        if (data) dataCache.customCategories.push(data[0]);
+    }
+    
+    renderWishlist();
+    showToast("Categoría guardada");
+}
+
+async function deleteCategory(cat) {
+    if (cat === 'Otros') return showToast("No puedes eliminar la categoría base", "error");
+    
+    if (confirm(`¿Eliminar "${cat}"? Los deseos pasarán a "Otros"`)) {
+        let wishCatsRow = dataCache.customCategories.find(c => c.type === 'wishlist');
+        if (wishCatsRow) {
+            wishCatsRow.categories = wishCatsRow.categories.filter(c => c !== cat);
+            await supabaseClient.from('custom_categories').update({ categories: wishCatsRow.categories }).eq('type', 'wishlist');
+        }
+        
+        // Mover los deseos a 'Otros' en la Base de Datos
+        await supabaseClient.from('wishlist').update({ category: 'Otros' }).eq('category', cat);
+        
+        if (dataCache.wishlist) {
+            dataCache.wishlist.forEach(w => {
+                if (w.category === cat) w.category = 'Otros';
+            });
+        }
+        
+        renderWishlist();
+        showToast('Categoría eliminada', 'success');
+    }
+}
+
+// --- FUNCIÓN COMPARTIR (Regalos) ---
+function shareWishlist() {
+    if (!currentUser) return;
+    
+    // Generamos una URL tipo: mi-app.com?public_wishlist=ID_DE_USUARIO
+    const shareUrl = `${window.location.origin}${window.location.pathname}?public_wishlist=${currentUser.id}`;
+    
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("✨ ¡Enlace de tu Wishlist (Tiempo Real) copiado!");
+    });
+}
+
 // ==========================================
 // FUNCIONES EXCLUSIVAS PARA MUNDO MÓVIL
 // ==========================================
@@ -11925,32 +12716,88 @@ function renderMobileNavigation(activeView = 'dashboard') {
     `;
 }
 
+
 // ============================================================================
 // INICIO DE LA APLICACIÓN
 // ============================================================================
+
+async function renderPublicView(userId) {
+    // 1. Limpiar el HTML para la vista de invitado
+    document.body.innerHTML = `
+        <div style="background: var(--bg-body); min-height: 100vh; padding: 40px 20px; font-family: 'Outfit', sans-serif;">
+            <div id="public-container" style="max-width: 900px; margin: 0 auto;">
+                <p style="text-align:center; color: var(--text-tertiary);">Cargando wishlist compartida...</p>
+            </div>
+        </div>`;
+
+    // 2. Traer solo los deseos de ese usuario desde Supabase
+    const { data: wishes, error } = await supabaseClient
+        .from('wishlist')
+        .select('*')
+        .eq('user_id', userId);
+
+    const container = document.getElementById('public-container');
+
+    if (error || !wishes) {
+        container.innerHTML = `<h1>Ups, no se encuentra esta lista</h1>`;
+        return;
+    }
+
+    // 3. Pintar la lista (Versión simplificada, sin botones de borrar/ahorrar)
+    container.innerHTML = `
+        <h1 style="text-align:center; color: var(--text-primary); margin-bottom: 10px;">🎁 Mi Wishlist</h1>
+        <p style="text-align:center; color: var(--text-tertiary); margin-bottom: 40px;">Actualizada en tiempo real</p>
+        
+        <div class="wishlist-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            ${wishes.map(w => `
+                <div class="wish-card" style="background:white; padding:20px; border-radius:24px; border:1px solid #eee;">
+                    <span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">${w.category}</span>
+                    <h3 style="margin:12px 0; color:var(--text-primary);">${w.name}</h3>
+                    <p style="font-weight:800; color:var(--primary); font-size:18px;">${formatCurrency(w.target)}</p>
+                    
+                    ${w.link ? `
+                        <a href="${w.link}" target="_blank" style="display:block; margin-top:20px; text-align:center; padding:12px; background:var(--text-primary); color:white; border-radius:14px; text-decoration:none; font-weight:700;">
+                            Ver artículo
+                        </a>
+                    ` : ''}
+                </div>
+            `).join('')}
+        </div>
+        <div style="text-align:center; margin-top:60px;">
+            <a href="${window.location.origin}${window.location.pathname}" style="color:var(--text-tertiary); text-decoration:none; font-size:12px;">Crear mi propia Wishlist →</a>
+        </div>
+    `;
+}
 
   // Variable global para saber en qué mundo estamos
   const isMobile = window.innerWidth <= 768;
 
   async function initializeApp() {
+    // 1. Detectar si es una visita pública
+    const urlParams = new URLSearchParams(window.location.search);
+    const publicUserId = urlParams.get('public_wishlist');
+
+    if (publicUserId) {
+        renderPublicView(publicUserId);
+        return; // No cargamos el resto de la app (sidebar, dashboard, etc.)
+    }
+    
     await checkSession();
     
-    // Si no hay usuario, el sistema de sesión ya muestra el muro de login, no hacemos nada más.
     if (!currentUser) return;
 
     const data = await initData();
     dataCache = data;
     await applyDailyInterest();
 
-    if (isMobile) {
-      // --- MUNDO MÓVIL ---
-      setupMobileShell();     // Crea la estructura limpia de App
-      renderMobileDashboard(); // Pinta el contenido inicial móvil
-    } else {
-      // --- MUNDO ESCRITORIO ---
-      // Tu lógica de siempre
-      await renderDashboard();
-    }
+    // --- CAMBIO CLAVE AQUÍ ---
+    // En lugar de llamar a renderDashboard() a piñón fijo,
+    // usamos switchView para que pinte la vista que toca.
+    // Si no hay ninguna guardada, irá al dashboard.
+    const vistaAInterrumpir = currentView || 'dashboard';
+    switchView(vistaAInterrumpir);
+    
+    console.log("App iniciada en vista:", vistaAInterrumpir);
   }
 
   initializeApp();
