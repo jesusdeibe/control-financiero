@@ -4643,6 +4643,10 @@ body.privacy-mode #dashboard-runway-value {
                       <label>Link del producto (opcional)</label>
                       <input type="url" id="wish-link" placeholder="https://amazon.es/..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
                   </div>
+                  <div class="form-group">
+                    <label>URL de la Imagen (opcional)</label>
+                    <input type="url" id="wish-image" placeholder="https://.../imagen.jpg" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -12088,6 +12092,11 @@ function renderWishlist(filter = 'todos') {
 
                 return `
                 <div class="wish-card ${isLarge}">
+                    ${wish.image_url ? `
+                        <div class="wish-image-container" style="width: 100%; height: 160px; margin-bottom: 15px; border-radius: 18px; overflow: hidden; background: #f5f5f5;">
+                            <img src="${wish.image_url}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
+                        </div>
+                    ` : ''}
                     <div class="wish-header">
                         <span class="wish-badge prio-${priority.toLowerCase()}">${priority}</span>
                         <span class="wish-cat-label">${wish.category || 'Otros'}</span>
@@ -12156,6 +12165,7 @@ async function saveNewWish() {
     const target = document.getElementById('wish-target').value;
     const category = document.getElementById('wish-category').value;
     const priority = document.getElementById('wish-priority').value;
+    const imageUrl = document.getElementById('wish-image').value;
     
     // Capturamos el nuevo campo del link
     const linkInput = document.getElementById('wish-link');
@@ -12173,7 +12183,8 @@ async function saveNewWish() {
         target: parseFloat(target),
         category: category,
         priority: priority,
-        link: link, // <--- Aquí es donde se enviaba el dato que daba error
+        link: link,
+        image_url: imageUrl, 
         saved: 0
     };
 
@@ -12721,105 +12732,110 @@ function renderMobileNavigation(activeView = 'dashboard') {
 // INICIO DE LA APLICACIÓN
 // ============================================================================
 
-// Variables de estado para los filtros
+// Variables de estado globales para la vista pública
 let publicWishesCache = [];
 let currentCat = 'all';
 let currentPrio = 'all';
 
 async function renderPublicView(userId) {
-    // 1. Estructura base con Meta Tag para móvil y CSS Pro
-    document.head.innerHTML += `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`;
-    
+    // 1. Meta para móvil (Evita que se vea pequeño)
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const meta = document.createElement('meta');
+        meta.name = "viewport";
+        meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+        document.head.appendChild(meta);
+    }
+
     document.body.innerHTML = `
         <style>
             :root {
-                --prio-esencial-bg: #FEE2E2; --prio-esencial-text: #B91C1C;
-                --prio-prod-bg: #DBEAFE; --prio-prod-text: #1E40AF;
-                --prio-capricho-bg: #FEF3C7; --prio-capricho-text: #92400E;
+                --primary: #4F46E5;
+                --dark: #1A2B4D;
+                --bg: #FDFBFA;
             }
-            body { background: #FDFBFA; margin: 0; font-family: 'Outfit', sans-serif; }
+            body { margin: 0; background: var(--bg); font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
             
-            /* Header */
             .pub-header { background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #F1F5F9; }
-            .pub-header h1 { font-size: 32px; font-weight: 800; margin: 15px 0 5px 0; color: #1A2B4D; }
+            .pub-header h1 { font-size: 28px; font-weight: 800; color: var(--dark); margin: 0; }
             
-            /* Filtros */
-            .filter-sticky { 
-                position: sticky; top: 0; background: rgba(255,255,255,0.9); 
-                backdrop-filter: blur(15px); z-index: 100; border-bottom: 1px solid #F1F5F9;
-                padding: 15px 0;
+            .filter-bar { 
+                position: sticky; top: 0; background: rgba(255,255,255,0.95); 
+                backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid #F1F5F9;
+                padding: 12px 0;
             }
-            .filter-container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
-            .filter-group { 
-                display: flex; gap: 8px; overflow-x: auto; 
-                padding-bottom: 10px; margin-bottom: 10px;
-                scrollbar-width: none; -webkit-overflow-scrolling: touch;
+            .filter-scroll {
+                display: flex; gap: 8px; overflow-x: auto; padding: 0 15px;
+                scrollbar-width: none;
             }
-            .filter-group::-webkit-scrollbar { display: none; }
+            .filter-scroll::-webkit-scrollbar { display: none; }
             
-            .btn-filter {
-                padding: 8px 18px; border-radius: 100px; border: 1px solid #E2E8F0;
+            .chip {
+                padding: 8px 16px; border-radius: 100px; border: 1px solid #E2E8F0;
                 background: white; color: #64748B; font-weight: 700; font-size: 13px;
                 white-space: nowrap; cursor: pointer; transition: 0.2s;
             }
-            .btn-filter.active { background: #1A2B4D; color: white; border-color: #1A2B4D; }
-            
-            .btn-sub-filter {
-                padding: 6px 14px; border-radius: 100px; border: none;
-                background: #F1F5F9; color: #64748B; font-weight: 700; font-size: 12px;
-                cursor: pointer; transition: 0.2s;
-            }
-            .btn-sub-filter.active { background: #4F46E5; color: white; }
+            .chip.active { background: var(--dark); color: white; border-color: var(--dark); }
 
-            /* Grid y Cards */
-            .pub-main { max-width: 1000px; margin: 30px auto; padding: 0 15px 100px 15px; }
-            .pub-grid { 
+            .main-content { max-width: 1100px; margin: 20px auto; padding: 0 15px 100px 15px; }
+            
+            /* GRID RESPONSIVO */
+            .wish-grid { 
                 display: grid; 
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
                 gap: 20px; 
             }
-            .pub-card {
-                background: white; border-radius: 28px; padding: 25px;
-                border: 1px solid #F1F5F9; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-                display: flex; flex-direction: column; justify-content: space-between;
+
+            /* TARJETA CON IMAGEN */
+            .wish-card {
+                background: white; border-radius: 28px; padding: 20px;
+                border: 1px solid #F1F5F9; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+                display: flex; flex-direction: column; transition: transform 0.2s;
             }
             
-            /* Ajustes Móvil */
+            /* ESTILO DE LA IMAGEN */
+            .wish-img-container {
+                width: 100%; height: 220px; border-radius: 20px; 
+                overflow: hidden; margin-bottom: 18px; background: #F8FAFC;
+                border: 1px solid #F1F5F9;
+            }
+            .wish-img {
+                width: 100%; height: 100%; object-fit: cover; 
+                transition: transform 0.5s;
+            }
+            .wish-card:hover .wish-img { transform: scale(1.05); }
+
             @media (max-width: 600px) {
                 .pub-header { padding: 30px 15px; }
-                .pub-header h1 { font-size: 26px; }
-                .pub-grid { grid-template-columns: 1fr; gap: 15px; }
-                .pub-card { padding: 20px; border-radius: 24px; }
+                .wish-grid { grid-template-columns: 1fr; } /* 1 columna en móvil */
+                .wish-img-container { height: 200px; }
             }
         </style>
 
         <header class="pub-header">
-            <h1 id="pub-title">🎁 Mis Deseos</h1>
-            <p id="pub-subtitle" style="color: #64748B; font-size: 15px;">Ideas para regalar que me harían mucha ilusión</p>
+            <h1>🎁 Mis Deseos</h1>
+            <p style="color: #64748B; margin-top: 8px; font-size: 15px;">Ideas que me harían mucha ilusión</p>
         </header>
 
-        <section class="filter-sticky">
-            <div class="filter-container">
-                <div id="pub-cat-filters" class="filter-group">
-                    <button class="btn-filter active" onclick="filterPublic('cat', 'all', this)">Todas</button>
-                </div>
-                <div id="pub-prio-filters" class="filter-group" style="margin-bottom:0; border-top:1px solid #F1F5F9; padding-top:12px;">
-                    <button class="btn-sub-filter active" onclick="filterPublic('prio', 'all', this)">Todo tipo</button>
-                    <button class="btn-sub-filter" onclick="filterPublic('prio', 'Esencial', this)">Esencial</button>
-                    <button class="btn-sub-filter" onclick="filterPublic('prio', 'Productividad', this)">Productividad</button>
-                    <button class="btn-sub-filter" onclick="filterPublic('prio', 'Capricho', this)">Caprichos</button>
-                </div>
+        <nav class="filter-bar">
+            <div id="pub-cat-filters" class="filter-scroll">
+                <button class="chip active" onclick="filterPublic('cat', 'all', this)">Todas</button>
             </div>
-        </section>
+            <div id="pub-prio-filters" class="filter-scroll" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #F8FAFC;">
+                <button class="chip active" onclick="filterPublic('prio', 'all', this)">Todo</button>
+                <button class="chip" onclick="filterPublic('prio', 'Esencial', this)">Esencial</button>
+                <button class="chip" onclick="filterPublic('prio', 'Productividad', this)">Productividad</button>
+                <button class="chip" onclick="filterPublic('prio', 'Capricho', this)">Capricho</button>
+            </div>
+        </nav>
 
-        <main class="pub-main">
-            <div id="pub-grid" class="pub-grid">
-                <p style="text-align:center; grid-column: 1/-1;">Cargando wishlist...</p>
+        <main class="main-content">
+            <div id="pub-grid" class="wish-grid">
+                <p style="text-align:center; grid-column: 1/-1; padding: 40px; color: #94A3B8;">Cargando wishlist...</p>
             </div>
         </main>
     `;
 
-    // 2. Carga de datos de Supabase
+    // Carga de datos de Supabase
     const { data: wishes } = await supabaseClient
         .from('wishlist')
         .select('*')
@@ -12828,52 +12844,28 @@ async function renderPublicView(userId) {
 
     publicWishesCache = wishes || [];
 
-    // 3. Generar botones de categoría
-    const categories = [...new Set(publicWishesCache.map(w => w.category))];
+    // Generar botones de categoría dinámicos
+    const categories = [...new Set(publicWishesCache.map(w => w.category))].filter(Boolean);
     const catContainer = document.getElementById('pub-cat-filters');
     categories.forEach(cat => {
-        if(cat) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-filter';
-            btn.innerText = cat;
-            btn.onclick = (e) => filterPublic('cat', cat, e.target);
-            catContainer.appendChild(btn);
-        }
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.innerText = cat;
+        btn.onclick = (e) => filterPublic('cat', cat, e.target);
+        catContainer.appendChild(btn);
     });
 
-    // Pintar inicial
     updatePublicGrid(publicWishesCache);
-}
-
-function filterPublic(type, value, btn) {
-    // Resetear visual de botones del grupo
-    const parent = btn.parentElement;
-    parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Actualizar estado global
-    if (type === 'cat') currentCat = value;
-    if (type === 'prio') currentPrio = value;
-
-    // Lógica de filtrado corregida
-    const filtered = publicWishesCache.filter(w => {
-        const matchCat = (currentCat === 'all' || w.category === currentCat);
-        const matchPrio = (currentPrio === 'all' || w.priority === currentPrio);
-        return matchCat && matchPrio;
-    });
-
-    updatePublicGrid(filtered);
 }
 
 function updatePublicGrid(items) {
     const grid = document.getElementById('pub-grid');
     
     if (items.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                <div style="font-size: 40px; margin-bottom: 15px;">🔍</div>
-                <p style="color: #64748B; font-weight: 600;">No hay nada con estos filtros.</p>
-            </div>`;
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:80px 20px; color:#94A3B8;">
+            <div style="font-size:40px; margin-bottom:15px;">🔍</div>
+            <p>No se han encontrado artículos</p>
+        </div>`;
         return;
     }
 
@@ -12882,25 +12874,28 @@ function updatePublicGrid(items) {
         const colors = getPublicPrioColors(prio);
         
         return `
-            <div class="pub-card">
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <span style="font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">${w.category || 'General'}</span>
-                        <span style="font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 100px; background: ${colors.bg}; color: ${colors.text}; text-transform: uppercase;">
-                            ${prio}
-                        </span>
+            <div class="wish-card">
+                ${w.image_url ? `
+                    <div class="wish-img-container">
+                        <img src="${w.image_url}" class="wish-img" alt="${w.name}" onerror="this.parentElement.style.display='none'">
                     </div>
-                    <h3 style="font-size: 20px; font-weight: 800; color: #1A2B4D; margin: 0 0 8px 0; line-height: 1.3;">${w.name}</h3>
-                    <div style="font-size: 22px; font-weight: 800; color: #4F46E5;">${formatCurrency(w.target)}</div>
+                ` : ''}
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                    <span style="font-size:10px; font-weight:800; color:#94A3B8; text-transform:uppercase; letter-spacing:0.5px;">${w.category || 'General'}</span>
+                    <span style="font-size:10px; font-weight:800; padding:4px 10px; border-radius:100px; background:${colors.bg}; color:${colors.text}; text-transform:uppercase;">${prio}</span>
                 </div>
 
-                <div style="margin-top: 25px;">
+                <h3 style="font-size:19px; font-weight:800; color:var(--dark); margin:0 0 6px 0; line-height:1.3;">${w.name}</h3>
+                <div style="font-size:22px; font-weight:800; color:var(--primary); margin-bottom:20px;">${formatCurrency(w.target)}</div>
+                
+                <div style="margin-top:auto;">
                     ${w.link ? `
-                        <a href="${w.link}" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; padding: 16px; background: #1A2B4D; color: white; border-radius: 16px; text-decoration: none; font-weight: 700; font-size: 14px;">
-                            <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i> Ver el artículo
+                        <a href="${w.link}" target="_blank" rel="noopener noreferrer" style="display:block; text-align:center; padding:16px; background:var(--dark); color:white; border-radius:16px; text-decoration:none; font-weight:700; font-size:14px; transition:0.2s;">
+                            <i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Ver el artículo
                         </a>
                     ` : `
-                        <div style="text-align: center; padding: 14px; background: #F8FAFC; color: #CBD5E1; border-radius: 16px; font-size: 13px; font-weight: 700; border: 1px dashed #E2E8F0;">
+                        <div style="text-align:center; color:#CBD5E1; font-size:13px; font-weight:600; padding:12px; border:1px dashed #E2E8F0; border-radius:16px;">
                             Sin enlace directo
                         </div>
                     `}
@@ -12911,9 +12906,11 @@ function updatePublicGrid(items) {
 }
 
 function getPublicPrioColors(prio) {
-    if (prio === 'Esencial') return { bg: 'var(--prio-esencial-bg)', text: 'var(--prio-esencial-text)' };
-    if (prio === 'Productividad') return { bg: 'var(--prio-prod-bg)', text: 'var(--prio-prod-text)' };
-    return { bg: 'var(--prio-capricho-bg)', text: 'var(--prio-capricho-text)' };
+    switch(prio) {
+        case 'Esencial': return { bg: '#FEE2E2', text: '#B91C1C' };
+        case 'Productividad': return { bg: '#DBEAFE', text: '#1E40AF' };
+        default: return { bg: '#FEF3C7', text: '#92400E' }; // Capricho
+    }
 }
 
   // Variable global para saber en qué mundo estamos
