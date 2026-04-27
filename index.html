@@ -12738,146 +12738,127 @@ let currentCat = 'all';
 let currentPrio = 'all';
 
 async function renderPublicView(userId) {
-    // 1. LIMPIEZA Y META TAGS (Aseguramos que el navegador entienda que es móvil)
-    document.documentElement.lang = "es";
-    let metaViewport = document.querySelector('meta[name="viewport"]');
-    if (!metaViewport) {
-        metaViewport = document.createElement('meta');
-        metaViewport.name = "viewport";
-        document.head.appendChild(metaViewport);
-    }
-    metaViewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
-
-    // 2. ESTILOS DEFINITIVOS (Copia esto tal cual)
-    document.body.innerHTML = `
+    // 1. Reset total del Viewport y estilos base para Móvil
+    document.documentElement.style.background = "#F8FAFC";
+    document.head.innerHTML = `
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <title>Mi Wishlist</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
         <style>
             :root {
-                --primary: #4F46E5;
-                --dark: #1A2B4D;
-                --gray-bg: #F8FAFC;
-                --text-main: #1E293B;
-                --text-muted: #64748B;
+                --primary: #4F46E5; --dark: #0F172A; --text: #1E293B;
+                --gray: #64748B; --bg: #F8FAFC;
                 --safe-top: env(safe-area-inset-top);
             }
-
             * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
             body { 
-                margin: 0; background: #FFFFFF; font-family: 'Outfit', sans-serif; 
-                color: var(--text-main); line-height: 1.5;
+                margin: 0; padding: 0; background: var(--bg); 
+                font-family: 'Outfit', sans-serif; color: var(--text);
             }
 
-            /* Header Minimalista */
-            .app-header {
-                padding: calc(20px + var(--safe-top)) 20px 15px;
-                text-align: center; background: white;
+            /* Header Estilo iOS */
+            .app-bar {
+                background: white; padding: calc(30px + var(--safe-top)) 20px 20px;
+                border-bottom: 1px solid #E2E8F0; text-align: left;
             }
-            .app-header h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-            .app-header p { font-size: 14px; color: var(--text-muted); margin: 4px 0 0; }
+            .app-bar h1 { font-size: 28px; font-weight: 800; margin: 0; color: var(--dark); letter-spacing: -1px; }
+            .app-bar p { font-size: 15px; color: var(--gray); margin: 5px 0 0; font-weight: 500; }
 
-            /* Barra de Filtros Estilo App */
-            .sticky-nav {
-                position: sticky; top: 0; background: rgba(255, 255, 255, 0.85);
+            /* Navegación de Filtros (Scroll horizontal suave) */
+            .nav-section {
+                position: sticky; top: 0; background: rgba(248, 250, 252, 0.9);
                 backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-                z-index: 1000; border-bottom: 1px solid #F1F5F9;
-                padding: 12px 0;
+                z-index: 1000; padding: 15px 0;
             }
             .filter-row {
-                display: flex; gap: 8px; overflow-x: auto; padding: 0 16px;
+                display: flex; gap: 10px; overflow-x: auto; padding: 0 20px;
                 scrollbar-width: none;
             }
             .filter-row::-webkit-scrollbar { display: none; }
 
             .pill {
-                padding: 8px 16px; border-radius: 100px; border: 1px solid #E2E8F0;
-                background: white; color: var(--text-muted); font-weight: 700;
-                font-size: 13px; white-space: nowrap; transition: 0.2s;
+                padding: 10px 20px; border-radius: 14px; border: 1px solid #E2E8F0;
+                background: white; color: var(--gray); font-weight: 700;
+                font-size: 14px; white-space: nowrap; transition: 0.2s;
             }
-            .pill.active { background: var(--dark); color: white; border-color: var(--dark); }
+            .pill.active { background: var(--dark); color: white; border-color: var(--dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
             
+            .sub-filter-row { display: flex; gap: 8px; padding: 12px 20px 0; overflow-x: auto; scrollbar-width: none; }
             .sub-pill {
-                padding: 6px 12px; border-radius: 100px; border: none;
-                background: #F1F5F9; color: var(--text-muted); font-weight: 700;
-                font-size: 12px; white-space: nowrap; transition: 0.2s;
+                padding: 7px 14px; border-radius: 10px; border: none;
+                background: #EDF2F7; color: var(--gray); font-weight: 700;
+                font-size: 12px; white-space: nowrap;
             }
             .sub-pill.active { background: var(--primary); color: white; }
 
-            /* Grid Responsivo */
-            .content-container { max-width: 1000px; margin: 0 auto; padding: 20px 16px 100px; }
-            .wish-grid { 
-                display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-                gap: 16px; 
+            /* Lista de deseos */
+            .content { padding: 10px 20px 100px; }
+            .wish-card {
+                background: white; border-radius: 24px; margin-bottom: 20px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: hidden;
+                border: 1px solid #F1F5F9;
             }
-
-            /* Tarjeta Estilo Moderno */
-            .card {
-                background: white; border-radius: 24px; border: 1px solid #F1F5F9;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
-                display: flex; flex-direction: column;
+            .wish-img {
+                width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+                background: #f0f0f0; display: block;
             }
-            .card-img {
-                width: 100%; aspect-ratio: 4/3; object-fit: cover;
-                background: var(--gray-bg); border-bottom: 1px solid #F1F5F9;
-            }
-            .card-content { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; }
+            .wish-info { padding: 20px; }
             
-            .card-tag-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-            .tag-cat { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-            .tag-prio { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+            .tag-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+            .cat-label { font-size: 11px; font-weight: 800; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+            .prio-tag { font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; }
 
-            .card-title { font-size: 18px; font-weight: 800; margin: 0 0 4px; color: var(--dark); line-height: 1.2; }
-            .card-price { font-size: 20px; font-weight: 800; color: var(--primary); }
+            .wish-name { font-size: 20px; font-weight: 800; color: var(--dark); margin: 0 0 5px; line-height: 1.2; }
+            .wish-price { font-size: 22px; font-weight: 800; color: var(--primary); }
 
-            .btn-buy {
-                margin-top: 16px; display: block; width: 100%; text-align: center;
-                padding: 14px; background: var(--dark); color: white;
-                text-decoration: none; font-weight: 700; border-radius: 14px;
-                font-size: 14px; transition: opacity 0.2s;
+            .btn-action {
+                margin-top: 20px; display: flex; align-items: center; justify-content: center;
+                gap: 10px; width: 100%; padding: 16px; background: var(--dark);
+                color: white; text-decoration: none; font-weight: 700;
+                border-radius: 18px; font-size: 15px;
             }
-            .btn-buy:active { opacity: 0.8; transform: scale(0.98); }
+            .btn-action:active { transform: scale(0.97); opacity: 0.9; }
 
-            /* Ajustes para Pantallas Pequeñas */
-            @media (max-width: 600px) {
-                .app-header { padding-top: calc(10px + var(--safe-top)); }
-                .wish-grid { grid-template-columns: 1fr; } /* Una columna perfecta */
-                .card-img { aspect-ratio: 16/9; } /* Más cinemático en móvil */
-            }
+            /* Empty State */
+            .empty { text-align: center; padding: 60px 20px; color: var(--gray); }
         </style>
+    `;
 
-        <header class="app-header">
-            <h1>🎁 Mi Wishlist</h1>
-            <p>Ideas para regalar que me encantan</p>
+    document.body.innerHTML = `
+        <header class="app-bar">
+            <h1>Mis Deseos 🎁</h1>
+            <p>Lista de regalos actualizada</p>
         </header>
 
-        <nav class="sticky-nav">
+        <nav class="nav-section">
             <div id="pub-cat-filters" class="filter-row">
-                <button class="pill active" onclick="filterPublic('cat', 'all', this)">Todas</button>
+                <button class="pill active" onclick="filterPublic('cat', 'all', this)">Todas las categorías</button>
             </div>
-            <div id="pub-prio-filters" class="filter-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
-                <button class="sub-pill active" onclick="filterPublic('prio', 'all', this)">Cualquier tipo</button>
+            <div id="pub-prio-filters" class="sub-filter-row">
+                <button class="sub-pill active" onclick="filterPublic('prio', 'all', this)">Todo tipo</button>
                 <button class="sub-pill" onclick="filterPublic('prio', 'Esencial', this)">Esencial</button>
                 <button class="sub-pill" onclick="filterPublic('prio', 'Productividad', this)">Productividad</button>
                 <button class="sub-pill" onclick="filterPublic('prio', 'Capricho', this)">Capricho</button>
             </div>
         </nav>
 
-        <main class="content-container">
-            <div id="pub-grid" class="wish-grid">
-                <p style="text-align:center; padding: 40px;">Cargando lista...</p>
-            </div>
+        <main class="content">
+            <div id="pub-grid"></div>
         </main>
     `;
 
-    // 3. CARGA DE DATOS
+    // Carga de datos
     const { data: wishes } = await supabaseClient
         .from('wishlist')
         .select('*')
         .eq('user_id', userId)
-        .order('category', { ascending: true });
+        .order('created_at', { ascending: false });
 
     publicWishesCache = wishes || [];
 
-    // Generar categorías dinámicas
+    // Generar categorías
     const categories = [...new Set(publicWishesCache.map(w => w.category))].filter(Boolean);
     const catContainer = document.getElementById('pub-cat-filters');
     categories.forEach(cat => {
@@ -12891,28 +12872,10 @@ async function renderPublicView(userId) {
     updatePublicGrid(publicWishesCache);
 }
 
-// Lógica de filtrado corregida para mostrar TODOS
-function filterPublic(type, value, btn) {
-    const parent = btn.parentElement;
-    parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    if (type === 'cat') currentCat = value;
-    if (type === 'prio') currentPrio = value;
-
-    const filtered = publicWishesCache.filter(w => {
-        const matchCat = (currentCat === 'all' || w.category === currentCat);
-        const matchPrio = (currentPrio === 'all' || (w.priority === 'Necesidad' ? 'Esencial' : w.priority) === currentPrio);
-        return matchCat && matchPrio;
-    });
-
-    updatePublicGrid(filtered);
-}
-
 function updatePublicGrid(items) {
     const grid = document.getElementById('pub-grid');
     if (items.length === 0) {
-        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#94A3B8;">No hay artículos con estos filtros</div>`;
+        grid.innerHTML = `<div class="empty"><i class="fas fa-search fa-2x"></i><p>No hay artículos con estos filtros</p></div>`;
         return;
     }
 
@@ -12921,23 +12884,23 @@ function updatePublicGrid(items) {
         const colors = getPublicPrioColors(prio);
         
         return `
-            <div class="card">
-                ${w.image_url ? `<img src="${w.image_url}" class="card-img" onerror="this.style.display='none'">` : ''}
-                <div class="card-content">
-                    <div class="card-tag-row">
-                        <span class="tag-cat">${w.category || 'General'}</span>
-                        <span class="tag-prio" style="background:${colors.bg}; color:${colors.text};">${prio}</span>
+            <div class="wish-card">
+                ${w.image_url ? `<img src="${w.image_url}" class="wish-img" onerror="this.style.display='none'">` : ''}
+                <div class="wish-info">
+                    <div class="tag-row">
+                        <span class="cat-label">${w.category || 'General'}</span>
+                        <span class="prio-tag" style="background:${colors.bg}; color:${colors.text};">${prio}</span>
                     </div>
-                    <h3 class="card-title">${w.name}</h3>
-                    <div class="card-price">${formatCurrency(w.target)}</div>
+                    <h3 class="wish-name">${w.name}</h3>
+                    <div class="wish-price">${formatCurrency(w.target)}</div>
                     
                     ${w.link ? `
-                        <a href="${w.link}" target="_blank" rel="noopener noreferrer" class="btn-buy">
-                            <i class="fas fa-shopping-cart" style="margin-right:8px;"></i> Ver artículo
+                        <a href="${w.link}" target="_blank" rel="noopener noreferrer" class="btn-action">
+                            <i class="fas fa-shopping-bag"></i> Ver artículo
                         </a>
                     ` : `
-                        <div style="margin-top:16px; text-align:center; color:#CBD5E1; font-size:13px; font-weight:600; padding:12px; border:1px dashed #E2E8F0; border-radius:12px;">
-                            Sin enlace directo
+                        <div style="margin-top:20px; text-align:center; color:#94A3B8; font-size:13px; font-weight:600; padding:15px; border:1px dashed #E2E8F0; border-radius:18px;">
+                            Sin enlace disponible
                         </div>
                     `}
                 </div>
