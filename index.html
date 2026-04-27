@@ -12732,47 +12732,40 @@ function renderMobileNavigation(activeView = 'dashboard') {
 // INICIO DE LA APLICACIÓN
 // ============================================================================
 
-// 1. Variables de estado globales (para que los filtros tengan memoria)
-let publicWishesCache = [];
-let currentCat = 'all';
-let currentPrio = 'all';
+// 1. Variables globales para que no se pierdan entre renders
+window.publicWishesCache = [];
+window.currentCat = 'all';
+window.currentPrio = 'all';
 
 async function renderPublicView(userId) {
-    // 1. Forzar Viewport para Móvil (Imprescindible)
+    // RESET TOTAL de la escala para móvil
     let meta = document.querySelector('meta[name="viewport"]');
-    if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = "viewport";
-        document.head.appendChild(meta);
-    }
+    if (!meta) { meta = document.createElement('meta'); document.head.appendChild(meta); }
     meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
 
-    // 2. Estilos: Formato Lista con acabado "Premium App"
+    // ESTILOS INYECTADOS (Blindados para móvil)
     document.body.innerHTML = `
         <style>
             :root {
                 --primary: #4F46E5; --dark: #0F172A; --bg: #F8FAFC;
                 --text-main: #1E293B; --text-muted: #64748B;
-                --safe-top: env(safe-area-inset-top);
             }
-            * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-            body { 
-                margin: 0; background: var(--bg); font-family: 'Outfit', sans-serif; 
-                color: var(--text-main); -webkit-font-smoothing: antialiased;
+            /* Reset agresivo para evitar que nada se salga por la derecha */
+            * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+            html, body { 
+                width: 100%; max-width: 100vw; overflow-x: hidden; 
+                background: var(--bg); font-family: 'Outfit', sans-serif; 
             }
 
-            /* Header con diseño de App */
-            .app-header { 
-                padding: calc(30px + var(--safe-top)) 20px 20px; 
-                background: white; border-bottom: 1px solid #F1F5F9;
-            }
-            .app-header h1 { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+            .app-header { padding: 40px 20px 20px; background: white; width: 100%; border-bottom: 1px solid #F1F5F9; }
+            .app-header h1 { font-size: 24px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px; }
 
-            /* Filtros Stickies con mejor tacto */
-            .sticky-filters { 
-                position: sticky; top: 0; background: rgba(255,255,255,0.85); 
-                backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            /* Filtros fijos */
+            .sticky-nav { 
+                position: sticky; top: 0; background: rgba(255,255,255,0.95); 
+                backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
                 z-index: 1000; border-bottom: 1px solid #F1F5F9; padding: 12px 0;
+                width: 100%;
             }
             .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; }
             .filter-row::-webkit-scrollbar { display: none; }
@@ -12780,67 +12773,58 @@ async function renderPublicView(userId) {
             .pill { 
                 padding: 10px 18px; border-radius: 14px; border: 1px solid #E2E8F0;
                 background: white; color: var(--text-muted); font-weight: 700; font-size: 13px;
-                white-space: nowrap; cursor: pointer; transition: 0.2s;
+                white-space: nowrap; cursor: pointer; outline: none;
             }
-            .pill.active { background: var(--dark) !important; color: white !important; border-color: var(--dark) !important; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+            .pill.active { background: var(--dark) !important; color: white !important; border-color: var(--dark); }
 
             .sub-pill {
                 padding: 7px 14px; border-radius: 10px; border: none;
                 background: #EDF2F7; color: var(--text-muted); font-weight: 700; font-size: 12px;
-                white-space: nowrap;
+                white-space: nowrap; cursor: pointer;
             }
             .sub-pill.active { background: var(--primary) !important; color: white !important; }
 
-            /* LISTA MEJORADA (Efecto Tarjeta Fina) */
-            .list-container { padding: 16px; max-width: 100%; margin: 0 auto; }
+            /* LISTA (Ocupa el 100% del ancho móvil) */
+            .list-container { width: 100%; padding: 16px; }
             
             .wish-item {
-                background: white; border-radius: 22px; padding: 14px;
-                margin-bottom: 12px; display: flex; align-items: center; gap: 16px;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #F1F5F9;
-                transition: transform 0.1s active;
+                background: white; border-radius: 20px; padding: 12px;
+                margin-bottom: 12px; display: flex; align-items: center; gap: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid #F1F5F9;
+                width: 100%; /* Asegura que no sea más ancha que la pantalla */
             }
-            .wish-item:active { transform: scale(0.98); }
             
             .wish-thumb {
-                width: 85px; height: 85px; border-radius: 16px;
+                width: 70px; height: 70px; border-radius: 12px;
                 object-fit: cover; background: #F1F5F9; flex-shrink: 0;
-                border: 1px solid #F1F5F9;
             }
 
-            .wish-details { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+            .wish-details { flex: 1; min-width: 0; } /* min-width: 0 es clave para el texto con puntos suspensivos */
             
             .wish-name { 
-                font-size: 17px; font-weight: 700; color: var(--dark); 
+                font-size: 16px; font-weight: 700; color: var(--dark); 
                 margin: 0; line-height: 1.2;
-                display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; 
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
             }
-            .wish-price { font-size: 19px; font-weight: 800; color: var(--primary); margin: 2px 0; }
+            .wish-price { font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 2px; }
             
-            .tag-row { display: flex; gap: 6px; }
-            .tag { 
-                font-size: 9px; font-weight: 800; text-transform: uppercase; 
-                padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px;
-            }
+            .tag-row { display: flex; gap: 6px; margin-top: 4px; }
+            .tag { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
 
-            /* Botón circular de acción */
             .btn-link {
-                width: 44px; height: 44px; border-radius: 50%;
+                width: 42px; height: 42px; border-radius: 50%;
                 background: var(--dark); color: white;
                 display: flex; align-items: center; justify-content: center;
-                text-decoration: none; flex-shrink: 0; font-size: 16px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                text-decoration: none; flex-shrink: 0;
             }
-
-            .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
         </style>
 
         <header class="app-header">
-            <h1>🎁 Mis Deseos</h1>
-            <p style="color:var(--text-muted); font-size:14px; margin:4px 0 0;">Cosas que me hacen ilusión</p>
+            <h1>🎁 Mi Wishlist</h1>
+            <p style="color:var(--text-muted); font-size:14px; margin-top:4px;">Lista de deseos compartida</p>
         </header>
 
-        <nav class="sticky-filters">
+        <nav class="sticky-nav">
             <div id="pub-cat-filters" class="filter-row">
                 <button class="pill active" onclick="filterPublic('cat', 'all', this)">Todas</button>
             </div>
@@ -12853,21 +12837,23 @@ async function renderPublicView(userId) {
         </nav>
 
         <main class="list-container">
-            <div id="pub-list"></div>
+            <div id="pub-list">
+                <p style="text-align:center; padding:40px; color:#94A3B8;">Cargando...</p>
+            </div>
         </main>
     `;
 
-    // 3. Carga y Filtros
+    // Carga de datos
     const { data: wishes } = await supabaseClient
         .from('wishlist')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-    publicWishesCache = wishes || [];
+    window.publicWishesCache = wishes || [];
 
-    // Generar categorías dinámicas
-    const categories = [...new Set(publicWishesCache.map(w => w.category))].filter(Boolean);
+    // Generar botones de categoría
+    const categories = [...new Set(window.publicWishesCache.map(w => w.category))].filter(Boolean);
     const catContainer = document.getElementById('pub-cat-filters');
     categories.forEach(cat => {
         const btn = document.createElement('button');
@@ -12877,15 +12863,38 @@ async function renderPublicView(userId) {
         catContainer.appendChild(btn);
     });
 
-    updatePublicGrid(publicWishesCache);
+    updatePublicGrid(window.publicWishesCache);
 }
 
-// Lógica de Renderizado corregida para Formato Lista App
-function updatePublicGrid(items) {
+// 2. FUNCIÓN DE FILTRADO (Asignada a window para que funcione siempre)
+window.filterPublic = function(type, value, btn) {
+    console.log("Filtrando:", type, value);
+    
+    // Marcar activo
+    const parent = btn.parentElement;
+    parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (type === 'cat') window.currentCat = value;
+    if (type === 'prio') window.currentPrio = value;
+
+    const filtered = window.publicWishesCache.filter(w => {
+        const pVal = w.priority === 'Necesidad' ? 'Esencial' : (w.priority || 'Capricho');
+        const matchCat = (window.currentCat === 'all' || w.category === window.currentCat);
+        const matchPrio = (window.currentPrio === 'all' || pVal === window.currentPrio);
+        return matchCat && matchPrio;
+    });
+
+    updatePublicGrid(filtered);
+};
+
+// 3. ACTUALIZAR LISTA
+window.updatePublicGrid = function(items) {
     const list = document.getElementById('pub-list');
+    if (!list) return;
     
     if (items.length === 0) {
-        list.innerHTML = `<div class="empty-state"><i class="fas fa-search fa-2x"></i><p>No hay resultados</p></div>`;
+        list.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#94A3B8;">No hay resultados</div>`;
         return;
     }
 
@@ -12895,17 +12904,17 @@ function updatePublicGrid(items) {
         
         return `
             <div class="wish-item">
-                <img src="${w.image_url || 'https://via.placeholder.com/150?text=Gift'}" 
+                <img src="${w.image_url || 'https://via.placeholder.com/100?text=Gift'}" 
                      class="wish-thumb" 
-                     onerror="this.src='https://via.placeholder.com/150?text=No+Imagen'">
+                     onerror="this.src='https://via.placeholder.com/100?text=Gift'">
                 
                 <div class="wish-details">
+                    <h3 class="wish-name">${w.name}</h3>
+                    <div class="wish-price">${formatCurrency(w.target)}</div>
                     <div class="tag-row">
                         <span class="tag" style="background:#F1F5F9; color:#64748B;">${w.category || 'General'}</span>
                         <span class="tag" style="background:${colors.bg}; color:${colors.text};">${prio}</span>
                     </div>
-                    <h3 class="wish-name">${w.name}</h3>
-                    <div class="wish-price">${formatCurrency(w.target)}</div>
                 </div>
 
                 ${w.link ? `
@@ -12916,7 +12925,7 @@ function updatePublicGrid(items) {
             </div>
         `;
     }).join('');
-}
+};
 
 function getPublicPrioColors(prio) {
     if (prio === 'Esencial') return { bg: '#FEE2E2', text: '#B91C1C' };
