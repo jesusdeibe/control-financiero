@@ -12721,47 +12721,156 @@ function renderMobileNavigation(activeView = 'dashboard') {
 // INICIO DE LA APLICACIÓN
 // ============================================================================
 
+// Variable global temporal para la vista pública (para que los filtros funcionen)
+let publicWishesCache = [];
+
 async function renderPublicView(userId) {
-    // Estructura básica de la página de invitado
     document.body.innerHTML = `
-        <div style="background: #FDFBFA; min-height: 100vh; padding: 40px 20px; font-family: 'Outfit', sans-serif;">
-            <div id="public-content" style="max-width: 800px; margin: 0 auto;">
-                <p style="text-align:center;">Cargando lista de deseos...</p>
-            </div>
+        <div style="background: #FDFBFA; min-height: 100vh; font-family: 'Outfit', sans-serif; color: #1A2B4D;">
+            <header style="background: white; padding: 60px 20px; text-align: center; border-bottom: 1px solid #F1F5F9;">
+                <div style="max-width: 1000px; margin: 0 auto;">
+                    <span style="background: #EEF2FF; color: #4F46E5; padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Wishlist compartida</span>
+                    <h1 style="font-size: 42px; font-weight: 800; margin: 20px 0 10px 0; letter-spacing: -1px;">🎁 Mis Deseos</h1>
+                    <p style="color: #64748B; font-size: 18px; max-width: 600px; margin: 0 auto;">Aquí tienes algunas ideas por si quieres hacerme un regalo. ¡Cualquier detalle me hace ilusión!</p>
+                </div>
+            </header>
+
+            <section id="public-filters" style="position: sticky; top: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); z-index: 100; padding: 20px; border-bottom: 1px solid #F1F5F9;">
+                <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;">
+                    
+                    <div id="cat-filters" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;">
+                        <button class="pub-filter active" onclick="filterPublic('cat', 'all', this)">Todas las categorías</button>
+                        </div>
+
+                    <div style="display: flex; gap: 10px; border-top: 1px solid #F1F5F9; pt: 15px; padding-top: 15px;">
+                        <button class="pub-filter-sub active" onclick="filterPublic('prio', 'all', this)">Cualquier tipo</button>
+                        <button class="pub-filter-sub" onclick="filterPublic('prio', 'Necesidad', this)">Necesidades</button>
+                        <button class="pub-filter-sub" onclick="filterPublic('prio', 'Productividad', this)">Productividad</button>
+                        <button class="pub-filter-sub" onclick="filterPublic('prio', 'Capricho', this)">Caprichos</button>
+                    </div>
+                </div>
+            </section>
+
+            <main style="max-width: 1000px; margin: 40px auto; padding: 0 20px 100px 20px;">
+                <div id="public-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+                    </div>
+            </main>
+
+            <style>
+                .pub-filter {
+                    padding: 10px 22px; border-radius: 100px; border: 1px solid #E2E8F0; background: white;
+                    cursor: pointer; font-family: 'Outfit'; font-weight: 600; white-space: nowrap; transition: all 0.2s;
+                }
+                .pub-filter.active { background: #1A2B4D; color: white; border-color: #1A2B4D; }
+                
+                .pub-filter-sub {
+                    padding: 6px 16px; border-radius: 100px; border: none; background: #F1F5F9;
+                    cursor: pointer; font-family: 'Outfit'; font-weight: 700; font-size: 13px; color: #64748B; transition: all 0.2s;
+                }
+                .pub-filter-sub.active { background: #4F46E5; color: white; }
+
+                .pub-card {
+                    background: white; border-radius: 32px; padding: 30px; border: 1px solid #F1F5F9;
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.03);
+                    display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+                .pub-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+            </style>
         </div>
     `;
 
-    // Pedimos los datos a Supabase del usuario dueño de la lista
+    // 1. Cargar Datos
     const { data: wishes } = await supabaseClient
         .from('wishlist')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .order('category', { ascending: true });
 
-    const container = document.getElementById('public-content');
+    publicWishesCache = wishes || [];
 
-    if (!wishes || wishes.length === 0) {
-        container.innerHTML = `<h2 style="text-align:center;">Esta lista de deseos está vacía o no existe.</h2>`;
+    // 2. Generar botones de categoría dinámicamente
+    const categories = [...new Set(publicWishesCache.map(w => w.category))];
+    const catContainer = document.getElementById('cat-filters');
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'pub-filter';
+        btn.innerText = cat;
+        btn.onclick = (e) => filterPublic('cat', cat, e.target);
+        catContainer.appendChild(btn);
+    });
+
+    // 3. Pintar por primera vez
+    updatePublicGrid(publicWishesCache);
+}
+
+// Lógica de filtrado
+let currentCat = 'all';
+let currentPrio = 'all';
+
+function filterPublic(type, value, btn) {
+    // Actualizar estado de botones
+    const parent = btn.parentElement;
+    parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (type === 'cat') currentCat = value;
+    if (type === 'prio') currentPrio = value;
+
+    const filtered = publicWishesCache.filter(w => {
+        const matchCat = currentCat === 'all' || w.category === currentCat;
+        const matchPrio = currentPrio === 'all' || w.priority === currentPrio;
+        return matchCat && matchPrio;
+    });
+
+    updatePublicGrid(filtered);
+}
+
+function updatePublicGrid(items) {
+    const grid = document.getElementById('public-grid');
+    if (items.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; color: #94A3B8;">
+            <i class="fas fa-search" style="font-size: 40px; margin-bottom: 20px; display: block;"></i>
+            <p style="font-size: 18px; font-weight: 600;">No hay artículos con estos filtros.</p>
+        </div>`;
         return;
     }
 
-    // Pintamos los deseos
-    container.innerHTML = `
-        <h1 style="text-align:center; color: #1A2B4D; margin-bottom: 40px;">🎁 Mi Wishlist</h1>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-            ${wishes.map(w => `
-                <div style="background:white; padding:25px; border-radius:24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #eee;">
-                    <span style="font-size:10px; font-weight:800; color:#999; text-transform:uppercase;">${w.category}</span>
-                    <h3 style="margin:10px 0; color:#1A2B4D;">${w.name}</h3>
-                    <p style="font-weight:800; color:#4F46E5; font-size:20px; margin-bottom:20px;">${formatCurrency(w.target)}</p>
-                    ${w.link ? `
-                        <a href="${w.link}" target="_blank" style="display:block; text-align:center; padding:14px; background:#1A2B4D; color:white; border-radius:12px; text-decoration:none; font-weight:700;">
-                            Ver artículo
-                        </a>
-                    ` : ''}
+    grid.innerHTML = items.map(w => `
+        <div class="pub-card">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span style="font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">${w.category}</span>
+                    <span style="font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 100px; background: ${getPrioColor(w.priority).bg}; color: ${getPrioColor(w.priority).text};">
+                        ${w.priority || 'Capricho'}
+                    </span>
                 </div>
-            `).join('')}
+                <h3 style="font-size: 22px; font-weight: 800; color: #1A2B4D; margin-bottom: 10px; line-height: 1.2;">${w.name}</h3>
+                <div style="font-size: 26px; font-weight: 800; color: #4F46E5;">${formatCurrency(w.target)}</div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                ${w.link ? `
+                    <a href="${w.link}" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; padding: 18px; background: #1A2B4D; color: white; border-radius: 18px; text-decoration: none; font-weight: 700; font-size: 15px; transition: all 0.2s;">
+                        <i class="fas fa-shopping-bag" style="margin-right: 10px;"></i> Ver artículo
+                    </a>
+                ` : `
+                    <div style="text-align: center; padding: 18px; background: #F8FAFC; color: #CBD5E1; border-radius: 18px; font-size: 15px; font-weight: 700; border: 1px dashed #E2E8F0;">
+                        Sin enlace directo
+                    </div>
+                `}
+            </div>
         </div>
-    `;
+    `).join('');
+}
+
+// Helper para colores de prioridad
+function getPrioColor(prio) {
+    switch(prio) {
+        case 'Necesidad': return { bg: '#FEE2E2', text: '#B91C1C' };
+        case 'Productividad': return { bg: '#DBEAFE', text: '#1E40AF' };
+        case 'Capricho': return { bg: '#FEF3C7', text: '#92400E' };
+        default: return { bg: '#F1F5F9', text: '#475569' };
+    }
 }
 
   // Variable global para saber en qué mundo estamos
