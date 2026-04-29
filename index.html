@@ -3511,121 +3511,349 @@ body.privacy-mode #dashboard-runway-value {
 }
 }
 
-/* WISHLIST PROFESSIONAL PORTFOLIO STYLE */
-.wishlist-panel {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    overflow: hidden;
+/* WISHLIST INTEGRATED DESIGN */
+.wish-summary-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
-/* Fila de cabecera */
-.wish-table-head {
-    display: grid;
-    grid-template-columns: 50px 2fr 100px 140px 100px;
-    padding: 12px 20px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 11px;
+.stat-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 20px; /* Redondeado igual que tus cards bento */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-label {
+    font-size: 10px;
     font-weight: 800;
-    color: #94a3b8;
+    color: var(--text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }
 
-/* Fila de producto */
-.wish-row {
+.stat-value {
+    font-family: 'Outfit', sans-serif; /* Mantenemos la fuente de la app */
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.stat-value.positive { color: var(--primary); }
+.stat-value.remaining { color: var(--text-secondary); }
+
+/* Tabla Estilo App */
+.wishlist-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 24px; /* Unificado con tus bento-cards */
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.wish-table-head, .wish-row {
     display: grid;
-    grid-template-columns: 50px 2fr 100px 140px 100px;
+    grid-template-columns: 60px 2fr 100px 1fr 150px; 
     align-items: center;
-    padding: 14px 20px;
-    border-bottom: 1px solid #f1f5f9;
-    transition: background 0.2s;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.wish-row:hover { background: #fcfcfd; }
+.wish-row-actions {
+    display: flex;
+    flex-direction: row; /* Asegura horizontalidad */
+    justify-content: flex-end;
+    gap: 8px; /* Reducimos un poco el gap para que quepan mejor */
+    flex-wrap: nowrap; /* Evita que salten de línea */
+}
+
+.wish-row:last-child { border-bottom: none; }
+.wish-row:hover { background: rgba(0,0,0,0.01); }
 
 .wish-row-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     object-fit: cover;
-    background: #f1f5f9;
+    background: var(--bg-secondary);
 }
 
 .wish-row-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .wish-row-cat {
     font-size: 11px;
-    color: #94a3b8;
-    font-weight: 500;
+    color: var(--text-tertiary);
 }
 
 .wish-row-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    color: #475569;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
 }
 
-/* Barra de progreso técnica */
+/* Progreso Estilo App */
 .wish-row-progress-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .wish-row-bar-bg {
     flex: 1;
-    height: 4px;
-    background: #f1f5f9;
-    border-radius: 2px;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .wish-row-bar-fill {
     height: 100%;
     background: var(--primary);
-    border-radius: 2px;
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .wish-row-percent {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
     color: var(--primary);
-    width: 30px;
+    width: 35px;
 }
 
-/* Acciones discretas */
-.wish-row-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
+/* Botones de acción integrados */
 .btn-table-action {
-    background: none;
-    border: none;
-    padding: 5px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: #cbd5e1;
-    transition: color 0.2s;
-    font-size: 14px;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Evita que el botón se encoja */
 }
 
-.btn-table-action:hover { color: var(--primary); }
-.btn-table-action.delete:hover { color: #ef4444; }
+.btn-table-action:hover {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+}
 
-@media (max-width: 768px) {
+.btn-table-action.delete:hover {
+    background: #FFF5F5;
+    color: #E53E3E;
+    border-color: #FED7D7;
+}
+
+@media (max-width: 600px) {
     .wish-table-head { display: none; }
     .wish-row {
-        grid-template-columns: 50px 1fr 80px;
-        gap: 10px;
+        grid-template-columns: 50px 1fr 130px; /* Simplificado para móvil */
+        padding: 12px 15px;
     }
-    .wish-row-progress-container { display: none; }
+    .wish-row-progress-container, .wish-row-value { display: none; }
+}
+
+/* --- REPARACIÓN QUIRÚRGICA DE TOPBAR --- */
+.global-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 32px !important;
+    height: 80px !important;
+    background: transparent !important;
+}
+
+.topbar-right-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important; /* Espacio entre campana y perfil */
+}
+
+/* Estilizamos la campana para que sea un cuadrado limpio */
+.notif-bell {
+    width: 42px !important;
+    height: 42px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    position: relative;
+    color: var(--text-secondary);
+}
+
+/* Estilizamos el botón de perfil como una "píldora" profesional */
+.topbar-profile-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 4px 14px 4px 6px !important; /* Aire interno */
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 14px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 42px !important;
+}
+
+.topbar-profile-btn:hover, .notif-bell:hover {
+    border-color: var(--primary) !important;
+    background: var(--bg-secondary) !important;
+    transform: translateY(-1px);
+}
+
+/* El menú desplegable (Drop-down) */
+.user-menu-dropdown {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    width: 200px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    display: none; /* Se activa con la clase .show */
+    z-index: 9999;
+    padding: 8px;
+}
+
+.user-menu-dropdown.show {
+    display: block !important;
+}
+
+.dropdown-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-body);
+    color: var(--primary);
+}
+
+/* --- AJUSTE BARRA DE LOGROS --- */
+#dashboard-achievements {
+    /* Evitamos que el contenedor ocupe todo el ancho */
+    flex: 0 1 auto !important; 
+    display: flex;
+    align-items: center;
+    margin-right: auto; /* Esto empuja los logros a la izquierda, pero sin estirarlos */
+}
+
+.achievement-bar-mini {
+    /* Cambiamos flex por inline-flex para que solo ocupe su propio ancho */
+    display: inline-flex !important; 
+    width: auto !important; 
+    max-width: fit-content !important;
+    padding: 6px 14px !important; /* Un poco de aire lateral */
+    gap: 8px !important;
+    white-space: nowrap; /* Evita que los iconos bajen de línea */
+}
+
+/* --- REDISEÑO PREMIUM: CASH FLOW --- */
+.cashflow-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px -12px rgba(26, 43, 77, 0.08); /* Sombra más suave */
+}
+
+.cashflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.cashflow-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.cashflow-ratio {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: -1px;
+}
+
+/* La Barra: Ahora con efecto "track" y segmentos redondeados */
+.cf-bar-bg {
+    height: 14px; /* Un pelín más gruesa para que luzca el color */
+    background: #F1F5F9; 
+    border-radius: 100px;
+    display: flex;
+    overflow: hidden; /* Esto es clave para que los segmentos no se salgan de la curva */
+    padding: 0;
+    border: none;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Sombra interna para dar profundidad */
+}
+
+.cf-segment {
+    height: 100%;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Quitamos bordes redondeados individuales para que encajen perfectos */
+    border-radius: 0; 
+}
+
+/* Colores Fintech Sólidos */
+.cf-spent { background: #F87171; }     
+.cf-committed { background: #FBBD23; } 
+.cf-saved { background: #34D399; }     
+
+/* Solo redondeamos los extremos exteriores del conjunto */
+.cf-segment:first-child { border-radius: 100px 0 0 100px; }
+.cf-segment:last-child { border-radius: 0 100px 100px 0; }
+
+/* Leyenda: Estilo "Píldora" */
+.cf-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.cf-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Bolitas de la leyenda más pequeñas y finas */
+.dot { 
+    width: 8px; 
+    height: 8px; 
+    border-radius: 50%; 
 }
 
   </style>
@@ -3709,26 +3937,39 @@ body.privacy-mode #dashboard-runway-value {
 
       <div class="right-wrapper">
 
-          <header class="global-topbar">
-              
-              <div id="dashboard-achievements" style="margin-right: auto;"></div>
+        <header class="global-topbar">
+          <div id="dashboard-achievements" style="flex-grow: 1;"></div>
+          
+          <div class="topbar-right-group" style="position: relative;">
               
               <div class="notif-bell">
                   <i class="fas fa-bell"></i>
                   <div class="notif-badge"></div>
               </div>
-
-              <div class="topbar-profile-btn" onclick="openAuthModal()">
-                  <div class="sidebar-avatar" style="width: 34px; height: 34px;">
+      
+              <div class="topbar-profile-btn" id="profile-trigger" onclick="toggleAccountMenu(event)">
+                  <div class="sidebar-avatar" style="width: 30px; height: 30px; margin: 0;">
                       <span id="sidebar-initials">J</span>
                   </div>
-                  <div style="display: flex; flex-direction: column;">
-                      <span style="font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2;" id="sidebar-name">Mi Cuenta</span>
-                      <span style="font-size: 10px; font-weight: 500; color: var(--text-tertiary);" id="sidebar-email">jesus@sunday.com</span>
+                  <div style="display: flex; flex-direction: column; text-align: left;">
+                      <span style="font-size: 12px; font-weight: 800; color: var(--text-primary); line-height: 1;" id="sidebar-name">Mi Cuenta</span>
+                      <span style="font-size: 9px; font-weight: 600; color: var(--text-tertiary);" id="sidebar-email">jesus@sunday.com</span>
                   </div>
-                  <i class="fas fa-chevron-down" style="font-size: 11px; color: var(--text-tertiary); margin-left: 6px;"></i>
+                  <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--text-tertiary);"></i>
+      
+                  <div class="user-menu-dropdown" id="account-menu">
+                      <div class="dropdown-item" onclick="switchAccount()">
+                          <i class="fas fa-exchange-alt"></i> Cambiar cuenta
+                      </div>
+                      <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                      <div class="dropdown-item" onclick="logout()" style="color: var(--red);">
+                          <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                      </div>
+                  </div>
               </div>
-          </header>
+      
+          </div>
+      </header>
     
       <main class="main-content">
 
@@ -3788,26 +4029,31 @@ body.privacy-mode #dashboard-runway-value {
                   <div id="dashboard-shared-breakdown" class="master-bento-breakdown"></div>
               </div>
           </div>
-    
-            <div class="bento-card bento-quarter">
-              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Ingresos Mes</div>
-              <div class="kpi-value" style="color: var(--green); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-income">0,00 €</div>
+
+          <div class="cashflow-container bento-full">
+            <div class="cashflow-header">
+                <div>
+                    <div class="cashflow-title">Salud Financiera Mensual</div>
+                    <div id="cf-percentage" class="cashflow-ratio">0% Libre</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 700;">EFICIENCIA</div>
+                    <div id="cf-status-label" style="font-size: 13px; font-weight: 800; color: var(--green);">Óptima</div>
+                </div>
             </div>
             
-            <div class="bento-card bento-quarter">
-              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Gastos Mes</div>
-              <div class="kpi-value" style="color: var(--red); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-expenses">0,00 €</div>
+            <div class="cf-bar-bg">
+                <div id="bar-spent" class="cf-segment cf-spent" style="width: 0%"></div>
+                <div id="bar-committed" class="cf-segment cf-committed" style="width: 0%"></div>
+                <div id="bar-saved" class="cf-segment cf-saved" style="width: 0%"></div>
             </div>
-            
-            <div class="bento-card bento-quarter">
-              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Inversiones</div>
-              <div class="kpi-value" style="color: var(--primary); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-investments">0,00 €</div>
+        
+            <div class="cf-legend">
+                <div class="cf-legend-item"><div class="dot" style="background: #F87171"></div> Gastos</div>
+                <div class="cf-legend-item"><div class="dot" style="background: #FBBD23"></div> Fijos</div>
+                <div class="cf-legend-item"><div class="dot" style="background: #34D399"></div> Inversión</div>
             </div>
-            
-            <div class="bento-card bento-quarter">
-              <div class="kpi-label" style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Ahorro Neto <span class="tooltip">ⓘ<span class="tooltip-text">Ingresos menos gastos e inversiones.</span></span></div>
-              <div class="kpi-value" style="color: var(--text-primary); font-size: 24px; font-weight: 800; margin-top: 8px;" id="dashboard-month-savings">0,00 €</div>
-            </div>
+        </div>
     
             <div class="bento-card bento-twothirds">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -5738,16 +5984,40 @@ body.privacy-mode #dashboard-runway-value {
         }
     }
 
-    // 4. CÁLCULOS DEL MES ACTUAL
+    // 4. CÁLCULOS DEL MES ACTUAL (CORREGIDO PARA DETECTAR TUS DATOS)
     const monthLabelEl = document.getElementById('dashboard-current-month');
     if (monthLabelEl) monthLabelEl.textContent = MONTHS[currentMonthIndex];
     
-    const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos')).reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const monthExpenses = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales')).reduce((sum, t) => sum + parseFloat(t.amount), 0) +
-                          (await getTransactionsByMonth(currentMonthIndex, 'gastos_compartidos')).reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const monthInvestments = (await getTransactionsByMonth(currentMonthIndex, 'inversiones')).reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const monthSavings = monthIncome - monthExpenses - monthInvestments;
+    // INGRESOS: Usamos el tipo exacto 'ingresos' (en plural) que usa tu app
+    const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
+        .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
     
+    // GASTOS PERSONALES: Solo los de tu cuenta personal
+    const gastosPersonalesSolo = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
+        .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    
+    // TU APORTACIÓN: La buscamos directamente en la tabla de aportaciones (los 284,77€)
+    const monthKey = `${currentMonthIndex}-${currentYear}`;
+    const monthContribData = data.contributions.find(c => c.month === monthKey);
+    const miAportacion = monthContribData ? parseFloat(monthContribData.my || 0) : 0;
+
+    // GASTO REAL = Tus gastos personales + lo que pusiste para la casa
+    const monthExpenses = gastosPersonalesSolo + miAportacion;
+    
+    // INVERSIONES: Usamos el tipo exacto 'inversiones'
+    const monthInvestments = (await getTransactionsByMonth(currentMonthIndex, 'inversiones'))
+        .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    
+    const monthSavings = monthIncome - monthExpenses - monthInvestments;
+
+    // DEBUG: Ahora verás los números reales en la consola
+    console.log("Datos detectados correctamente:", { 
+        Ingresos: monthIncome, 
+        Gastos_y_Aportacion: monthExpenses, 
+        Inversiones: monthInvestments 
+    });
+
+    // Actualizar KPIs de las tarjetas superiores
     animateValue('dashboard-month-income', 0, monthIncome, 800);
     animateValue('dashboard-month-expenses', 0, monthExpenses, 800);
     animateValue('dashboard-month-investments', 0, monthInvestments, 800);
@@ -5756,6 +6026,58 @@ body.privacy-mode #dashboard-runway-value {
     if (savingsEl) {
       animateValue('dashboard-month-savings', 0, monthSavings, 800);
       savingsEl.style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+
+    // --- LÓGICA DE LA BARRA DE FLUJO (SIN DUPLICADOS) ---
+    const income = monthIncome || 0;
+    const spent = monthExpenses || 0;
+    const saved = monthInvestments || 0;
+    
+    // COMPROMETIDO: Gastos fijos personales que aún no has marcado como pagados
+    const paidFixedIds = data.fixedExpensesPaid[monthKey] || [];
+    const committed = (data.fixedExpenses || [])
+        .filter(fe => fe.type === 'gastos_personales' && 
+                      fe.months.includes(currentMonthIndex) && 
+                      !paidFixedIds.includes(fe.id))
+        .reduce((sum, fe) => sum + parseFloat(fe.amount || 0), 0);
+
+    const barSpent = document.getElementById('bar-spent');
+    const barCommitted = document.getElementById('bar-committed');
+    const barSaved = document.getElementById('bar-saved');
+    const ratioText = document.getElementById('cf-percentage');
+
+    if (income > 0 && barSpent) {
+        const spentPct = (spent / income) * 100;
+        const committedPct = (committed / income) * 100;
+        const savedPct = (saved / income) * 100;
+
+        barSpent.style.width = Math.min(spentPct, 100) + '%';
+        barCommitted.style.width = Math.min(committedPct, 100 - spentPct) + '%';
+        barSaved.style.width = Math.min(savedPct, 100 - spentPct - committedPct) + '%';
+
+        const freePct = Math.max(0, 100 - spentPct - committedPct - savedPct);
+        if (ratioText) {
+            ratioText.innerText = freePct.toFixed(0) + '% Libre';
+            ratioText.style.color = freePct < 15 ? 'var(--red)' : 'var(--text-primary)';
+        }
+    } else if (barSpent) {
+        barSpent.style.width = '0%';
+        if (ratioText) ratioText.innerText = 'Sin ingresos';
+    }
+
+    // Dentro de tu lógica de la barra, añade esto después de calcular freePct:
+    const statusLabel = document.getElementById('cf-status-label');
+    if (statusLabel) {
+        if (freePct > 25) {
+            statusLabel.innerText = "ÓPTIMA";
+            statusLabel.style.color = "var(--green)";
+        } else if (freePct > 10) {
+            statusLabel.innerText = "AJUSTADA";
+            statusLabel.style.color = "var(--orange)";
+        } else {
+            statusLabel.innerText = "CRÍTICA";
+            statusLabel.style.color = "var(--red)";
+        }
     }
 
     // 4.5 INTERESES (Solo usuario actual)
@@ -5804,6 +6126,7 @@ body.privacy-mode #dashboard-runway-value {
     // LOGROS
     const { data: loans } = await supabaseClient.from('loans').select('*').eq('user_id', currentUser.id);
     await renderAchievements(data, loans || []);
+
 }
 
     async function renderInvestmentSparkline() {
@@ -6716,6 +7039,21 @@ async function editTransaction(id) {
     async function handleConfirmDeleteHolding(id) {
       await confirmDeleteHolding(id);
     }
+
+    function toggleAccountMenu(event) {
+    event.stopPropagation(); // Evita que el clic cierre el menú inmediatamente
+    const menu = document.getElementById('account-menu');
+    menu.classList.toggle('show');
+
+    // Cerrar al hacer clic fuera
+    const closeHandler = (e) => {
+        if (!document.getElementById('profile-trigger').contains(e.target)) {
+            menu.classList.remove('show');
+            document.removeEventListener('click', closeHandler);
+        }
+    };
+    document.addEventListener('click', closeHandler);
+}
 
     // ============================================================================
 // UPDATE VALUE MODAL
@@ -12016,22 +12354,49 @@ function renderWishlist(filter = 'todos') {
         const wishes = (dataCache && dataCache.wishlist) ? dataCache.wishlist : [];
         const filteredWishes = filter === 'todos' ? wishes : wishes.filter(w => w.category === filter);
 
-        // 1. Cabecera y Tabla
-        let html = `
+        // 1. CÁLCULO DE TOTALES (Stats de la App)
+        const totalTarget = wishes.reduce((acc, w) => acc + (parseFloat(w.target) || 0), 0);
+        const totalSaved = wishes.reduce((acc, w) => acc + (parseFloat(w.saved) || 0), 0);
+        const remaining = totalTarget - totalSaved;
+
+        // 2. HTML DE LOS STATS
+        let summaryHtml = `
+            <div class="wish-summary-container">
+                <div class="stat-box">
+                    <span class="stat-label">Presupuesto Objetivos</span>
+                    <span class="stat-value">${formatCurrency(totalTarget)}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Capital Ahorrado</span>
+                    <span class="stat-value positive">${formatCurrency(totalSaved)}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Pendiente</span>
+                    <span class="stat-value remaining">${formatCurrency(remaining)}</span>
+                </div>
+            </div>
+        `;
+
+        // 3. TABLA DE ALTA DENSIDAD
+        let tableHtml = `
             <div class="wishlist-panel">
                 <div class="wish-table-head">
                     <div></div>
                     <div>Artículo</div>
                     <div>Precio</div>
-                    <div>Ahorro</div>
+                    <div>Progreso</div>
                     <div style="text-align: right;">Acciones</div>
                 </div>
         `;
 
         if (filteredWishes.length === 0) {
-            html += `<div style="padding: 40px; text-align: center; color: #94a3b8;">No hay elementos en esta categoría.</div>`;
+            tableHtml += `
+                <div style="padding: 60px; text-align: center; color: var(--text-tertiary);">
+                    <i class="fas fa-layer-group" style="font-size: 24px; margin-bottom: 12px; opacity: 0.3;"></i>
+                    <p style="font-size: 14px; font-weight: 600;">No hay elementos para mostrar</p>
+                </div>`;
         } else {
-            html += filteredWishes.map(wish => {
+            tableHtml += filteredWishes.map(wish => {
                 const target = parseFloat(wish.target) || 0;
                 const saved = parseFloat(wish.saved) || 0;
                 const progress = target > 0 ? Math.min((saved / target) * 100, 100) : 0;
@@ -12041,40 +12406,46 @@ function renderWishlist(filter = 'todos') {
                         <img src="${wish.image_url || ''}" class="wish-row-img" onerror="this.style.opacity='0'">
                         
                         <div class="wish-details">
-                            <div class="wish-row-name">${wish.name}</div>
-                            <div class="wish-row-cat">${wish.category} • ${wish.priority}</div>
-                        </div>
+                          <div class="wish-row-name">${wish.name}</div>
+                          <div class="wish-row-cat">${wish.category}</div>
+                      </div>
 
-                        <div class="wish-row-value">
-                            ${formatCurrency(target)}
-                        </div>
+                      <div class="wish-row-value">
+                          ${formatCurrency(target)}
+                      </div>
 
-                        <div class="wish-row-progress-container">
-                            <div class="wish-row-bar-bg">
-                                <div class="wish-row-bar-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <span class="wish-row-percent">${progress.toFixed(0)}%</span>
-                        </div>
+                      <div class="wish-row-progress-container">
+                          <div class="wish-row-bar-bg">
+                              <div class="wish-row-bar-fill" style="width: ${progress}%"></div>
+                          </div>
+                          <span class="wish-row-percent">${progress.toFixed(0)}%</span>
+                      </div>
 
-                        <div class="wish-row-actions">
-                            ${wish.link ? `<a href="${wish.link}" target="_blank" class="btn-table-action"><i class="fas fa-external-link-alt"></i></a>` : ''}
-                            <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Añadir ahorro">
-                                <i class="fas fa-piggy-bank"></i>
-                            </button>
-                            <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Eliminar">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
+                      <div class="wish-row-actions">
+                          ${wish.link ? `
+                              <a href="${wish.link}" target="_blank" class="btn-table-action" title="Ver link">
+                                  <i class="fas fa-external-link-alt"></i>
+                              </a>` : `
+                              <div style="width:36px"></div> `}
+                          <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Asignar capital">
+                              <i class="fas fa-piggy-bank"></i>
+                          </button>
+                          <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Archivar">
+                              <i class="fas fa-trash"></i>
+                          </button>
+                      </div>
+                  </div>
+              `;
             }).join('');
         }
 
-        html += `</div>`;
-        container.innerHTML = html;
+        tableHtml += `</div>`;
+        
+        // Inyectamos todo en el contenedor
+        container.innerHTML = summaryHtml + tableHtml;
 
     } catch (error) {
-        console.error("Error en render:", error);
+        console.error("Error en renderWishlist:", error);
     }
 }
 
