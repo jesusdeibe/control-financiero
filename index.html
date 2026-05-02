@@ -3556,20 +3556,21 @@ body.privacy-mode #dashboard-runway-value {
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
+/* Redefinimos la cuadrícula para 6 columnas claras */
 .wish-table-head, .wish-row {
     display: grid;
-    grid-template-columns: 60px 2fr 100px 1fr 150px; 
+    /* Columnas: Imagen, Nombre, Viabilidad, Precio, Progreso, Acciones */
+    grid-template-columns: 80px 2fr 1.5fr 120px 1.5fr 140px; 
     align-items: center;
+    gap: 15px;
     padding: 16px 24px;
     border-bottom: 1px solid var(--border-color);
 }
 
 .wish-row-actions {
     display: flex;
-    flex-direction: row; /* Asegura horizontalidad */
-    justify-content: flex-end;
-    gap: 8px; /* Reducimos un poco el gap para que quepan mejor */
-    flex-wrap: nowrap; /* Evita que salten de línea */
+    justify-content: flex-end; /* Acciones siempre a la derecha */
+    gap: 8px;
 }
 
 .wish-row:last-child { border-bottom: none; }
@@ -3594,10 +3595,11 @@ body.privacy-mode #dashboard-runway-value {
     color: var(--text-tertiary);
 }
 
+/* Alineación específica para que no choquen */
 .wish-row-value {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-weight: 800;
+    text-align: left;
+    color: var(--text-primary);
 }
 
 /* Progreso Estilo App */
@@ -3856,6 +3858,63 @@ body.privacy-mode #dashboard-runway-value {
     border-radius: 50%; 
 }
 
+/* --- DISEÑO DE BOTONES DE ICONO --- */
+.icon-only-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.icon-only-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 69, 137, 0.08);
+}
+
+/* Variante pequeña para el selector de meses */
+.icon-only-btn.mini {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    font-size: 10px;
+}
+
+/* Asegura que el canvas del análisis personal sea visible */
+#personalGrowthChart {
+    min-height: 350px !important;
+    width: 100% !important;
+}
+
+/* Estilo para el KPI de Tasa de Ahorro que faltaba en el HTML */
+#pa-savings-rate {
+    font-size: 28px;
+    font-weight: 900;
+    transition: color 0.3s ease;
+}
+
+.smart-advice-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.smart-advice-box .badge {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
   </style>
 </head>
 <body>
@@ -3911,7 +3970,9 @@ body.privacy-mode #dashboard-runway-value {
         </button>
     
         <button class="nav-item nav-btn" data-view="travels" onclick="switchView('travels')">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3.5S19 4 17.5 5.5L14 9l-8.2-1.8L3 10l7.5 3L13.5 21l3-2.8z"></path></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path>
+            </svg>
             <span>Viajes</span>
         </button>
     
@@ -3941,12 +4002,11 @@ body.privacy-mode #dashboard-runway-value {
           <div id="dashboard-achievements" style="flex-grow: 1;"></div>
           
           <div class="topbar-right-group" style="position: relative;">
-              
               <div class="notif-bell">
                   <i class="fas fa-bell"></i>
                   <div class="notif-badge"></div>
               </div>
-      
+        
               <div class="topbar-profile-btn" id="profile-trigger" onclick="toggleAccountMenu(event)">
                   <div class="sidebar-avatar" style="width: 30px; height: 30px; margin: 0;">
                       <span id="sidebar-initials">J</span>
@@ -3956,7 +4016,7 @@ body.privacy-mode #dashboard-runway-value {
                       <span style="font-size: 9px; font-weight: 600; color: var(--text-tertiary);" id="sidebar-email">jesus@sunday.com</span>
                   </div>
                   <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--text-tertiary);"></i>
-      
+        
                   <div class="user-menu-dropdown" id="account-menu">
                       <div class="dropdown-item" onclick="switchAccount()">
                           <i class="fas fa-exchange-alt"></i> Cambiar cuenta
@@ -3966,10 +4026,9 @@ body.privacy-mode #dashboard-runway-value {
                           <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                       </div>
                   </div>
-              </div>
-      
-          </div>
-      </header>
+              </div> <!-- Cierre topbar-profile-btn -->
+          </div> <!-- Cierre topbar-right-group -->
+        </header>
     
       <main class="main-content">
 
@@ -3996,14 +4055,14 @@ body.privacy-mode #dashboard-runway-value {
     
             <div class="bento-full" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
                 
-              <div class="hero-bento-card hero-personal">
-                  <div>
-                      <div class="hero-icon-wrap hero-icon-personal">
-                          <i class="fas fa-wallet"></i>
-                      </div>
-                      <div class="hero-title">Patrimonio Personal</div>
-                      <div id="dashboard-total-patrimony" class="hero-value">0,00 €</div>
-                  </div>
+              <div class="hero-bento-card hero-personal clickable" onclick="switchView('personal-analysis')">
+                <div>
+                    <div class="hero-icon-wrap hero-icon-personal">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="hero-title">Patrimonio Personal</div>
+                    <div id="dashboard-total-patrimony" class="hero-value">0,00 €</div>
+                </div>
                   
                   <div class="master-bento-breakdown">
                       <div class="mb-col">
@@ -4054,6 +4113,7 @@ body.privacy-mode #dashboard-runway-value {
                 <div class="cf-legend-item"><div class="dot" style="background: #34D399"></div> Inversión</div>
             </div>
         </div>
+
     
             <div class="bento-card bento-twothirds">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -4641,12 +4701,66 @@ body.privacy-mode #dashboard-runway-value {
     </section>
   </div>
 
+  <div id="personal-analysis-view" class="view">
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="icon-only-btn" onclick="switchView('dashboard')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div>
+                <h1 class="page-title">Mi Salud Financiera</h1>
+                <p class="page-subtitle">Análisis detallado de ahorros e inversiones</p>
+            </div>
+        </div>
+    </header>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
+      <!-- KPI: Capital Líquido -->
+      <div class="kpi-card" style="border-left: 4px solid var(--primary);">
+          <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Efectivo Disponible</div>
+          <div style="font-size: 28px; font-weight: 900;" id="pa-liquid-value">0,00 €</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">En cuentas corrientes</div>
+      </div>
+  
+      <!-- KPI: Tasa de Ahorro (NUEVO) -->
+      <div class="kpi-card" style="border-left: 4px solid var(--green);">
+          <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Tasa de Ahorro Real</div>
+          <div id="pa-savings-rate">0,0%</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Ingresos vs Gastos + Aportación</div>
+      </div>
+  
+      <!-- KPI: Supervivencia -->
+      <div class="kpi-card" style="border-left: 4px solid var(--orange);">
+          <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Margen de Vida</div>
+          <div style="font-size: 28px; font-weight: 900;" id="pa-runway-value">0 meses</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Meses de libertad financiera</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+        <div class="section">
+            <h3 class="section-title">📉 Crecimiento del Patrimonio</h3>
+            <div style="height: 350px;">
+                <canvas id="personalGrowthChart"></canvas>
+            </div>
+        </div>
+        <div class="section">
+            <h3 class="section-title">🏦 Mis Reservas</h3>
+            <div id="personal-accounts-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Se llena con JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
   <div id="shared-analysis-view" class="view">
     <header class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="icon-only-btn" onclick="switchView('dashboard')">←</button>
+            <button class="icon-only-btn" onclick="switchView('dashboard')" title="Volver al Resumen">
+              <i class="fas fa-arrow-left"></i>
+            </button>
             <div>
-                <h1 class="page-title">Análisis Silvia & Jesús</h1>
+                <h1 class="page-title">Análisis Silvia y Jesús</h1>
                 <p class="page-subtitle">Evolución del gasto compartido mensual</p>
             </div>
         </div>
@@ -4670,11 +4784,19 @@ body.privacy-mode #dashboard-runway-value {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Aportaciones</div>
                 
-                <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px 6px; border-radius: 8px;">
-                    <button class="icon-only-btn" onclick="changeSharedMonth(-1)" style="width: 20px; height: 20px; font-size: 10px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">←</button>
-                    <div id="shared-current-month-display" style="font-size: 10px; font-weight: 800; color: var(--primary); min-width: 65px; text-align: center;">MES</div>
-                    <button class="icon-only-btn" onclick="changeSharedMonth(1)" style="width: 20px; height: 20px; font-size: 10px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">→</button>
-                </div>
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px; border-radius: 10px;">
+                  <button class="icon-only-btn mini" onclick="changeSharedMonth(-1)">
+                      <i class="fas fa-chevron-left"></i>
+                  </button>
+                  
+                  <div id="shared-current-month-display" style="font-size: 10px; font-weight: 800; color: var(--primary); min-width: 70px; text-align: center; text-transform: uppercase;">
+                      MES
+                  </div>
+                  
+                  <button class="icon-only-btn mini" onclick="changeSharedMonth(1)">
+                      <i class="fas fa-chevron-right"></i>
+                  </button>
+              </div>
             </div>
 
             <div style="font-size: 24px; font-weight: 900;" id="shared-balance-text">0% / 0%</div>
@@ -4802,6 +4924,7 @@ body.privacy-mode #dashboard-runway-value {
 </div>
 
 </main>
+</div>
 
   <!-- Users Modal -->
 <div class="modal-overlay" id="auth-modal">
@@ -5905,14 +6028,15 @@ body.privacy-mode #dashboard-runway-value {
     }
 
     async function renderDashboard() {
-    if (!currentUser) return; // Seguridad: Si no hay usuario, no hacemos nada
+    if (!currentUser) return;
 
     const data = await getData();
     const now = new Date();
     const currentMonthIndex = now.getMonth();
-    const currentYear = now.getFullYear(); // Declarada solo UNA vez aquí
+    const currentYear = now.getFullYear();
+    const monthKey = `${currentMonthIndex}-${currentYear}`;
     
-    // 1. CÁLCULOS DE CUENTAS
+    // 1. CÁLCULOS DE PATRIMONIO (Tu lógica original)
     const sharedAccounts = data.accounts.filter(a => a.isShared === true || a.is_shared === true);
     const sharedBalances = await Promise.all(sharedAccounts.map(async acc => {
         const bal = await calculateAccountBalance(acc.name);
@@ -5925,7 +6049,6 @@ body.privacy-mode #dashboard-runway-value {
       a.type !== 'Broker' && a.type !== 'Exchange Crypto' &&
       a.includeInPatrimony !== false
     );
-    
     const brokerAccounts = data.accounts.filter(a => 
       (a.type === 'Broker' || a.type === 'Exchange Crypto') &&
       a.includeInPatrimony !== false
@@ -5933,13 +6056,12 @@ body.privacy-mode #dashboard-runway-value {
     
     const normalTotal = await Promise.all(normalAccounts.map(a => calculateAccountBalance(a.name)))
       .then(balances => balances.reduce((sum, b) => sum + b, 0));
-        
     const brokerTotal = await Promise.all(brokerAccounts.map(a => calculateAccountBalance(a.name)))
       .then(balances => balances.reduce((sum, b) => sum + b, 0));
     
     const totalPatrimony = normalTotal + brokerTotal;
 
-    // 2. ACTUALIZAR UI SUPERIOR
+    // 2. ACTUALIZAR UI SUPERIOR (NÚMEROS Y COLORES)
     animateValue('dashboard-total-patrimony', 0, totalPatrimony, 1000);
     animateValue('dashboard-normal-total', 0, normalTotal, 800);
     animateValue('dashboard-investments-total', 0, brokerTotal, 800);
@@ -5960,7 +6082,7 @@ body.privacy-mode #dashboard-runway-value {
           </div>`).join('') : '';
     }
 
-    // 3. LÓGICA DE SUPERVIVENCIA
+    // 3. LÓGICA DE SUPERVIVENCIA (Tus tarjetas de meses)
     const runway = await calculateRunway();
     const runwayCard = document.getElementById('runway-card');
     const runwayEl = document.getElementById('dashboard-runway-value');
@@ -5984,60 +6106,25 @@ body.privacy-mode #dashboard-runway-value {
         }
     }
 
-    // 4. CÁLCULOS DEL MES ACTUAL (CORREGIDO PARA DETECTAR TUS DATOS)
-    const monthLabelEl = document.getElementById('dashboard-current-month');
-    if (monthLabelEl) monthLabelEl.textContent = MONTHS[currentMonthIndex];
-    
-    // INGRESOS: Usamos el tipo exacto 'ingresos' (en plural) que usa tu app
+    // 4. CÁLCULOS DEL MES ACTUAL (INGRESOS, GASTOS REALES E INVERSIÓN)
     const monthIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
         .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-    
-    // GASTOS PERSONALES: Solo los de tu cuenta personal
     const gastosPersonalesSolo = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
         .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
     
-    // TU APORTACIÓN: La buscamos directamente en la tabla de aportaciones (los 284,77€)
-    const monthKey = `${currentMonthIndex}-${currentYear}`;
     const monthContribData = data.contributions.find(c => c.month === monthKey);
     const miAportacion = monthContribData ? parseFloat(monthContribData.my || 0) : 0;
-
-    // GASTO REAL = Tus gastos personales + lo que pusiste para la casa
     const monthExpenses = gastosPersonalesSolo + miAportacion;
     
-    // INVERSIONES: Usamos el tipo exacto 'inversiones'
     const monthInvestments = (await getTransactionsByMonth(currentMonthIndex, 'inversiones'))
         .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-    
-    const monthSavings = monthIncome - monthExpenses - monthInvestments;
 
-    // DEBUG: Ahora verás los números reales en la consola
-    console.log("Datos detectados correctamente:", { 
-        Ingresos: monthIncome, 
-        Gastos_y_Aportacion: monthExpenses, 
-        Inversiones: monthInvestments 
-    });
-
-    // Actualizar KPIs de las tarjetas superiores
-    animateValue('dashboard-month-income', 0, monthIncome, 800);
-    animateValue('dashboard-month-expenses', 0, monthExpenses, 800);
-    animateValue('dashboard-month-investments', 0, monthInvestments, 800);
-    
-    const savingsEl = document.getElementById('dashboard-month-savings');
-    if (savingsEl) {
-      animateValue('dashboard-month-savings', 0, monthSavings, 800);
-      savingsEl.style.color = monthSavings >= 0 ? 'var(--green)' : 'var(--red)';
-    }
-
-    // --- LÓGICA DE LA BARRA DE FLUJO (SIN DUPLICADOS) ---
-    const income = monthIncome || 0;
-    const spent = monthExpenses || 0;
-    const saved = monthInvestments || 0;
-    
-    // COMPROMETIDO: Gastos fijos personales que aún no has marcado como pagados
+    // --- LÓGICA DE LA BARRA DE FLUJO (CON FILTRO BLINDADO) ---
+    // CULPABLE DEL ERROR CORREGIDO: (fe.months || [])
     const paidFixedIds = data.fixedExpensesPaid[monthKey] || [];
     const committed = (data.fixedExpenses || [])
         .filter(fe => fe.type === 'gastos_personales' && 
-                      fe.months.includes(currentMonthIndex) && 
+                      (fe.months || []).includes(currentMonthIndex) && 
                       !paidFixedIds.includes(fe.id))
         .reduce((sum, fe) => sum + parseFloat(fe.amount || 0), 0);
 
@@ -6045,51 +6132,34 @@ body.privacy-mode #dashboard-runway-value {
     const barCommitted = document.getElementById('bar-committed');
     const barSaved = document.getElementById('bar-saved');
     const ratioText = document.getElementById('cf-percentage');
+    const statusLabel = document.getElementById('cf-status-label');
 
-    if (income > 0 && barSpent) {
-        const spentPct = (spent / income) * 100;
-        const committedPct = (committed / income) * 100;
-        const savedPct = (saved / income) * 100;
+    if (monthIncome > 0 && barSpent) {
+        const spentPct = (monthExpenses / monthIncome) * 100;
+        const committedPct = (committed / monthIncome) * 100;
+        const savedPct = (monthInvestments / monthIncome) * 100;
 
         barSpent.style.width = Math.min(spentPct, 100) + '%';
-        barCommitted.style.width = Math.min(committedPct, 100 - spentPct) + '%';
-        barSaved.style.width = Math.min(savedPct, 100 - spentPct - committedPct) + '%';
+        if (barCommitted) barCommitted.style.width = Math.min(committedPct, 100 - spentPct) + '%';
+        if (barSaved) barSaved.style.width = Math.min(savedPct, 100 - spentPct - committedPct) + '%';
 
         const freePct = Math.max(0, 100 - spentPct - committedPct - savedPct);
-        if (ratioText) {
-            ratioText.innerText = freePct.toFixed(0) + '% Libre';
-            ratioText.style.color = freePct < 15 ? 'var(--red)' : 'var(--text-primary)';
-        }
-    } else if (barSpent) {
-        barSpent.style.width = '0%';
-        if (ratioText) ratioText.innerText = 'Sin ingresos';
-    }
-
-    // Dentro de tu lógica de la barra, añade esto después de calcular freePct:
-    const statusLabel = document.getElementById('cf-status-label');
-    if (statusLabel) {
-        if (freePct > 25) {
-            statusLabel.innerText = "ÓPTIMA";
-            statusLabel.style.color = "var(--green)";
-        } else if (freePct > 10) {
-            statusLabel.innerText = "AJUSTADA";
-            statusLabel.style.color = "var(--orange)";
-        } else {
-            statusLabel.innerText = "CRÍTICA";
-            statusLabel.style.color = "var(--red)";
+        if (ratioText) ratioText.innerText = freePct.toFixed(0) + '% Libre';
+        
+        if (statusLabel) {
+            if (freePct > 25) { statusLabel.innerText = "ÓPTIMA"; statusLabel.style.color = "var(--green)"; }
+            else if (freePct > 10) { statusLabel.innerText = "AJUSTADA"; statusLabel.style.color = "var(--orange)"; }
+            else { statusLabel.innerText = "CRÍTICA"; statusLabel.style.color = "var(--red)"; }
         }
     }
 
-    // 4.5 INTERESES (Solo usuario actual)
+    // 4.5 INTERESES (Tu lógica de notificación SaaS)
     const monthInterests = data.transactions.filter(t => {
         const d = new Date(t.date);
-        return d.getMonth() === currentMonthIndex && 
-               d.getFullYear() === currentYear && 
-               t.category === 'Intereses' &&
-               t.user_id === currentUser.id;
+        return d.getMonth() === currentMonthIndex && d.getFullYear() === currentYear && 
+               t.category === 'Intereses' && t.user_id === currentUser.id;
     }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-    // 5. RENDER DE ALERTAS, GRÁFICOS Y TODOS LOS WIDGETS
     const alertsList = document.getElementById('alerts-list');
     if (alertsList) {
         alertsList.innerHTML = ''; 
@@ -6110,23 +6180,24 @@ body.privacy-mode #dashboard-runway-value {
         }
     }
 
-    // LLAMADAS A TUS GRÁFICOS Y WIDGETS (MANTENIENDO TODOS)
-    renderInvestmentEvolutionChart();
-    renderDistributionChart(normalTotal, brokerTotal, sharedTotal);
-    renderEvolutionChart('personal');
-    await renderInvestmentSparkline();
+    // 5. RENDERIZADO DE GRÁFICOS Y WIDGETS (Aislados por si uno falla)
+    try { renderInvestmentEvolutionChart(); } catch(e) {}
+    try { renderDistributionChart(normalTotal, brokerTotal, sharedTotal); } catch(e) {}
+    try { renderEvolutionChart('personal'); } catch(e) {}
+    try { await renderInvestmentSparkline(); } catch(e) {}
     
-    await checkBudgetAlerts();
-    await checkLiquidityAlerts();
-    await renderSavingGoals();
-    await renderUpcomingExpenses();
-    await renderSavingsStreak(); 
-    await renderActiveTravelWidget();
+    try { await checkBudgetAlerts(); } catch(e) {}
+    try { await checkLiquidityAlerts(); } catch(e) {}
+    try { await renderSavingGoals(); } catch(e) {}
+    try { await renderUpcomingExpenses(); } catch(e) {}
+    try { await renderSavingsStreak(); } catch(e) {}
+    try { await renderActiveTravelWidget(); } catch(e) {}
     
-    // LOGROS
-    const { data: loans } = await supabaseClient.from('loans').select('*').eq('user_id', currentUser.id);
-    await renderAchievements(data, loans || []);
-
+    // 6. LOGROS
+    try {
+        const { data: loans } = await supabaseClient.from('loans').select('*').eq('user_id', currentUser.id);
+        await renderAchievements(data, loans || []);
+    } catch(e) {}
 }
 
     async function renderInvestmentSparkline() {
@@ -7388,6 +7459,10 @@ async function showPersonalExpensesBreakdown() {
             renderTravelPlans();
         }
 
+        if (viewName === 'personal-analysis') {
+            renderPersonalAnalysis();
+        }
+
         // Scroll al inicio
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.scrollTop = 0;
@@ -7413,6 +7488,141 @@ async function showPersonalExpensesBreakdown() {
     });
 
     // ============================================================================
+
+    async function renderPersonalAnalysis() {
+    if (!currentUser) return;
+    const data = await getData();
+    const currentMonthIndex = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthKey = `${currentMonthIndex}-${currentYear}`;
+
+    // 1. RECALCULAR DATOS DE FLUJO PERSONAL
+    const personalIncome = (await getTransactionsByMonth(currentMonthIndex, 'ingresos'))
+        .reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+
+    const personalExpenses = (await getTransactionsByMonth(currentMonthIndex, 'gastos_personales'))
+        .reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+
+    // Buscamos tu aportación específica (los 284,77€ aprox)
+    const monthContribData = data.contributions.find(c => c.month === monthKey);
+    const miAportacion = monthContribData ? parseFloat(monthContribData.my || 0) : 0;
+
+    const realSaved = personalIncome - personalExpenses - miAportacion;
+    const savingsRate = personalIncome > 0 ? (realSaved / personalIncome) * 100 : 0;
+
+    // 2. ACTUALIZAR KPIs
+    document.getElementById('pa-savings-rate').textContent = savingsRate.toFixed(1) + '%';
+    document.getElementById('pa-savings-rate').style.color = savingsRate > 20 ? 'var(--green)' : 'var(--orange)';
+
+    // 3. FILTRAR Y RENDERIZAR LISTA DE CUENTAS (MIS RESERVAS)
+    const personalAccounts = data.accounts.filter(a => 
+        !(a.isShared || a.is_shared === true) && a.type !== 'Broker' && a.type !== 'Exchange Crypto'
+    );
+    const personalInvestments = data.accounts.filter(a => 
+        !(a.isShared || a.is_shared === true) && (a.type === 'Broker' || a.type === 'Exchange Crypto')
+    );
+
+    const listContainer = document.getElementById('personal-accounts-list');
+    if (listContainer) {
+        let listHtml = '';
+        const allPersonal = [...personalAccounts, ...personalInvestments];
+        
+        // Usamos un bucle for tradicional para manejar los awaits correctamente
+        for (const acc of allPersonal) {
+            const balance = await calculateAccountBalance(acc.name);
+            listHtml += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; background:rgba(0,0,0,0.02); border-radius:12px; border: 1px solid rgba(0,0,0,0.03);">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:8px; height:8px; border-radius:50%; background:${acc.color || 'var(--primary)'}"></div>
+                        <span style="font-weight:700; font-size:13px; color:var(--text-primary);">${acc.name}</span>
+                    </div>
+                    <span style="font-weight:800; color:var(--text-primary);">${formatCurrency(balance)}</span>
+                </div>`;
+        }
+        listContainer.innerHTML = listHtml || '<div style="text-align:center; color:var(--text-tertiary);">No hay cuentas personales</div>';
+    }
+
+    // 4. DATOS ADICIONALES (LIQUIDEZ Y RUNWAY)
+    const liquidTotal = await Promise.all(personalAccounts.map(a => calculateAccountBalance(a.name)))
+        .then(res => res.reduce((s, b) => s + b, 0));
+    
+    document.getElementById('pa-liquid-value').textContent = formatCurrency(liquidTotal);
+    
+    const runway = await calculateRunway();
+    document.getElementById('pa-runway-value').textContent = runway.lifestyleMonths.toFixed(1) + ' meses';
+
+    // 5. LANZAR GRÁFICO (Envuelto para que no rompa la lista si falla)
+    try {
+        await renderPersonalGrowthChart();
+    } catch (e) {
+        console.error("Error al renderizar el gráfico personal:", e);
+    }
+}
+
+async function renderPersonalGrowthChart() {
+    const canvas = document.getElementById('personalGrowthChart');
+    if (!canvas) return;
+
+    const data = await getData();
+    const history = data.holdingsHistory || [];
+    
+    // Filtramos inversiones personales (evitamos las que digan "pareja" o "compartida")
+    const personalHoldings = data.holdings.filter(h => 
+        !h.account.toLowerCase().includes('pareja') && 
+        !h.account.toLowerCase().includes('compartida')
+    );
+
+    const ctx = canvas.getContext('2d');
+    if (window.pGrowthChart) window.pGrowthChart.destroy();
+
+    // FALLBACK: Si no hay historial de inversiones, creamos un dato ficticio con el patrimonio actual
+    // para que el gráfico no aparezca vacío.
+    let labels = [];
+    let values = [];
+
+    if (history.length > 0 && personalHoldings.length > 0) {
+        const uniqueDates = [...new Set(history.map(h => h.date))].sort();
+        labels = uniqueDates.map(d => new Intl.DateTimeFormat('es-ES', {month: 'short'}).format(new Date(d)));
+        values = uniqueDates.map(date => {
+            return personalHoldings.reduce((total, h) => {
+                const lastUpdate = history.filter(up => up.holding_id === h.id && up.date <= date)
+                                         .sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+                return total + (lastUpdate ? parseFloat(lastUpdate.value) : 0);
+            }, 0);
+        });
+    } else {
+        // Si no hay datos, mostramos el mes actual con el valor actual de tus inversiones
+        labels = [MONTHS[currentMonth]];
+        values = [personalHoldings.reduce((sum, h) => sum + h.currentValue, 0)];
+    }
+
+    window.pGrowthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Patrimonio en Inversiones',
+                data: values,
+                borderColor: '#214589',
+                backgroundColor: 'rgba(33, 69, 137, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
 // ============================================================================
 // ADICIONAL PARA VISTA DE CUENTAS
 // ============================================================================
@@ -12346,20 +12556,21 @@ function handleQuickAction(type) {
     }
 }
 
-function renderWishlist(filter = 'todos') {
+async function renderWishlist(filter = 'todos') { // 1. Ahora es async
     const container = document.getElementById('wishlist-container');
     if (!container) return;
 
     try {
-        const wishes = (dataCache && dataCache.wishlist) ? dataCache.wishlist : [];
+        const data = await getData(); // Aseguramos datos frescos
+        const wishes = (data && data.wishlist) ? data.wishlist : [];
         const filteredWishes = filter === 'todos' ? wishes : wishes.filter(w => w.category === filter);
 
-        // 1. CÁLCULO DE TOTALES (Stats de la App)
+        // --- CÁLCULO DE TOTALES ---
         const totalTarget = wishes.reduce((acc, w) => acc + (parseFloat(w.target) || 0), 0);
         const totalSaved = wishes.reduce((acc, w) => acc + (parseFloat(w.saved) || 0), 0);
         const remaining = totalTarget - totalSaved;
 
-        // 2. HTML DE LOS STATS
+        // --- HTML DE STATS (Igual al tuyo) ---
         let summaryHtml = `
             <div class="wish-summary-container">
                 <div class="stat-box">
@@ -12377,12 +12588,13 @@ function renderWishlist(filter = 'todos') {
             </div>
         `;
 
-        // 3. TABLA DE ALTA DENSIDAD
+        // --- CONSTRUCCIÓN DE LA TABLA ---
         let tableHtml = `
             <div class="wishlist-panel">
                 <div class="wish-table-head">
-                    <div></div>
+                    <div>Foto</div>
                     <div>Artículo</div>
+                    <div>Viabilidad</div>
                     <div>Precio</div>
                     <div>Progreso</div>
                     <div style="text-align: right;">Acciones</div>
@@ -12390,62 +12602,92 @@ function renderWishlist(filter = 'todos') {
         `;
 
         if (filteredWishes.length === 0) {
-            tableHtml += `
-                <div style="padding: 60px; text-align: center; color: var(--text-tertiary);">
-                    <i class="fas fa-layer-group" style="font-size: 24px; margin-bottom: 12px; opacity: 0.3;"></i>
-                    <p style="font-size: 14px; font-weight: 600;">No hay elementos para mostrar</p>
-                </div>`;
+            tableHtml += `<div style="padding: 60px; text-align: center; color: var(--text-tertiary);">No hay deseos registrados.</div>`;
         } else {
-            tableHtml += filteredWishes.map(wish => {
+            // 2. Usamos un bucle for para manejar los 'await' de los consejos
+            for (const wish of filteredWishes) {
                 const target = parseFloat(wish.target) || 0;
                 const saved = parseFloat(wish.saved) || 0;
                 const progress = target > 0 ? Math.min((saved / target) * 100, 100) : 0;
 
-                return `
+                // OBTENEMOS EL CONSEJO INTELIGENTE AQUÍ
+                const advice = await getSmartWishAdvice(target);
+
+                tableHtml += `
                     <div class="wish-row">
-                        <img src="${wish.image_url || ''}" class="wish-row-img" onerror="this.style.opacity='0'">
-                        
-                        <div class="wish-details">
-                          <div class="wish-row-name">${wish.name}</div>
-                          <div class="wish-row-cat">${wish.category}</div>
+                      <!-- 1. Imagen -->
+                      <img src="${wish.image_url || ''}" class="wish-row-img" onerror="this.style.opacity='0.2'">
+                      
+                      <!-- 2. Detalles -->
+                      <div class="wish-details">
+                          <div class="wish-row-name" style="font-weight:700;">${wish.name}</div>
+                          <div class="wish-row-cat" style="font-size:11px; color:var(--text-tertiary);">${wish.category}</div>
+                      </div>
+                      
+                      <!-- 3. Viabilidad Smart (Advice) -->
+                      <div class="smart-advice-box">
+                          <span class="badge" style="background: ${advice.color}; color: white; padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; width: fit-content;">
+                              ${advice.label}
+                          </span>
+                          <small style="font-size: 10px; color: var(--text-secondary); line-height: 1.1; display: block;">
+                              ${advice.advice}
+                          </small>
                       </div>
 
+                      <!-- 4. Precio -->
                       <div class="wish-row-value">
                           ${formatCurrency(target)}
                       </div>
 
+                      <!-- 5. Progreso -->
                       <div class="wish-row-progress-container">
-                          <div class="wish-row-bar-bg">
-                              <div class="wish-row-bar-fill" style="width: ${progress}%"></div>
+                          <div class="wish-row-bar-bg" style="flex:1; height:6px; background:#eee; border-radius:10px; overflow:hidden;">
+                              <div class="wish-row-bar-fill" style="width: ${progress}%; height:100%; background:var(--primary); transition:width 0.5s;"></div>
                           </div>
-                          <span class="wish-row-percent">${progress.toFixed(0)}%</span>
+                          <span class="wish-row-percent" style="font-size:11px; font-weight:800; margin-left:8px;">${progress.toFixed(0)}%</span>
                       </div>
 
+                      <!-- 6. Acciones -->
                       <div class="wish-row-actions">
-                          ${wish.link ? `
-                              <a href="${wish.link}" target="_blank" class="btn-table-action" title="Ver link">
-                                  <i class="fas fa-external-link-alt"></i>
-                              </a>` : `
-                              <div style="width:36px"></div> `}
-                          <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Asignar capital">
-                              <i class="fas fa-piggy-bank"></i>
-                          </button>
-                          <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Archivar">
-                              <i class="fas fa-trash"></i>
-                          </button>
+                          ${wish.link ? `<a href="${wish.link}" target="_blank" class="btn-table-action"><i class="fas fa-external-link-alt"></i></a>` : ''}
+                          <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Añadir ahorro"><i class="fas fa-piggy-bank"></i></button>
+                          <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Eliminar"><i class="fas fa-trash"></i></button>
                       </div>
                   </div>
               `;
-            }).join('');
+            }
         }
 
         tableHtml += `</div>`;
-        
-        // Inyectamos todo en el contenedor
         container.innerHTML = summaryHtml + tableHtml;
 
     } catch (error) {
         console.error("Error en renderWishlist:", error);
+    }
+}
+
+async function getSmartWishAdvice(wishPrice) {
+    const runway = await calculateRunway(); // Ya lo tienes definido
+    const data = await getData();
+    
+    // Calculamos capital líquido personal
+    const liquidPersonal = await Promise.all(
+        data.accounts
+            .filter(a => !(a.isShared || a.is_shared === true) && a.type !== 'Broker')
+            .map(a => calculateAccountBalance(a.name))
+    ).then(res => res.reduce((s, b) => s + b, 0));
+
+    // LÓGICA INTELIGENTE
+    const costInRunwayMonths = wishPrice / runway.avgBurn;
+    const newRunway = runway.lifestyleMonths - costInRunwayMonths;
+    const liquidityImpact = (wishPrice / liquidPersonal) * 100;
+
+    if (newRunway > 6 && liquidityImpact < 10) {
+        return { label: 'COMPRA SEGURA', color: 'var(--green)', advice: 'Impacto mínimo en tu libertad.' };
+    } else if (newRunway > 3) {
+        return { label: 'PLANIFICAR', color: 'var(--orange)', advice: `Te costaría ${(costInRunwayMonths * 30).toFixed(0)} días de vida.` };
+    } else {
+        return { label: 'ESPERAR', color: 'var(--red)', advice: 'Tu colchón de seguridad es prioridad ahora.' };
     }
 }
 
