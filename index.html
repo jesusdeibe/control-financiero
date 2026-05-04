@@ -4730,7 +4730,7 @@ body.privacy-mode #dashboard-runway-value {
       </div>
   
       <!-- KPI: Supervivencia -->
-      <div class="kpi-card" style="border-left: 4px solid var(--orange);">
+      <div class="kpi-card clickable" onclick="renderRunwayDetail()" style="border-left: 4px solid var(--orange); cursor: pointer;">
           <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Margen de Vida</div>
           <div style="font-size: 28px; font-weight: 900;" id="pa-runway-value">0 meses</div>
           <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Meses de libertad financiera</div>
@@ -4751,6 +4751,84 @@ body.privacy-mode #dashboard-runway-value {
             </div>
         </div>
     </div>
+</div>
+
+<div id="runway-detail-view" class="view">
+  <header class="header">
+      <div style="display: flex; align-items: center; gap: 15px;">
+          <button class="icon-only-btn" onclick="switchView('personal-analysis')">
+              <i class="fas fa-arrow-left"></i>
+          </button>
+          <div>
+              <h1 class="page-title">Proyector de Supervivencia</h1>
+              <p class="page-subtitle">Simulación de flujos futuros</p>
+          </div>
+      </div>
+  </header>
+
+  <!-- Barra de Controles de Simulación -->
+  <div class="section" style="background: var(--primary-light) !important; border: 1px solid var(--primary);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Base de Capital</label>
+            <div class="tabs" style="background: rgba(0,0,0,0.05); padding: 4px;">
+                <button id="btn-mode-disposable" class="active" onclick="updateRunwayConfig('disposable')">Solo Disponible</button>
+                <button id="btn-mode-patrimony" onclick="updateRunwayConfig('patrimony')">Patrimonio Total</button>
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Ingresos Base (€)</label>
+          <div style="position: relative; display: flex; align-items: center;">
+              <input type="number" id="rd-input-income" class="form-input" style="padding-right: 30px;" value="0" oninput="saveBaselines(); renderRunwayDetail();">
+              <span style="position: absolute; right: 12px; color: var(--text-tertiary); font-weight: 700;">€</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Gasto Variable Base (€)</label>
+          <div style="position: relative; display: flex; align-items: center;">
+              <input type="number" id="rd-input-variable" class="form-input" style="padding-right: 30px;" value="0" oninput="saveBaselines(); renderRunwayDetail();">
+              <span style="position: absolute; right: 12px; color: var(--text-tertiary); font-weight: 700;">€</span>
+          </div>
+        </div>
+        <button class="add-btn" onclick="clearRunwaySimulation()" style="background: white; color: var(--red); border-color: var(--red-bg); height: 42px;">
+            <i class="fas fa-trash-alt"></i> Limpiar
+        </button>
+    </div>
+</div>
+
+  <div class="kpi-grid">
+      <div class="kpi-card">
+          <div class="kpi-label">Capital de Inicio</div>
+          <div id="rd-total-capital" class="kpi-value">0,00 €</div>
+      </div>
+      <div class="kpi-card">
+          <div class="kpi-label">Gasto Variable Est.</div>
+          <div id="rd-avg-variable" class="kpi-value">0,00 €</div>
+      </div>
+      <div class="kpi-card">
+          <div class="kpi-label">Supervivencia Est.</div>
+          <div id="rd-total-months" class="kpi-value" style="color: var(--orange);">0 meses</div>
+      </div>
+  </div>
+
+  <!-- El resto de la tabla se mantiene igual con el ID runway-projection-table -->
+  <div class="section">
+      <div class="table-container">
+          <table>
+              <thead>
+                  <tr>
+                      <th>Mes</th>
+                      <th>Gasto Fijo</th>
+                      <th>Gasto Variable</th>
+                      <th>Ingresos</th>
+                      <th>Balance Mes</th>
+                      <th style="text-align: right;">Capital Restante</th>    
+                  </tr>
+              </thead>
+              <tbody id="runway-projection-table"></tbody>
+          </table>
+      </div>
+  </div>
 </div>
 
   <div id="shared-analysis-view" class="view">
@@ -5010,8 +5088,8 @@ body.privacy-mode #dashboard-runway-value {
                     </select>
                 </div>
                 
-                <button onclick="saveNewWish()" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                    Guardar en la Wishlist
+                <button id="wish-save-btn" onclick="saveNewWish()" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                  Guardar en la Wishlist
                 </button>
             </div>
         </div>
@@ -5681,6 +5759,7 @@ body.privacy-mode #dashboard-runway-value {
     
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let dataCache = null;
+    let currentUser = null;
     console.log('✅ Supabase initialized');
     // Forzar Outfit como fuente global para todos los gráficos
     Chart.defaults.font.family = "'Outfit', sans-serif";
@@ -7548,15 +7627,208 @@ async function showPersonalExpensesBreakdown() {
     
     document.getElementById('pa-liquid-value').textContent = formatCurrency(liquidTotal);
     
+    // --- AQUÍ EL CAMBIO PARA EL TERMÓMETRO ---
     const runway = await calculateRunway();
-    document.getElementById('pa-runway-value').textContent = runway.lifestyleMonths.toFixed(1) + ' meses';
+    const runwayValueEl = document.getElementById('pa-runway-value');
 
-    // 5. LANZAR GRÁFICO (Envuelto para que no rompa la lista si falla)
+    if (runwayValueEl) {
+        // 1. Calculamos el porcentaje basado en un objetivo de 12 meses (1 año)
+        const runwayPercent = Math.min((runway.lifestyleMonths / 12) * 100, 100);
+        
+        // 2. Inyectamos el HTML con la barra de progreso
+        runwayValueEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <span style="font-size: 28px; font-weight: 900;">${runway.lifestyleMonths.toFixed(1).replace('.', ',')} <small style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">meses</small></span>
+            </div>
+            
+            <!-- Barra de progreso (Termómetro) -->
+            <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 12px; overflow: hidden;">
+                <div style="width: ${runwayPercent}%; height: 100%; background: var(--orange); border-radius: 10px; transition: width 1s ease-out;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+                <span style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Libertad actual</span>
+                <span style="font-size: 9px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Objetivo: 1 año</span>
+            </div>
+        `;
+    }
+
+    // 5. LANZAR GRÁFICO
     try {
         await renderPersonalGrowthChart();
     } catch (e) {
         console.error("Error al renderizar el gráfico personal:", e);
     }
+}
+
+let currentRunwayMode = 'disposable'; // 'disposable' o 'patrimony'
+
+function updateRunwayConfig(mode) {
+    currentRunwayMode = mode;
+    document.getElementById('btn-mode-disposable').classList.toggle('active', mode === 'disposable');
+    document.getElementById('btn-mode-patrimony').classList.toggle('active', mode === 'patrimony');
+    renderRunwayDetail();
+}
+
+let runwayAdjustments = {};
+
+// 2. Función para guardar y recalcular
+function setRunwayAdjustment(type, monthKey, value) {
+    if (!currentUser) return;
+    runwayAdjustments[`${type}-${monthKey}`] = parseFloat(value) || 0;
+    
+    // Guardamos en el navegador (Persistencia)
+    localStorage.setItem(`runway_sim_${currentUser.id}`, JSON.stringify(runwayAdjustments));
+    
+    // Recalculamos la proyección con el nuevo valor
+    renderRunwayDetail(); 
+}
+
+// 3. Función para resetear la simulación (opcional pero recomendada)
+function clearRunwaySimulation() {
+    if (confirm("¿Seguro que quieres borrar todos los ajustes manuales de la simulación?")) {
+        runwayAdjustments = {};
+        localStorage.removeItem(`runway_sim_${currentUser.id}`);
+        renderRunwayDetail();
+    }
+}
+
+// 1. Guardar valores base (los de arriba)
+function saveBaselines() {
+    if (!currentUser) return;
+    const baselines = {
+        income: document.getElementById('rd-input-income').value,
+        variable: document.getElementById('rd-input-variable').value
+    };
+    localStorage.setItem(`runway_baselines_${currentUser.id}`, JSON.stringify(baselines));
+}
+
+// 2. Función principal de renderizado
+async function renderRunwayDetail() {
+    switchView('runway-detail');
+    const data = await getData();
+    const now = new Date();
+    
+    // CARGA DE PERSISTENCIA: Recuperar baselines guardados
+    const savedBaselines = JSON.parse(localStorage.getItem(`runway_baselines_${currentUser?.id}`)) || { income: 0, variable: 0 };
+    
+    // Si los inputs están vacíos (por recarga), ponemos los valores guardados
+    const inputIncome = document.getElementById('rd-input-income');
+    const inputVariable = document.getElementById('rd-input-variable');
+    
+    if (inputIncome && inputIncome.value === "" || inputIncome.value == 0) {
+        inputIncome.value = savedBaselines.income;
+    }
+    if (inputVariable && inputVariable.value === "" || inputVariable.value == 0) {
+        inputVariable.value = savedBaselines.variable;
+    }
+
+    const baseIncome = parseFloat(inputIncome.value) || 0;
+    const baseVariable = parseFloat(inputVariable.value) || 0;
+
+    // Cargar ajustes manuales de la tabla
+    if (currentUser) {
+        runwayAdjustments = JSON.parse(localStorage.getItem(`runway_sim_${currentUser.id}`)) || {};
+    }
+
+    // Cálculo de Capital Inicial
+    let currentCapital = 0;
+    const personalAccounts = data.accounts.filter(a => {
+        const isShared = (a.isShared || a.is_shared === true);
+        if (isShared) return false; 
+        return currentRunwayMode === 'disposable' ? (a.isDisposable === true || a.is_disposable === true) : (a.includeInPatrimony !== false);
+    });
+
+    for (const acc of personalAccounts) {
+        currentCapital += await calculateAccountBalance(acc.name);
+    }
+    document.getElementById('rd-total-capital').textContent = formatCurrency(currentCapital);
+
+    // PROYECCIÓN A 12 MESES
+    const tableBody = document.getElementById('runway-projection-table');
+    let html = '';
+    let runningCapital = currentCapital;
+    let monthsOfLife = 0;
+
+    for (let i = 0; i < 12; i++) {
+        const projectionDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        const monthIdx = projectionDate.getMonth();
+        const year = projectionDate.getFullYear();
+        const monthKey = `${monthIdx}-${year}`;
+        
+        // 1. Cálculo automático de gastos fijos según configuración
+        const autoFixedValue = data.fixedExpenses
+            .filter(fe => fe.type === 'gastos_personales' && fe.months.includes(monthIdx))
+            .reduce((s, fe) => s + fe.amount, 0);
+
+        // 2. Lógica de prioridad: Ajuste manual > Valor automático de la App
+        const currentFixed = runwayAdjustments[`fixed-${monthKey}`] !== undefined ? 
+            runwayAdjustments[`fixed-${monthKey}`] : autoFixedValue;
+            
+        const currentIncome = runwayAdjustments[`income-${monthKey}`] !== undefined ? 
+            runwayAdjustments[`income-${monthKey}`] : baseIncome;
+            
+        const currentVariable = runwayAdjustments[`variable-${monthKey}`] !== undefined ? 
+            runwayAdjustments[`variable-${monthKey}`] : baseVariable;
+
+        // 3. Totales del mes
+        const totalOut = currentFixed + currentVariable;
+        const monthNet = currentIncome - totalOut;
+        
+        runningCapital += monthNet;
+        if (runningCapital > 0) monthsOfLife++;
+
+        // 4. Generar HTML con inputs y símbolos de Euro
+        html += `
+            <tr style="${runningCapital < 0 ? 'opacity: 0.5; background: var(--red-bg);' : ''}">
+                <td class="description-cell"><b>${MONTHS[monthIdx]} ${year}</b></td>
+                
+                <!-- Columna Gasto Fijo (AHORA EDITABLE) -->
+                <td>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="number" class="date-input-mini" 
+                               style="width: 65px; text-align: right; border-bottom: 1px dashed #ccc !important;" 
+                               value="${currentFixed.toFixed(2)}" 
+                               onchange="setRunwayAdjustment('fixed', '${monthKey}', this.value)">
+                        <span style="font-size: 11px; color: var(--text-tertiary);">€</span>
+                    </div>
+                </td>
+
+                <!-- Columna Gasto Variable -->
+                <td>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="number" class="date-input-mini" style="width: 65px; text-align: right;" 
+                               value="${currentVariable.toFixed(2)}" 
+                               onchange="setRunwayAdjustment('variable', '${monthKey}', this.value)">
+                        <span style="font-size: 11px; color: var(--text-tertiary);">€</span>
+                    </div>
+                </td>
+
+                <!-- Columna Ingresos -->
+                <td>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="number" class="date-input-mini" style="width: 65px; text-align: right; color: var(--green); font-weight: 700;" 
+                               value="${currentIncome.toFixed(2)}" 
+                               onchange="setRunwayAdjustment('income', '${monthKey}', this.value)">
+                        <span style="font-size: 11px; color: var(--green); font-weight: 700;">€</span>
+                    </div>
+                </td>
+
+                <td style="font-weight: 700; color: ${monthNet >= 0 ? 'var(--green)' : 'var(--red)'}">
+                    ${formatCurrency(monthNet)}
+                </td>
+                <td style="text-align: right; font-weight: 800; color: ${runningCapital > 0 ? 'var(--green)' : 'var(--red)'}">
+                    ${formatCurrency(runningCapital)}
+                </td>
+            </tr>`;
+    }
+
+    tableBody.innerHTML = html;
+    
+    // Actualización de KPIs
+    const monthsEl = document.getElementById('rd-total-months');
+    monthsEl.textContent = monthsOfLife >= 12 ? "12+ meses" : monthsOfLife + " meses";
+    monthsEl.style.color = monthsOfLife > 6 ? 'var(--green)' : (monthsOfLife > 3 ? 'var(--orange)' : 'var(--red)');
 }
 
 async function renderPersonalGrowthChart() {
@@ -10031,8 +10303,6 @@ function compressImage(file) {
 // ============================================================================
 // SISTEMA DE USUARIOS Y AUTENTICACIÓN
 // ============================================================================
-
-let currentUser = null;
 
 // 1. Comprobar si ya hay alguien logueado al abrir la app
 async function checkSession() {
@@ -12649,10 +12919,16 @@ async function renderWishlist(filter = 'todos') { // 1. Ahora es async
 
                       <!-- 6. Acciones -->
                       <div class="wish-row-actions">
-                          ${wish.link ? `<a href="${wish.link}" target="_blank" class="btn-table-action"><i class="fas fa-external-link-alt"></i></a>` : ''}
-                          <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Añadir ahorro"><i class="fas fa-piggy-bank"></i></button>
-                          <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Eliminar"><i class="fas fa-trash"></i></button>
-                      </div>
+                        ${wish.link ? `<a href="${wish.link}" target="_blank" class="btn-table-action"><i class="fas fa-external-link-alt"></i></a>` : ''}
+                        
+                        <!-- NUEVO BOTÓN DE EDICIÓN -->
+                        <button onclick="editWish('${wish.id}')" class="btn-table-action" title="Editar deseo">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <button onclick="addSavingToWish('${wish.id}')" class="btn-table-action" title="Añadir ahorro"><i class="fas fa-piggy-bank"></i></button>
+                        <button onclick="deleteWish('${wish.id}')" class="btn-table-action delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                    </div>
                   </div>
               `;
             }
@@ -12664,6 +12940,84 @@ async function renderWishlist(filter = 'todos') { // 1. Ahora es async
     } catch (error) {
         console.error("Error en renderWishlist:", error);
     }
+}
+
+// 1. Función para abrir el modal en modo EDICIÓN
+async function editWish(wishId) {
+    const data = await getData();
+    const wish = data.wishlist.find(w => w.id === wishId);
+    if (!wish) return;
+
+    // --- CRUCIAL: RELLENAR PRIMERO EL SELECT ---
+    populateWishCategories();
+
+    // Ahora que las opciones existen, ya podemos asignar los valores
+    document.getElementById('wish-name').value = wish.name;
+    document.getElementById('wish-target').value = wish.target;
+    document.getElementById('wish-category').value = wish.category; // Ahora sí funcionará
+    document.getElementById('wish-link').value = wish.link || '';
+    document.getElementById('wish-image').value = wish.image_url || '';
+    
+    // Configuramos el botón para "Actualizar"
+    document.querySelector('#wish-modal .modal-title').innerText = "Editar Deseo";
+    const saveBtn = document.getElementById('wish-save-btn');
+    saveBtn.innerText = "Actualizar Cambios";
+    saveBtn.onclick = () => updateWish(wishId);
+
+    document.getElementById('wish-modal').classList.add('active');
+}
+
+// 2. Función para guardar los cambios en Supabase
+async function updateWish(wishId) {
+    const updatedData = {
+        name: document.getElementById('wish-name').value,
+        target: parseFloat(document.getElementById('wish-target').value) || 0,
+        category: document.getElementById('wish-category').value,
+        link: document.getElementById('wish-link').value,
+        image_url: document.getElementById('wish-image').value
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('wishlist')
+            .update(updatedData)
+            .eq('id', wishId);
+
+        if (error) throw error;
+
+        showToast("Deseo actualizado ✓", "success");
+        closeWishModal(); // Usamos tu función de cierre
+        invalidateCache();
+        await renderWishlist(); // Refrescamos la vista
+        
+    } catch (error) {
+        console.error("Error:", error);
+        showToast("Error al actualizar", "error");
+    }
+}
+
+// 3. ACTUALIZA tu función openWishModal (para limpiar el modo edición)
+function openWishModal() {
+    // Limpiamos los inputs
+    document.getElementById('wish-name').value = '';
+    document.getElementById('wish-target').value = '';
+    document.getElementById('wish-link').value = '';
+    document.getElementById('wish-image').value = '';
+    
+    // Restauramos textos originales
+    document.querySelector('#wish-modal .modal-title').innerText = "Nuevo Deseo Estratégico";
+    const saveBtn = document.getElementById('wish-save-btn');
+    saveBtn.innerText = "Guardar en la Wishlist";
+    
+    // Restauramos la función original de guardado
+    saveBtn.onclick = saveNewWish;
+
+    document.getElementById('wish-modal').classList.add('active');
+}
+
+// Asegúrate de tener esta función de cierre (si no la tienes)
+function closeWishModal() {
+    document.getElementById('wish-modal').classList.remove('active');
 }
 
 async function getSmartWishAdvice(wishPrice) {
@@ -12691,18 +13045,23 @@ async function getSmartWishAdvice(wishPrice) {
     }
 }
 
-// --- 3. ABRIR MODAL (Leyendo categorías reales) ---
 function openWishModal() {
-    let wishCatsRow = dataCache.customCategories.find(c => c.type === 'wishlist');
-    let wishCats = wishCatsRow ? wishCatsRow.categories : ['Tecnología', 'Hogar', 'Viajes', 'Ropa', 'Otros'];
+    // 1. Limpiamos los inputs
+    document.getElementById('wish-name').value = '';
+    document.getElementById('wish-target').value = '';
+    document.getElementById('wish-link').value = '';
+    document.getElementById('wish-image').value = '';
+    
+    // 2. Rellenamos el desplegable con las categorías actuales
+    populateWishCategories();
+    
+    // 3. Configuramos el botón para "Guardar" (Crear)
+    document.querySelector('#wish-modal .modal-title').innerText = "Nuevo Deseo Estratégico";
+    const saveBtn = document.getElementById('wish-save-btn');
+    saveBtn.innerText = "Guardar en la Wishlist";
+    saveBtn.onclick = saveNewWish;
 
-    const select = document.getElementById('wish-category');
-    if (select) {
-        select.innerHTML = wishCats.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-    }
-
-    const modal = document.getElementById('wish-modal');
-    if (modal) modal.classList.add('active');
+    document.getElementById('wish-modal').classList.add('active');
 }
 
 function closeWishModal() {
@@ -12799,6 +13158,21 @@ function renderSavingsGoals() {
     renderWishlist();
 }
 
+function populateWishCategories() {
+    const catSelect = document.getElementById('wish-category');
+    if (!catSelect) return;
+
+    // Buscamos las categorías en el cache (lo que gestiona tu función addCategory)
+    const wishRow = dataCache.customCategories.find(c => c.type === 'wishlist');
+    
+    // Si existen en el cache las usamos; si no, usamos unas por defecto
+    const categories = wishRow ? wishRow.categories : ['Tecnología', 'Hogar', 'Viajes', 'Ropa', 'Otros'];
+
+    catSelect.innerHTML = categories.map(cat => 
+        `<option value="${cat}">${cat}</option>`
+    ).join('');
+}
+
 // --- 4. GESTIÓN DE CATEGORÍAS (Usando tu tabla custom_categories) ---
 async function addCategory() {
     const name = prompt("Nombre de la nueva categoría:");
@@ -12833,6 +13207,7 @@ async function addCategory() {
     
     renderWishlist();
     showToast("Categoría guardada");
+    populateWishCategories();
 }
 
 async function deleteCategory(cat) {
