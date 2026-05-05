@@ -72,157 +72,218 @@
       font-family: 'Outfit', sans-serif;
     }
 
-    /* 2. Sidebar Estilo Glassmorphism Premium */
+    /* ===================================================
+   NUEVA SIDEBAR ULTRA-LIMPIA (REEMPLAZO)
+   =================================================== */
+
+    /* Sidebar: Ajuste de estructura */
     .sidebar {
-      width: 260px; /* Un pelín más estrecho para mayor elegancia */
-      height: calc(100vh - 40px);
-      margin: 20px;
-      /* Efecto cristal */
-      background: rgba(255, 255, 255, 0.6) !important;
-      backdrop-filter: blur(25px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-      /* Borde de cristal pulido */
-      border: 1px solid rgba(255, 255, 255, 0.4) !important;
-      border-radius: 24px !important;
-      display: flex;
-      flex-direction: column;
-      padding: 32px 24px 24px 24px;
-      flex-shrink: 0;
-      z-index: 100;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.04) !important;
-      position: relative;
+        width: 260px;
+        height: calc(100vh - 40px);
+        margin: 20px;
+        background: rgba(255, 255, 255, 0.4) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        border-radius: 24px !important;
+        padding: 0 12px 24px 12px !important; /* Quitamos padding superior */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Evita que la sidebar entera scrollee */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.02) !important;
     }
 
-    /* === FIX: Logo Más Grande y Redondeado === */
+    .sidebar-nav-container {
+        flex: 1;
+        overflow-y: auto;
+        margin: 0;
+        scrollbar-width: none;
+        
+        /* 1. Añadimos un margen interno al final de la lista */
+        /* Esto asegura que el degradado caiga sobre espacio vacío si hay pocos items */
+        padding-bottom: 60px; 
+        
+        /* 2. Ajustamos el degradado para que sea más sutil y empiece más abajo */
+        mask-image: linear-gradient(to bottom, 
+            black 0%, 
+            black 92%,    /* El contenido es 100% opaco hasta el 92% del alto */
+            transparent 100%
+        );
+        -webkit-mask-image: linear-gradient(to bottom, 
+            black 0%, 
+            black 92%, 
+            transparent 100%
+        );
+    }
+
+    /* OPCIONAL: Una pequeña flecha animada que solo aparece si quieres algo más explícito */
+    .scroll-hint {
+        text-align: center;
+        font-size: 10px;
+        color: var(--text-tertiary);
+        margin-top: -15px; /* Se posiciona sobre el degradado */
+        opacity: 0.6;
+        animation: bounce 2s infinite;
+        pointer-events: none; /* No interfiere con los clics */
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-3px);}
+        60% {transform: translateY(-1px);}
+    }
+    .sidebar-nav-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ocultar la flecha si no hay suficiente contenido (Opcional pero recomendado) */
+    .sidebar-nav-container:not(:has(button:nth-child(10))) .scroll-hint {
+        display: none;
+    }
+
+    /* Ajuste del Dock para que nunca se corte */
+    .settings-dock {
+        margin-top: auto;
+        padding: 16px 4px 4px 4px;
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        flex-shrink: 0; /* Prohíbe que el dock se encoja */
+    }
+
     .sidebar-logo {
-      margin-bottom: 30px; /* Reducimos margen porque el logo es más grande */
-      display: flex;
-      justify-content: center; /* Centramos el logo grande */
-      width: 100%;
+        /* Aumentamos significativamente la altura para empujar el menú hacia abajo */
+        height: 110px; 
+        margin: 0;
+        display: flex;
+        /* Mantenemos el logo en la parte superior del bloque para que no baje con el texto */
+        align-items: flex-start; 
+        padding-top: 15px; 
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .sidebar-logo-img {
-      height: 70px; /* Tamaño más equilibrado para el sidebar */
-      width: 70px; /* Cuadrado base */
-      object-fit: contain; /* Mantiene la proporción de la favicon.png */
-      border-radius: 16px; /* Esquinas redondeadas (smooth corners) */
-      /* No aplicamos sombras o bordes aquí para que se vea 'Clean' */
+        height: 50px;
+        width: 50px;
+        object-fit: contain;
+        border-radius: 14px;
     }
 
-    /* Títulos de sección */
+    /* Estilo base para los títulos de sección */
     .nav-section-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin: 24px 0 8px 12px;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin: 0 0 12px 12px; /* Eliminamos el margin-top (era 32px) */
+        padding: 4px 12px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    /* Botones de navegación (Estilo Píldora) */
+    /* El punto de color al lado del texto */
+    .nav-section-title::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Colores por Categoría */
+    /* 1. Principal: Azul */
+    .title-principal { 
+        color: #3B82F6; 
+        background: rgba(59, 130, 246, 0.08); 
+    }
+    .title-principal::before { background: #3B82F6; }
+
+    /* 2. Planificación: Naranja */
+    .title-plan { 
+        color: #F59E0B; 
+        background: rgba(245, 158, 11, 0.08); 
+    }
+    .title-plan::before { background: #F59E0B; }
+
+    /* 3. Inversión: Verde */
+    .title-patrimonio { 
+        color: #10B981; 
+        background: rgba(16, 185, 129, 0.08); 
+    }
+    .title-patrimonio::before { background: #10B981; }
+
     .nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      width: 100%;
-      padding: 12px 14px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      margin-bottom: 2px;
+        width: 100%;
+        padding: 12px 16px;
+        margin-bottom: 4px;
+        border-radius: 14px;
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-secondary);
+        text-align: left;
     }
 
-    /* Iconos SVG (Grosor uniforme) */
-    .nav-icon {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-      flex-shrink: 0;
-      transition: transform 0.2s ease;
+    .nav-btn i {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+        color: var(--text-tertiary);
     }
 
-    /* Hover State (Al pasar el ratón) */
+    .nav-btn span {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
     .nav-btn:hover {
-      /* Fondo translúcido sutil sobre base cristal */
-      background: rgba(255, 255, 255, 0.5); 
-      color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.6);
+        color: var(--text-primary);
+        transform: translateX(4px);
     }
 
-    /* Active State (Pestaña actual) */
     .nav-btn.active {
-      background: #EFF6FF; 
-      color: var(--primary); 
-      font-weight: 700;
-      position: relative; /* Necesario para el indicador flotante */
-    }
-    
-    .nav-btn.active .nav-icon {
-      stroke-width: 2.5; 
+        background: var(--primary) !important;
+        color: white !important;
+        box-shadow: 0 8px 16px rgba(33, 69, 137, 0.15);
     }
 
-    /* === EL DETALLE PREMIUM: Barrita vertical indicadora === */
-    .nav-btn.active::before {
-      content: '';
-      position: absolute;
-      left: 0; /* Pegado al borde izquierdo del botón */
-      top: 50%;
-      transform: translateY(-50%); /* Centrado verticalmente */
-      height: 60%; /* No ocupa toda la altura del botón, queda más elegante */
-      width: 4px; /* Grosor de la barrita */
-      background: var(--primary); /* Azul corporativo */
-      border-radius: 0 4px 4px 0; /* Redondeada a la derecha */
-      box-shadow: 2px 0 8px rgba(33, 69, 137, 0.2); /* Pequeño brillo a la derecha */
+    .nav-btn.active i {
+        color: white;
     }
 
-    /* === FIX: Dock Inferior Unificado === */
     .settings-dock {
-      margin-top: auto; /* Empuja esto al fondo */
-      padding-top: 24px;
-      border-top: 1px solid rgba(0,0,0,0.05); /* Separador sutil invisible */
+        margin-top: auto;
+        padding-top: 24px;
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* === FIX: CLASE UNIFICADA PARA BOTONES (Inconsistencia Resuelta) === */
     .icon-action-btn {
-      flex: 1; /* Todos ocupan el mismo espacio */
-      height: 38px;
-      border-radius: 10px;
-      /* Base translúcida sutil sobre el cristal */
-      background: rgba(255, 255, 255, 0.5); 
-      border: 1px solid rgba(255, 255, 255, 0.8); /* Borde sutil pulido */
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
+        flex: 1;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.5); 
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
     }
 
     .icon-action-btn:hover {
-      background: #FFFFFF; /* Blanco opaco al pasar el ratón */
-      color: var(--text-primary);
-    }
-    
-    .icon-action-btn .nav-icon {
-      width: 16px; height: 16px; /* Iconos un pelín más pequeños abajo */
-    }
-
-    /* Perfil de Usuario Premium (Misma estética pastel del Dashboard) */
-    .sidebar-avatar {
-        width: 38px; height: 38px; border-radius: 12px; 
-        background: #EFF6FF; color: var(--primary); border: 1px solid #DBEAFE; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: 800; font-size: 14px; flex-shrink: 0;
+        background: #FFFFFF;
+        color: var(--primary);
     }
 
     /* 3. Área Principal (Vistas) */
@@ -3915,6 +3976,221 @@ body.privacy-mode #dashboard-runway-value {
     letter-spacing: 0.5px;
 }
 
+/* Indicador de interactividad para tarjetas clicables */
+.hero-bento-card.clickable {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* El pequeño distintivo de "Ver detalle" */
+/* Indicador para todas las tarjetas clicables (Hero y KPI) */
+.hero-bento-card.clickable::after,
+.kpi-card.clickable::after {
+    content: "Ver detalle →";
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+/* Efectos hover unificados */
+.hero-bento-card.clickable:hover,
+.kpi-card.clickable:hover {
+    transform: translateY(-5px) scale(1.01);
+    border-color: var(--primary) !important;
+    box-shadow: 0 20px 40px rgba(33, 69, 137, 0.1) !important;
+}
+
+.hero-bento-card.clickable:hover::after,
+.kpi-card.clickable:hover::after {
+    opacity: 1;
+    color: var(--primary);
+    transform: translateX(5px);
+}
+
+/* Micro-etiqueta para valores automáticos */
+.auto-label {
+    font-size: 7px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    background: #F1F5F9;
+    padding: 2px 4px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Filas con más aire y transición */
+#runway-projection-table tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+#runway-projection-table tr:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Inputs "Fantasma" */
+.date-input-mini {
+    border: 1px solid transparent !important;
+    border-radius: 6px;
+    padding: 4px 8px !important;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.date-input-mini:hover {
+    background: rgba(0,0,0,0.03);
+}
+
+.date-input-mini:focus {
+    background: white !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(33, 69, 137, 0.1);
+    outline: none;
+}
+
+/* Estilo para cuando un campo ha sido editado (opcional: borde sutil) */
+.input-edited {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+}
+
+.runway-life-bar-wrap {
+    width: 100%;
+    height: 14px;
+    background: #F1F5F9;
+    border-radius: 100px;
+    position: relative;
+    overflow: hidden; /* Esto es vital para el efecto de llenado */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.runway-life-bar-fill {
+    height: 100%;
+    width: 0%; /* Se controla con JS */
+    background: var(--primary);
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.5s;
+}
+
+.runway-markers-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.runway-marker-tick {
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+
+/* Contenedor principal de simulación */
+.simulation-panel {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--primary-light) !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: flex-end;
+}
+
+/* Etiquetas con icono */
+.control-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-label i {
+    color: var(--primary);
+    font-size: 12px;
+}
+
+/* Inputs integrados */
+.control-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.control-input {
+    width: 100%;
+    padding: 12px 40px 12px 14px !important;
+    background: white !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.control-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(33, 69, 137, 0.05);
+}
+
+.input-suffix {
+    position: absolute;
+    right: 14px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+/* Selector de modo (Tabs) mejorado */
+.mode-selector {
+    background: #F1F5F9;
+    padding: 4px;
+    border-radius: 12px;
+    display: flex;
+    gap: 4px;
+}
+
+.mode-btn {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+    background: transparent;
+}
+
+.mode-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
   </style>
 </head>
 <body>
@@ -3950,51 +4226,56 @@ body.privacy-mode #dashboard-runway-value {
             <img src="favicon.png" alt="Logo" class="sidebar-logo-img">
         </div>
     
-        <div class="nav-section-title">Principal</div>
-        <button class="nav-item nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            <span>Resumen</span>
-        </button>
-        <button class="nav-item nav-btn" data-view="monthly" onclick="switchView('monthly')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>Mes actual</span>
-        </button>
-        <button class="nav-item nav-btn" data-view="accounts" onclick="switchView('accounts')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-            <span>Mis Cuentas</span>
-        </button>
-        
-        <button class="nav-item nav-btn" data-view="wishlist" onclick="switchView('wishlist')">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11h10M7 7h10M7 15h10"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
-            <span>Wishlist</span>
-        </button>
+        <!-- TODO EL MENÚ VA DENTRO DE ESTE CONTENEDOR DE SCROLL -->
+        <div class="sidebar-nav-container">
+            
+            <!-- GRUPO 1 -->
+            <div class="nav-section-title title-principal">Principal</div>
+            <button class="nav-item nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
+                <i class="fas fa-th-large"></i><span>Dashboard</span>
+            </button>
+            <button class="nav-item nav-btn" data-view="monthly" onclick="switchView('monthly')">
+                <i class="fas fa-calendar-alt"></i><span>Meses</span>
+            </button>
+            <button class="nav-item nav-btn" data-view="accounts" onclick="switchView('accounts')">
+                <i class="fas fa-wallet"></i><span>Mis Cuentas</span>
+            </button>
     
-        <button class="nav-item nav-btn" data-view="travels" onclick="switchView('travels')">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path>
-            </svg>
-            <span>Viajes</span>
-        </button>
+            <!-- GRUPO 2 -->
+            <div class="nav-section-title title-plan">Planificación</div>
+            <button class="nav-item nav-btn" data-view="runway-detail" onclick="switchView('runway-detail')">
+                <i class="fas fa-chart-line"></i><span>Proyector</span>
+            </button>
+            <button class="nav-item nav-btn" data-view="wishlist" onclick="switchView('wishlist')">
+                <i class="fas fa-magic"></i><span>Wishlist</span>
+            </button>
+            <button class="nav-item nav-btn" data-view="travels" onclick="switchView('travels')">
+                <i class="fas fa-plane"></i><span>Viajes</span>
+            </button>
+            <button class="nav-item nav-btn" data-view="search" onclick="switchView('search')">
+                <i class="fas fa-search"></i><span>Buscador</span>
+            </button>
     
-        <button class="nav-item nav-btn" data-view="search" onclick="switchView('search')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>Buscador</span>
-        </button>
-    
-        <div class="nav-section-title">Patrimonio</div>
-        <button class="nav-item nav-btn" data-view="inversiones" onclick="switchView('inversiones')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-            <span>Inversiones</span>
-        </button>
-    
-        <div class="settings-dock">
-            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-              <button class="icon-action-btn" onclick="toggleDarkMode()" title="Modo Oscuro"><svg class="nav-icon" viewBox="0 0 24 24" id="dark-mode-icon-svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-              <button class="icon-action-btn" onclick="switchView('settings')" title="Ajustes"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
-              <button class="icon-action-btn" onclick="togglePrivacyMode()" title="Modo Privacidad"><svg id="privacy-icon-svg" class="nav-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-            </div>
+            <!-- GRUPO 3 -->
+            <div class="nav-section-title title-patrimonio">Patrimonio</div>
+            <button class="nav-item nav-btn" data-view="inversiones" onclick="switchView('inversiones')">
+                <i class="fas fa-seedling"></i><span>Inversiones</span>
+            </button>
+            
+        </div> <!-- Cierre del sidebar-nav-container -->
+
+        <!-- EL INDICADOR DISCRETO AL FINAL -->
+        <div class="scroll-hint">
+          <i class="fas fa-chevron-down"></i>
         </div>
-    </aside>
+    
+        <!-- EL DOCK QUEDA FUERA DEL SCROLL, SIEMPRE VISIBLE -->
+        <div class="settings-dock">
+            <button class="icon-action-btn" onclick="toggleDarkMode()" title="Modo Oscuro"><i class="fas fa-moon"></i></button>
+            <button class="icon-action-btn" onclick="switchView('settings')" title="Ajustes"><i class="fas fa-cog"></i></button>
+            <button class="icon-action-btn" onclick="togglePrivacyMode()" title="Modo Privacidad"><i class="fas fa-eye-slash"></i></button>
+        </div>
+      </aside>
 
       <div class="right-wrapper">
 
@@ -4052,42 +4333,47 @@ body.privacy-mode #dashboard-runway-value {
           <div id="dashboard-active-travel" style="margin-bottom: 24px; display: none;"></div>
     
           <div class="bento-grid">
-    
+            <!-- Fila superior: Patrimonio y Cuentas Compartidas -->
             <div class="bento-full" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
                 
-              <div class="hero-bento-card hero-personal clickable" onclick="switchView('personal-analysis')">
-                <div>
-                    <div class="hero-icon-wrap hero-icon-personal">
-                        <i class="fas fa-wallet"></i>
+                <!-- TARJETA PATRIMONIO PERSONAL -->
+                <div class="hero-bento-card hero-personal clickable" onclick="switchView('personal-analysis')">
+                    <div>
+                        <div class="hero-icon-wrap hero-icon-personal">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="hero-title">Patrimonio Personal <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 5px; opacity: 0.5;"></i></div>
+                        <div id="dashboard-total-patrimony" class="hero-value">0,00 €</div>
                     </div>
-                    <div class="hero-title">Patrimonio Personal</div>
-                    <div id="dashboard-total-patrimony" class="hero-value">0,00 €</div>
-                </div>
-                  
-                  <div class="master-bento-breakdown">
-                      <div class="mb-col">
-                          <div class="mb-label">Cuentas Corrientes</div>
-                          <div id="dashboard-normal-total" class="mb-val">0,00 €</div>
-                      </div>
-                      <div class="mb-col">
-                          <div class="mb-label">Inversiones</div>
-                          <div id="dashboard-investments-total" class="mb-val">0,00 €</div>
-                      </div>
-                  </div>
-              </div>
-  
-              <div class="hero-bento-card hero-shared clickable" onclick="openSharedAnalysis()">
-                  <div>
-                      <div class="hero-icon-wrap hero-icon-shared">
-                          <i class="fas fa-users"></i>
-                      </div>
-                      <div class="hero-title">Cuentas Compartidas</div>
-                      <div id="dashboard-shared-total" class="hero-value">0,00 €</div>
-                  </div>
-                  
-                  <div id="dashboard-shared-breakdown" class="master-bento-breakdown"></div>
-              </div>
-          </div>
+                    
+                    <!-- El desglose DEBE estar dentro de hero-bento-card -->
+                    <div class="master-bento-breakdown">
+                        <div class="mb-col">
+                            <div class="mb-label">Cuentas Corrientes</div>
+                            <div id="dashboard-normal-total" class="mb-val">0,00 €</div>
+                        </div>
+                        <div class="mb-col">
+                            <div class="mb-label">Inversiones</div>
+                            <div id="dashboard-investments-total" class="mb-val">0,00 €</div>
+                        </div>
+                    </div>
+                </div> <!-- Cierre correcto de la tarjeta personal -->
+        
+                <!-- TARJETA CUENTAS COMPARTIDAS -->
+                <div class="hero-bento-card hero-shared clickable" onclick="openSharedAnalysis()">
+                    <div>
+                        <div class="hero-icon-wrap hero-icon-shared">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="hero-title">Cuentas Compartidas <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 5px; opacity: 0.5;"></i></div>
+                        <div id="dashboard-shared-total" class="hero-value">0,00 €</div>
+                    </div>
+                    
+                    <div id="dashboard-shared-breakdown" class="master-bento-breakdown">
+                        <!-- Se llena dinámicamente con JS -->
+                    </div>
+                </div> <!-- Cierre correcto de la tarjeta compartida -->
+            </div> <!-- Cierre correcto del contenedor bento-full -->
 
           <div class="cashflow-container bento-full">
             <div class="cashflow-header">
@@ -4730,10 +5016,12 @@ body.privacy-mode #dashboard-runway-value {
       </div>
   
       <!-- KPI: Supervivencia -->
-      <div class="kpi-card clickable" onclick="renderRunwayDetail()" style="border-left: 4px solid var(--orange); cursor: pointer;">
-          <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">Margen de Vida</div>
-          <div style="font-size: 28px; font-weight: 900;" id="pa-runway-value">0 meses</div>
-          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Meses de libertad financiera</div>
+      <div class="kpi-card clickable" onclick="switchView('runway-detail')" style="border-left: 4px solid var(--orange); cursor: pointer;">
+        <div style="font-size: 10px; color: var(--text-tertiary); font-weight: 800; text-transform: uppercase;">
+            Margen de Vida <i class="fas fa-chevron-right" style="font-size: 8px; margin-left: 5px; opacity: 0.5;"></i>
+        </div>
+        <div style="font-size: 28px; font-weight: 900;" id="pa-runway-value">0 meses</div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Meses de libertad financiera</div>
       </div>
     </div>
 
@@ -4766,35 +5054,75 @@ body.privacy-mode #dashboard-runway-value {
       </div>
   </header>
 
-  <!-- Barra de Controles de Simulación -->
-  <div class="section" style="background: var(--primary-light) !important; border: 1px solid var(--primary);">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; align-items: end;">
-        <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Base de Capital</label>
-            <div class="tabs" style="background: rgba(0,0,0,0.05); padding: 4px;">
-                <button id="btn-mode-disposable" class="active" onclick="updateRunwayConfig('disposable')">Solo Disponible</button>
-                <button id="btn-mode-patrimony" onclick="updateRunwayConfig('patrimony')">Patrimonio Total</button>
-            </div>
+  <div class="simulation-panel">
+    <!-- Selector de Base -->
+    <div class="form-group" style="margin-bottom: 0;">
+        <label class="control-label"><i class="fas fa-database"></i> Base de Capital</label>
+        <div class="mode-selector">
+            <button id="btn-mode-disposable" class="mode-btn active" onclick="updateRunwayConfig('disposable')">DISPONIBLE</button>
+            <button id="btn-mode-patrimony" class="mode-btn" onclick="updateRunwayConfig('patrimony')">TOTAL</button>
         </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Ingresos Base (€)</label>
-          <div style="position: relative; display: flex; align-items: center;">
-              <input type="number" id="rd-input-income" class="form-input" style="padding-right: 30px;" value="0" oninput="saveBaselines(); renderRunwayDetail();">
-              <span style="position: absolute; right: 12px; color: var(--text-tertiary); font-weight: 700;">€</span>
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Gasto Variable Base (€)</label>
-          <div style="position: relative; display: flex; align-items: center;">
-              <input type="number" id="rd-input-variable" class="form-input" style="padding-right: 30px;" value="0" oninput="saveBaselines(); renderRunwayDetail();">
-              <span style="position: absolute; right: 12px; color: var(--text-tertiary); font-weight: 700;">€</span>
-          </div>
-        </div>
-        <button class="add-btn" onclick="clearRunwaySimulation()" style="background: white; color: var(--red); border-color: var(--red-bg); height: 42px;">
-            <i class="fas fa-trash-alt"></i> Limpiar
-        </button>
     </div>
-</div>
+
+    <!-- Ingresos Base -->
+    <div class="form-group" style="margin-bottom: 0;">
+        <label class="control-label"><i class="fas fa-hand-holding-usd"></i> Ingresos Base</label>
+        <div class="control-input-wrapper">
+            <input type="number" id="rd-input-income" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
+            <span class="input-suffix">€</span>
+        </div>
+    </div>
+
+    <!-- Gastos Variables -->
+    <div class="form-group" style="margin-bottom: 0;">
+        <label class="control-label"><i class="fas fa-shopping-cart"></i> Gasto Variable</label>
+        <div class="control-input-wrapper">
+            <input type="number" id="rd-input-variable" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
+            <span class="input-suffix">€</span>
+        </div>
+    </div>
+
+    <!-- Aportaciones a la compartida -->
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="control-label"><i class="fas fa-users"></i> Aportación Base</label>
+      <div class="control-input-wrapper">
+          <input type="number" id="rd-input-contribution" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
+          <span class="input-suffix">€</span>
+      </div>
+    </div>
+
+    <!-- Botón Limpiar -->
+    <button onclick="clearRunwaySimulation()" style="
+        height: 46px; 
+        border-radius: 12px; 
+        border: 1px solid #FEE2E2; 
+        background: #FFF5F5; 
+        color: #F26464; 
+        font-weight: 700; 
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    " onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">
+        <i class="fas fa-undo-alt"></i> Resetear
+    </button>
+  </div>
+
+  <!-- LÍNEA DE VIDA VISUAL -->
+  <div class="section" style="padding: 20px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px;">Estado de Supervivencia (12 Meses)</span>
+        <span id="runway-status-badge" class="auto-label" style="font-size: 10px; padding: 4px 10px;">Calculando...</span>
+    </div>
+    <div class="runway-life-bar-wrap">
+        <div id="runway-life-fill" class="runway-life-bar-fill"></div>
+        <!-- Marcadores de meses -->
+        <div class="runway-markers-container" id="runway-markers"></div>
+    </div>
+  </div>
 
   <div class="kpi-grid">
       <div class="kpi-card">
@@ -4802,8 +5130,9 @@ body.privacy-mode #dashboard-runway-value {
           <div id="rd-total-capital" class="kpi-value">0,00 €</div>
       </div>
       <div class="kpi-card">
-          <div class="kpi-label">Gasto Variable Est.</div>
-          <div id="rd-avg-variable" class="kpi-value">0,00 €</div>
+        <div class="kpi-label">Ahorro Neto Proyectado</div>
+        <div id="rd-net-savings" class="kpi-value">0,00 €</div>
+        <small style="color: var(--text-tertiary);">Balance total tras 12 meses</small>
       </div>
       <div class="kpi-card">
           <div class="kpi-label">Supervivencia Est.</div>
@@ -4820,6 +5149,7 @@ body.privacy-mode #dashboard-runway-value {
                       <th>Mes</th>
                       <th>Gasto Fijo</th>
                       <th>Gasto Variable</th>
+                      <th>Aportación Casa</th>
                       <th>Ingresos</th>
                       <th>Balance Mes</th>
                       <th style="text-align: right;">Capital Restante</th>    
@@ -6507,7 +6837,6 @@ function renderDistributionChart(normal, investments, shared) {
     }
 
     // 4. ACTUALIZAR KPIs
-    // Busca esta parte dentro de renderMonthlyView()
     const monthlyKpis = document.getElementById('monthly-kpis');
     if (monthlyKpis) {
         monthlyKpis.innerHTML = `
@@ -6520,25 +6849,26 @@ function renderDistributionChart(normal, investments, shared) {
                 <div class="kpi-value" style="color:var(--red)">${formatCurrency(gastosPersonales)}</div>
             </div>
             
-            <div class="kpi-card" onclick="openSharedAnalysis()" style="cursor: pointer; border-left: 4px solid var(--orange); display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-                  👥 Cuentas Compartidas <span style="font-size: 10px; margin-left: 5px; opacity: 0.5;">→</span>
-                </div>
-                <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
-            </div>
-            
-            <div style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
-                ${cuentasCompartidas.map(acc => `
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-                        <span style="color: var(--text-secondary);">${acc.name}</span>
-                        <span style="font-weight: 700; color: var(--text-primary);">${formatCurrency(acc.balance)}</span>
+            <!-- TARJETA ACTUALIZADA: Cuentas Compartidas -->
+            <div class="kpi-card clickable" onclick="openSharedAnalysis()" style="cursor: pointer; border-left: 4px solid var(--orange); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                      👥 Cuentas Compartidas <i class="fas fa-chevron-right" style="font-size: 8px; margin-left: 5px; opacity: 0.5;"></i>
                     </div>
-                `).join('')}
+                    <div class="kpi-value" style="color:var(--orange)">${formatCurrency(sharedBalanceTotal)}</div>
+                </div>
+                
+                <div style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px;">
+                    ${cuentasCompartidas.map(acc => `
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
+                            <span style="color: var(--text-secondary);">${acc.name}</span>
+                            <span style="font-weight: 700; color: var(--text-primary);">${formatCurrency(acc.balance)}</span>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-        </div>
-    `;
-}
+        `;
+    }
 
     // 5. RENDERIZADO DE TABLAS Y COMPONENTES
     const setTotal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = formatCurrency(val); };
@@ -7454,102 +7784,42 @@ async function showPersonalExpensesBreakdown() {
     });
 
     function switchView(viewName) {
-    console.log("🚀 [DEBUG 1] Entrando en switchView. Objetivo:", viewName);
-    
     currentView = viewName;
 
     try {
-        // 1. Actualizar botones del Sidebar (Escritorio)
-        console.log("🔍 [DEBUG 2] Actualizando clases active de los botones...");
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.view === viewName) {
-                btn.classList.add('active');
-                console.log("✅ [DEBUG 3] Botón activado:", viewName);
-            }
-        });
-
-        // 2. Actualizar botones del Menú Inferior (Móvil) - Lo dejamos por si acaso
-        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        // 1. Gestionar clases active (Botones)
+        document.querySelectorAll('.nav-btn').forEach(item => { 
             item.classList.remove('active');
             if (item.dataset.view === viewName) item.classList.add('active');
         });
 
-        // 3. Mostrar la vista correspondiente
-        console.log("🖼️ [DEBUG 4] Cambiando visibilidad de contenedores...");
+        // 2. Gestionar visibilidad de contenedores (Vistas)
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         
         const targetView = document.getElementById(`${viewName}-view`);
         if (targetView) {
-            targetView.classList.add('active');
-            console.log("✅ [DEBUG 5] Contenedor HTML encontrado y activado:", `${viewName}-view`);
-        } else {
-            console.error("❌ [DEBUG 5-ERROR] No se encontró el elemento:", `${viewName}-view`);
+            targetView.classList.add('active'); // Aquí es donde se muestra el Proyector
         }
 
-        // 4. EJECUTAR RENDERIZADO SEGÚN LA VISTA
-        console.log("🎨 [DEBUG 6] Iniciando lógica de renderizado para:", viewName);
-
-        if (viewName === 'dashboard') {
-            console.log("➡️ Ejecutando renderDashboard...");
-            renderDashboard();
-        }
+        // 3. Ejecutar renderizado (Solo carga de datos)
+        if (viewName === 'dashboard') renderDashboard();
+        if (viewName === 'monthly') renderMonthlyView();
+        if (viewName === 'accounts') renderAccountsView();
+        if (viewName === 'inversiones') renderInvestmentsView();
+        if (viewName === 'settings') renderSettingsView();
+        if (viewName === 'search') renderSearchView();
+        if (viewName === 'wishlist') renderWishlist();
+        if (viewName === 'travels') renderTravelPlans();
+        if (viewName === 'personal-analysis') renderPersonalAnalysis();
         
-        if (viewName === 'monthly') {
-            console.log("➡️ Ejecutando renderMonthlyView...");
-            renderMonthlyView();
-        }
-        
-        if (viewName === 'inversiones') {
-            console.log("➡️ Ejecutando renderInvestmentsView...");
-            renderInvestmentsView();
-        }
-        
-        if (viewName === 'accounts') {
-            console.log("➡️ Ejecutando renderAccountsView...");
-            renderAccountsView();
-        }
-        
-        if (viewName === 'settings') {
-            console.log("➡️ Ejecutando renderSettingsView...");
-            renderSettingsView();
-        }
-        
-        if (viewName === 'search') {
-            console.log("➡️ Ejecutando renderSearchView...");
-            renderSearchView();
-        }
+        // El Proyector ahora se carga aquí SIN volver a llamar a switchView
+        if (viewName === 'runway-detail') renderRunwayDetail();
 
-        // EL PUNTO CLAVE
-        if (viewName === 'wishlist') {
-            console.log("🎯 [DEBUG 7] ¡DIANA! Detectada vista wishlist. Llamando a renderWishlist()...");
-            
-            // Verificamos si la función existe antes de llamarla
-            if (typeof renderWishlist === 'function') {
-                renderWishlist();
-                console.log("✅ [DEBUG 8] La llamada a renderWishlist() se ha completado.");
-            } else {
-                console.error("❌ [DEBUG 8-ERROR] La función renderWishlist NO ESTÁ DEFINIDA.");
-            }
-        }
-
-        if (viewName === 'travels') {
-            console.log("➡️ Ejecutando renderTravelPlans...");
-            renderTravelPlans();
-        }
-
-        if (viewName === 'personal-analysis') {
-            renderPersonalAnalysis();
-        }
-
-        // Scroll al inicio
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.scrollTop = 0;
 
-        console.log("🏁 [DEBUG 9] switchView ha terminado con éxito.");
-
     } catch (error) {
-        console.error("💥 [DEBUG FATAL] Se ha producido un error dentro de switchView:", error);
+        console.error("💥 Error en switchView:", error);
     }
 }
 
@@ -7698,40 +7968,38 @@ function saveBaselines() {
     if (!currentUser) return;
     const baselines = {
         income: document.getElementById('rd-input-income').value,
-        variable: document.getElementById('rd-input-variable').value
+        variable: document.getElementById('rd-input-variable').value,
+        contribution: document.getElementById('rd-input-contribution').value // Nueva línea
     };
     localStorage.setItem(`runway_baselines_${currentUser.id}`, JSON.stringify(baselines));
 }
 
 // 2. Función principal de renderizado
 async function renderRunwayDetail() {
-    switchView('runway-detail');
     const data = await getData();
     const now = new Date();
     
-    // CARGA DE PERSISTENCIA: Recuperar baselines guardados
-    const savedBaselines = JSON.parse(localStorage.getItem(`runway_baselines_${currentUser?.id}`)) || { income: 0, variable: 0 };
-    
-    // Si los inputs están vacíos (por recarga), ponemos los valores guardados
+    // 1. PERSISTENCIA DE VALORES BASE (Añadida Aportación)
+    const savedBaselines = JSON.parse(localStorage.getItem(`runway_baselines_${currentUser?.id}`)) || { income: 0, variable: 0, contribution: 0 };
     const inputIncome = document.getElementById('rd-input-income');
     const inputVariable = document.getElementById('rd-input-variable');
+    const inputContrib = document.getElementById('rd-input-contribution'); // Nuevo input
     
-    if (inputIncome && inputIncome.value === "" || inputIncome.value == 0) {
-        inputIncome.value = savedBaselines.income;
-    }
-    if (inputVariable && inputVariable.value === "" || inputVariable.value == 0) {
-        inputVariable.value = savedBaselines.variable;
+    if (inputIncome && (inputIncome.value === "" || inputIncome.value == 0)) {
+        inputIncome.value = savedBaselines.income || 0;
+        inputVariable.value = savedBaselines.variable || 0;
+        if(inputContrib) inputContrib.value = savedBaselines.contribution || 0;
     }
 
     const baseIncome = parseFloat(inputIncome.value) || 0;
     const baseVariable = parseFloat(inputVariable.value) || 0;
+    const baseContrib = inputContrib ? (parseFloat(inputContrib.value) || 0) : 0;
 
-    // Cargar ajustes manuales de la tabla
     if (currentUser) {
         runwayAdjustments = JSON.parse(localStorage.getItem(`runway_sim_${currentUser.id}`)) || {};
     }
 
-    // Cálculo de Capital Inicial
+    // 2. CÁLCULO DE CAPITAL INICIAL
     let currentCapital = 0;
     const personalAccounts = data.accounts.filter(a => {
         const isShared = (a.isShared || a.is_shared === true);
@@ -7742,13 +8010,28 @@ async function renderRunwayDetail() {
     for (const acc of personalAccounts) {
         currentCapital += await calculateAccountBalance(acc.name);
     }
+    const startingCapital = currentCapital;
     document.getElementById('rd-total-capital').textContent = formatCurrency(currentCapital);
 
-    // PROYECCIÓN A 12 MESES
+    // 3. GENERACIÓN DE LA TABLA (12 MESES)
     const tableBody = document.getElementById('runway-projection-table');
     let html = '';
     let runningCapital = currentCapital;
     let monthsOfLife = 0;
+
+    // Ayudantes visuales (AUTO / €)
+    const getIndicator = (isEdited) => {
+        return !isEdited 
+            ? `<span class="auto-label">AUTO</span>` 
+            : `<span style="width: 32px; display: inline-block;"></span>`;
+    };
+
+    const valueAddons = (isEdited) => `
+        <div style="display: flex; align-items: center; gap: 4px; width: 50px; justify-content: flex-start; flex-shrink: 0;">
+            ${getIndicator(isEdited)}
+            <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">€</span>
+        </div>
+    `;
 
     for (let i = 0; i < 12; i++) {
         const projectionDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
@@ -7756,67 +8039,90 @@ async function renderRunwayDetail() {
         const year = projectionDate.getFullYear();
         const monthKey = `${monthIdx}-${year}`;
         
-        // 1. Cálculo automático de gastos fijos según configuración
+        // Datos automáticos vs manuales
         const autoFixedValue = data.fixedExpenses
-            .filter(fe => fe.type === 'gastos_personales' && fe.months.includes(monthIdx))
+            .filter(fe => fe.type === 'gastos_personales' && (fe.months || []).includes(monthIdx))
             .reduce((s, fe) => s + fe.amount, 0);
 
-        // 2. Lógica de prioridad: Ajuste manual > Valor automático de la App
-        const currentFixed = runwayAdjustments[`fixed-${monthKey}`] !== undefined ? 
-            runwayAdjustments[`fixed-${monthKey}`] : autoFixedValue;
+        // Lógica de edición por columna
+        const isFixedEdited = runwayAdjustments[`fixed-${monthKey}`] !== undefined;
+        const currentFixed = isFixedEdited ? runwayAdjustments[`fixed-${monthKey}`] : autoFixedValue;
             
-        const currentIncome = runwayAdjustments[`income-${monthKey}`] !== undefined ? 
-            runwayAdjustments[`income-${monthKey}`] : baseIncome;
-            
-        const currentVariable = runwayAdjustments[`variable-${monthKey}`] !== undefined ? 
-            runwayAdjustments[`variable-${monthKey}`] : baseVariable;
+        const isVariableEdited = runwayAdjustments[`variable-${monthKey}`] !== undefined;
+        const currentVariable = isVariableEdited ? runwayAdjustments[`variable-${monthKey}`] : baseVariable;
 
-        // 3. Totales del mes
-        const totalOut = currentFixed + currentVariable;
+        const isContribEdited = runwayAdjustments[`contribution-${monthKey}`] !== undefined;
+        const currentContrib = isContribEdited ? runwayAdjustments[`contribution-${monthKey}`] : baseContrib;
+
+        const isIncomeEdited = runwayAdjustments[`income-${monthKey}`] !== undefined;
+        const currentIncome = isIncomeEdited ? runwayAdjustments[`income-${monthKey}`] : baseIncome;
+
+        // CÁLCULO FINAL: Salidas (Fijo + Variable + Aportación Casa)
+        const totalOut = currentFixed + currentVariable + currentContrib;
         const monthNet = currentIncome - totalOut;
-        
         runningCapital += monthNet;
         if (runningCapital > 0) monthsOfLife++;
 
-        // 4. Generar HTML con inputs y símbolos de Euro
+        // Estilos visuales
+        const incomeBg = currentIncome > baseIncome ? 'background: rgba(16, 185, 129, 0.12);' : (currentIncome < baseIncome && currentIncome > 0 ? 'background: rgba(242, 100, 100, 0.08);' : '');
+        const fixedBg = currentFixed > (autoFixedValue > 0 ? autoFixedValue : 0) ? 'background: rgba(245, 158, 11, 0.1);' : '';
+        const rowWarning = monthNet < 0 ? 'border-left: 4px solid var(--red);' : '';
+
         html += `
-            <tr style="${runningCapital < 0 ? 'opacity: 0.5; background: var(--red-bg);' : ''}">
+            <tr style="${runningCapital < 0 ? 'opacity: 0.5; background: var(--red-bg);' : ''} ${rowWarning}">
                 <td class="description-cell"><b>${MONTHS[monthIdx]} ${year}</b></td>
                 
-                <!-- Columna Gasto Fijo (AHORA EDITABLE) -->
-                <td>
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="number" class="date-input-mini" 
-                               style="width: 65px; text-align: right; border-bottom: 1px dashed #ccc !important;" 
-                               value="${currentFixed.toFixed(2)}" 
-                               onchange="setRunwayAdjustment('fixed', '${monthKey}', this.value)">
-                        <span style="font-size: 11px; color: var(--text-tertiary);">€</span>
+                <!-- Gasto Fijo -->
+                <td style="${fixedBg}">
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <input type="number" step="0.01" class="date-input-mini ${isFixedEdited ? 'input-edited' : ''}" 
+                              style="width: 75px; text-align: right; border:none; background:transparent;" 
+                              value="${currentFixed.toFixed(2)}" onchange="setRunwayAdjustment('fixed', '${monthKey}', this.value)">
+                        ${valueAddons(isFixedEdited)}
                     </div>
                 </td>
 
-                <!-- Columna Gasto Variable -->
+                <!-- Gasto Variable -->
                 <td>
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="number" class="date-input-mini" style="width: 65px; text-align: right;" 
-                               value="${currentVariable.toFixed(2)}" 
-                               onchange="setRunwayAdjustment('variable', '${monthKey}', this.value)">
-                        <span style="font-size: 11px; color: var(--text-tertiary);">€</span>
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <input type="number" step="0.01" class="date-input-mini ${isVariableEdited ? 'input-edited' : ''}" 
+                              style="width: 75px; text-align: right; border:none; background:transparent;" 
+                              value="${currentVariable.toFixed(2)}" onchange="setRunwayAdjustment('variable', '${monthKey}', this.value)">
+                        ${valueAddons(isVariableEdited)}
                     </div>
                 </td>
 
-                <!-- Columna Ingresos -->
+                <!-- Aportación Casa (NUEVA COLUMNA) -->
                 <td>
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <input type="number" class="date-input-mini" style="width: 65px; text-align: right; color: var(--green); font-weight: 700;" 
-                               value="${currentIncome.toFixed(2)}" 
-                               onchange="setRunwayAdjustment('income', '${monthKey}', this.value)">
-                        <span style="font-size: 11px; color: var(--green); font-weight: 700;">€</span>
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <input type="number" step="0.01" class="date-input-mini ${isContribEdited ? 'input-edited' : ''}" 
+                              style="width: 75px; text-align: right; border:none; background:transparent;" 
+                              value="${currentContrib.toFixed(2)}" onchange="setRunwayAdjustment('contribution', '${monthKey}', this.value)">
+                        ${valueAddons(isContribEdited)}
                     </div>
                 </td>
 
-                <td style="font-weight: 700; color: ${monthNet >= 0 ? 'var(--green)' : 'var(--red)'}">
-                    ${formatCurrency(monthNet)}
+                <!-- Ingresos -->
+                <td style="${incomeBg}">
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <input type="number" step="0.01" class="date-input-mini ${isIncomeEdited ? 'input-edited' : ''}" 
+                              style="width: 75px; text-align: right; border:none; background:transparent; ${!isIncomeEdited ? 'color: var(--green); font-weight: 700;' : ''}" 
+                              value="${currentIncome.toFixed(2)}" onchange="setRunwayAdjustment('income', '${monthKey}', this.value)">
+                        ${valueAddons(isIncomeEdited)}
+                    </div>
                 </td>
+
+                <!-- Balance Píldora -->
+                <td style="padding-right: 20px;">
+                    <span style="color: ${monthNet >= 0 ? 'var(--green)' : 'var(--red)'}; 
+                                background: ${monthNet >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(242, 100, 100, 0.1)'}; 
+                                padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 800;
+                                display: inline-block; min-width: 90px; text-align: center;">
+                        ${monthNet >= 0 ? '+' : ''}${formatCurrency(monthNet)}
+                    </span>
+                </td>
+
+                <!-- Capital Restante -->
                 <td style="text-align: right; font-weight: 800; color: ${runningCapital > 0 ? 'var(--green)' : 'var(--red)'}">
                     ${formatCurrency(runningCapital)}
                 </td>
@@ -7825,10 +8131,49 @@ async function renderRunwayDetail() {
 
     tableBody.innerHTML = html;
     
-    // Actualización de KPIs
+    // 4. ACTUALIZAR KPIS SUPERIORES Y LÍNEA DE VIDA
+    const totalNetSavings = runningCapital - startingCapital;
+    if (document.getElementById('rd-net-savings')) {
+        document.getElementById('rd-net-savings').textContent = formatCurrency(totalNetSavings);
+        document.getElementById('rd-net-savings').style.color = totalNetSavings >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+
     const monthsEl = document.getElementById('rd-total-months');
     monthsEl.textContent = monthsOfLife >= 12 ? "12+ meses" : monthsOfLife + " meses";
     monthsEl.style.color = monthsOfLife > 6 ? 'var(--green)' : (monthsOfLife > 3 ? 'var(--orange)' : 'var(--red)');
+
+    // Actualización de la barra visual (Línea de vida)
+    updateLifeBar(monthsOfLife);
+}
+
+// Función auxiliar para no saturar el render principal
+function updateLifeBar(months) {
+    const fillEl = document.getElementById('runway-life-fill');
+    const badgeEl = document.getElementById('runway-status-badge');
+    const markersEl = document.getElementById('runway-markers');
+
+    if (fillEl && badgeEl) {
+        const survivalPercent = (months / 12) * 100;
+        fillEl.style.width = Math.min(survivalPercent, 100) + '%';
+
+        if (months >= 12) {
+            fillEl.style.backgroundColor = '#10B981';
+            badgeEl.textContent = "ESTABLE";
+            badgeEl.style.color = "#10B981";
+            badgeEl.style.background = "rgba(16, 185, 129, 0.1)";
+        } else if (months > 6) {
+            fillEl.style.backgroundColor = 'var(--primary)';
+            badgeEl.textContent = "BAJO CONTROL";
+            badgeEl.style.color = "var(--primary)";
+            badgeEl.style.background = "rgba(33, 69, 137, 0.1)";
+        } else {
+            fillEl.style.backgroundColor = '#F26464';
+            badgeEl.textContent = "ALERTA LÍQUIDA";
+            badgeEl.style.color = "#F26464";
+            badgeEl.style.background = "rgba(242, 100, 100, 0.1)";
+        }
+        if(markersEl) markersEl.innerHTML = Array(11).fill('<div class="runway-marker-tick"></div>').join('');
+    }
 }
 
 async function renderPersonalGrowthChart() {
