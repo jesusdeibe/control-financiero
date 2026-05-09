@@ -21,7 +21,7 @@
 
     :root {
         /* Fondos */
-        --bg-body: #FDFBFA; /* Un gris blanquecino muy neutro */
+        --bg-body: #E9EFF5;
         --bg-surface: #FFFFFF; /* Blanco puro para las tarjetas */
 
         /* Textos */
@@ -30,8 +30,8 @@
         --text-tertiary: #A1A5B7; /* Gris claro para fechas o ejes de gráficos */
 
         /* Colores Principales extraídos de la imagen */
-        --primary: #214589; /* El azul eléctrico vibrante */
-        --primary-light: #f1ead4; /* Azul muy clarito para fondos */
+        --primary: #214589;
+        --primary-light: #E0E7FF;
         
         /* Estados (Verde y Rojo estilo Primetrack) */
         --green: #10B981; 
@@ -51,6 +51,9 @@
         --border-light: #E4E6EF; 
         --border-medium: #D1D5DB;
         --bg-primary: #F3F4F6;
+
+        --shadow-sm: 0 2px 4px rgba(33, 69, 137, 0.08);
+        --shadow-md: 0 10px 15px -3px rgba(33, 69, 137, 0.12);
     }
 
     /* 1. Estructura General y Fondo */
@@ -688,15 +691,23 @@
       justify-content: flex-end;
     }
 
+    /* Botón de Acción Estilizado */
     .action-btn {
-      background: none;
-      border: none;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-secondary);
-      transition: color 0.2s;
-      font-weight: 500;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px; /* Squircle */
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 13px;
+        position: relative;
+    }
+
+    .action-btn:active {
+        transform: scale(0.92);
     }
 
     .action-btn:hover {
@@ -705,6 +716,41 @@
 
     .action-btn.delete:hover {
       color: var(--red);
+    }
+
+    /* Estilo para el Engranaje (Ajustes) */
+    .btn-settings {
+        background: rgba(33, 69, 137, 0.06);
+        color: var(--primary);
+    }
+
+    .btn-settings:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(33, 69, 137, 0.2);
+    }
+
+    /* Estilo para el Reset (Undo) */
+    .btn-reset {
+        background: rgba(226, 232, 240, 0.5);
+        color: #64748b;
+    }
+
+    .btn-reset:hover {
+        background: #64748b;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+    }
+
+    /* Iconos más finos */
+    .action-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-settings:hover i {
+        transform: rotate(45deg); /* Giro sutil al pasar el ratón */
     }
 
     /* --- ESTRUCTURA FUNCIONAL DE LOS MODALES --- */
@@ -4196,6 +4242,245 @@ body.privacy-mode #dashboard-runway-value {
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
+/* CAMBIO CRÍTICO: Añadimos .active para que respete el sistema de pestañas */
+#runway-detail-view.active {
+    display: flex !important;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+}
+
+/* El resto se mantiene igual */
+.table-container {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    margin-bottom: 50px;
+}
+
+/* Hacer la fila de "Meta" más discreta */
+.budget-drawer {
+    background: rgba(33, 69, 137, 0.04) !important;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+.drawer-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    border: 1px solid var(--primary-light);
+    margin: 10px;
+}
+
+.drawer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.drawer-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.drawer-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.05);
+}
+
+.drawer-stat span:last-child {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.input-meta {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    /* Usamos un borde transparente que se colorea al hacer foco */
+    border: 2px solid transparent; 
+    background: #f1f5f9; /* Gris muy suave, estilo Apple/Fintech */
+    color: var(--primary);
+    
+    /* FUENTE: Forzamos Outfit y ajustamos el tamaño */
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 16px;
+    font-weight: 800;
+    
+    transition: all 0.2s ease;
+    outline: none;
+    text-align: left;
+    
+    /* Quitamos las flechitas feas de los inputs numéricos */
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+/* Efecto al hacer clic para escribir */
+.input-meta:focus {
+    background: white;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(33, 69, 137, 0.1);
+}
+
+/* Quitar flechas en Chrome/Safari */
+.input-meta::-webkit-outer-spin-button,
+.input-meta::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Estilo general de la tabla */
+.table-container table {
+    border-collapse: separate;
+    border-spacing: 0 8px; /* Crea el efecto de filas separadas */
+    width: 100%;
+}
+
+.table-container th {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    padding: 10px 15px;
+    border: none;
+}
+
+/* En el proyector, las celdas de la tabla ahora resaltarán más */
+.table-container tr td {
+    background: var(--bg-surface) !important;
+    border-top: 1px solid #E2E8F0 !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* Redondear esquinas de las filas */
+.table-container tr td:first-child {
+    border-left: 1px solid rgba(0,0,0,0.03);
+    border-radius: 12px 0 0 12px;
+}
+.table-container tr td:last-child {
+    border-right: 1px solid rgba(0,0,0,0.03);
+    border-radius: 0 12px 12px 0;
+}
+
+/* Hover en la fila principal */
+.table-container tr:hover td {
+    background: #fdfdfd;
+    border-color: var(--primary-light);
+}
+
+/* Diseño del Desplegable (Drawer) */
+.budget-drawer-row td {
+    background: #f8fafc !important; /* Un gris azulado muy suave */
+    border-radius: 0 0 12px 12px !important;
+    padding: 0 !important; /* El padding lo dará el contenido interno */
+    border-top: none !important;
+}
+
+.drawer-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 24px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bloques de categoría dentro del drawer */
+.drawer-col {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--primary-light);
+}
+
+/* Micro-barra de progreso */
+.progress-container {
+    height: 6px;
+    background: #eee;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Forzar fuente en todo el Proyector */
+#runway-detail-view, 
+#runway-detail-view *, 
+.drawer-content, 
+.drawer-content * {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Refinar las etiquetas pequeñas del desplegable */
+.drawer-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilo para las filas de Ejecutado/Pendiente */
+.drawer-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.drawer-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.drawer-stat-value {
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* 1. Forzar Outfit en todo el proyector */
+#runway-detail-view, 
+#runway-detail-view *, 
+.drawer-content, 
+.drawer-content * {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* 2. EXCEPCIÓN CRÍTICA: Los iconos DEBEN mantener FontAwesome */
+#runway-detail-view i, 
+.drawer-content i, 
+.fas, .far, .fab {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free" !important;
+    font-weight: 900 !important; /* FontAwesome necesita este peso para verse */
+}
+
+/* Esto afectará a las secciones, tarjetas KPI y columnas del engranaje */
+.section, .kpi-card, .drawer-col {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important; /* Borde casi invisible pero que define el límite */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
   </style>
 </head>
 <body>
@@ -5046,6 +5331,7 @@ body.privacy-mode #dashboard-runway-value {
     </div>
 </div>
 
+<!-- ESTA ES LA ÚNICA PARTE QUE DEBE EXISTIR PARA EL PROYECTOR -->
 <div id="runway-detail-view" class="view">
   <header class="header">
       <div style="display: flex; align-items: center; gap: 15px;">
@@ -5054,113 +5340,58 @@ body.privacy-mode #dashboard-runway-value {
           </button>
           <div>
               <h1 class="page-title">Proyector de Supervivencia</h1>
-              <p class="page-subtitle">Simulación de flujos futuros</p>
+              <p class="page-subtitle">Simulación de flujos basada en metas mensuales</p>
           </div>
       </div>
   </header>
 
-  <div class="simulation-panel">
-    <!-- Selector de Base -->
-    <div class="form-group" style="margin-bottom: 0;">
-        <label class="control-label"><i class="fas fa-database"></i> Base de Capital</label>
-        <div class="mode-selector">
-            <button id="btn-mode-disposable" class="mode-btn active" onclick="updateRunwayConfig('disposable')">DISPONIBLE</button>
-            <button id="btn-mode-patrimony" class="mode-btn" onclick="updateRunwayConfig('patrimony')">TOTAL</button>
-        </div>
+  <!-- SELECTOR DE BASE (COMPACTO Y DENTRO DE LA VISTA) -->
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 12px; align-items: center;">
+    <span style="font-size: 10px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">
+        <i class="fas fa-database"></i> Calcular sobre:
+    </span>
+    <div class="mode-selector" style="width: 280px; margin: 0;">
+        <button id="btn-mode-disposable" class="mode-btn active" onclick="updateRunwayConfig('disposable')">DISPONIBLE</button>
+        <button id="btn-mode-patrimony" class="mode-btn" onclick="updateRunwayConfig('patrimony')">TOTAL</button>
     </div>
-
-    <!-- Ingresos Base -->
-    <div class="form-group" style="margin-bottom: 0;">
-        <label class="control-label"><i class="fas fa-hand-holding-usd"></i> Ingresos Base</label>
-        <div class="control-input-wrapper">
-            <input type="number" id="rd-input-income" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
-            <span class="input-suffix">€</span>
-        </div>
-    </div>
-
-    <!-- Gastos Variables -->
-    <div class="form-group" style="margin-bottom: 0;">
-        <label class="control-label"><i class="fas fa-shopping-cart"></i> Gasto Variable</label>
-        <div class="control-input-wrapper">
-            <input type="number" id="rd-input-variable" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
-            <span class="input-suffix">€</span>
-        </div>
-    </div>
-
-    <!-- Aportaciones a la compartida -->
-    <div class="form-group" style="margin-bottom: 0;">
-      <label class="control-label"><i class="fas fa-users"></i> Aportación Base</label>
-      <div class="control-input-wrapper">
-          <input type="number" id="rd-input-contribution" class="control-input" value="0" oninput="saveBaselines(); renderRunwayDetail();">
-          <span class="input-suffix">€</span>
-      </div>
-    </div>
-
-    <!-- Botón Limpiar -->
-    <button onclick="clearRunwaySimulation()" style="
-        height: 46px; 
-        border-radius: 12px; 
-        border: 1px solid #FEE2E2; 
-        background: #FFF5F5; 
-        color: #F26464; 
-        font-weight: 700; 
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    " onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">
-        <i class="fas fa-undo-alt"></i> Resetear
-    </button>
   </div>
 
-  <!-- LÍNEA DE VIDA VISUAL -->
+  <!-- LÍNEA DE VIDA VISUAL (DENTRO DE LA VISTA) -->
   <div class="section" style="padding: 20px; margin-bottom: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <span style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px;">Estado de Supervivencia (12 Meses)</span>
-        <span id="runway-status-badge" class="auto-label" style="font-size: 10px; padding: 4px 10px;">Calculando...</span>
+        <span style="font-size: 11px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase;">Supervivencia Proyectada</span>
+        <span id="runway-status-badge" class="auto-label">Calculando...</span>
     </div>
     <div class="runway-life-bar-wrap">
         <div id="runway-life-fill" class="runway-life-bar-fill"></div>
-        <!-- Marcadores de meses -->
         <div class="runway-markers-container" id="runway-markers"></div>
     </div>
   </div>
 
+  <!-- KPIs -->
   <div class="kpi-grid">
-      <div class="kpi-card">
-          <div class="kpi-label">Capital de Inicio</div>
-          <div id="rd-total-capital" class="kpi-value">0,00 €</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Ahorro Neto Proyectado</div>
-        <div id="rd-net-savings" class="kpi-value">0,00 €</div>
-        <small style="color: var(--text-tertiary);">Balance total tras 12 meses</small>
-      </div>
-      <div class="kpi-card">
-          <div class="kpi-label">Supervivencia Est.</div>
-          <div id="rd-total-months" class="kpi-value" style="color: var(--orange);">0 meses</div>
-      </div>
+      <div class="kpi-card"><div class="kpi-label">Capital de Inicio</div><div id="rd-total-capital" class="kpi-value">0,00 €</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ahorro Neto</div><div id="rd-net-savings" class="kpi-value">0,00 €</div></div>
+      <div class="kpi-card"><div class="kpi-label">Supervivencia</div><div id="rd-total-months" class="kpi-value" style="color: var(--orange);">0 meses</div></div>
   </div>
 
-  <!-- El resto de la tabla se mantiene igual con el ID runway-projection-table -->
+  <!-- TABLA CON CABECERA CORREGIDA (8 COLUMNAS) -->
   <div class="section">
       <div class="table-container">
           <table>
-              <thead>
-                  <tr>
-                      <th>Mes</th>
-                      <th>Gasto Fijo</th>
-                      <th>Gasto Variable</th>
-                      <th>Aportación Casa</th>
-                      <th>Ingresos</th>
-                      <th>Balance Mes</th>
-                      <th style="text-align: right;">Capital Restante</th>    
-                  </tr>
-              </thead>
-              <tbody id="runway-projection-table"></tbody>
+            <thead>
+              <tr>
+                  <th style="width: 100px;">Acciones</th>
+                  <th>Mes</th>
+                  <th style="text-align: right;">Gasto Fijo</th>
+                  <th style="text-align: right;">Gasto Variable</th>
+                  <th style="text-align: right;">Aportación</th>
+                  <th style="text-align: right;">Ingresos</th>
+                  <th style="text-align: right;">Balance</th>
+                  <th style="text-align: right;">Restante</th>    
+              </tr>
+            </thead>
+            <tbody id="runway-projection-table"></tbody>
           </table>
       </div>
   </div>
@@ -7959,52 +8190,24 @@ function setRunwayAdjustment(type, monthKey, value) {
     renderRunwayDetail(); 
 }
 
-// 3. Función para resetear la simulación (opcional pero recomendada)
-function clearRunwaySimulation() {
-    if (confirm("¿Seguro que quieres borrar todos los ajustes manuales de la simulación?")) {
-        runwayAdjustments = {};
-        localStorage.removeItem(`runway_sim_${currentUser.id}`);
-        renderRunwayDetail();
-    }
-}
-
-// 1. Guardar valores base (los de arriba)
-function saveBaselines() {
-    if (!currentUser) return;
-    const baselines = {
-        income: document.getElementById('rd-input-income').value,
-        variable: document.getElementById('rd-input-variable').value,
-        contribution: document.getElementById('rd-input-contribution').value // Nueva línea
-    };
-    localStorage.setItem(`runway_baselines_${currentUser.id}`, JSON.stringify(baselines));
-}
-
 // 2. Función principal de renderizado
 async function renderRunwayDetail() {
     const data = await getData();
     const now = new Date();
     
-    // 1. PERSISTENCIA DE VALORES BASE (Añadida Aportación)
-    const savedBaselines = JSON.parse(localStorage.getItem(`runway_baselines_${currentUser?.id}`)) || { income: 0, variable: 0, contribution: 0 };
-    const inputIncome = document.getElementById('rd-input-income');
-    const inputVariable = document.getElementById('rd-input-variable');
-    const inputContrib = document.getElementById('rd-input-contribution'); // Nuevo input
+    // 1. Cargar Metas de Supabase
+    const { data: monthlyBudgets } = await supabaseClient
+        .from('budgets')
+        .select('*')
+        .eq('user_id', currentUser.id);
     
-    if (inputIncome && (inputIncome.value === "" || inputIncome.value == 0)) {
-        inputIncome.value = savedBaselines.income || 0;
-        inputVariable.value = savedBaselines.variable || 0;
-        if(inputContrib) inputContrib.value = savedBaselines.contribution || 0;
-    }
-
-    const baseIncome = parseFloat(inputIncome.value) || 0;
-    const baseVariable = parseFloat(inputVariable.value) || 0;
-    const baseContrib = inputContrib ? (parseFloat(inputContrib.value) || 0) : 0;
+    const budgetsMap = (monthlyBudgets || []).reduce((map, b) => ({ ...map, [b.month_key]: b }), {});
 
     if (currentUser) {
         runwayAdjustments = JSON.parse(localStorage.getItem(`runway_sim_${currentUser.id}`)) || {};
     }
 
-    // 2. CÁLCULO DE CAPITAL INICIAL
+    // 2. Capital Inicial
     let currentCapital = 0;
     const personalAccounts = data.accounts.filter(a => {
         const isShared = (a.isShared || a.is_shared === true);
@@ -8015,140 +8218,165 @@ async function renderRunwayDetail() {
     for (const acc of personalAccounts) {
         currentCapital += await calculateAccountBalance(acc.name);
     }
-    const startingCapital = currentCapital;
     document.getElementById('rd-total-capital').textContent = formatCurrency(currentCapital);
 
-    // 3. GENERACIÓN DE LA TABLA (12 MESES)
+    // 3. Generación de Tabla
     const tableBody = document.getElementById('runway-projection-table');
     let html = '';
     let runningCapital = currentCapital;
     let monthsOfLife = 0;
 
-    // Ayudantes visuales (AUTO / €)
-    const getIndicator = (isEdited) => {
-        return !isEdited 
-            ? `<span class="auto-label">AUTO</span>` 
-            : `<span style="width: 32px; display: inline-block;"></span>`;
-    };
-
-    const valueAddons = (isEdited) => `
-        <div style="display: flex; align-items: center; gap: 4px; width: 50px; justify-content: flex-start; flex-shrink: 0;">
-            ${getIndicator(isEdited)}
-            <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">€</span>
-        </div>
-    `;
-
     for (let i = 0; i < 12; i++) {
-        const projectionDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
-        const monthIdx = projectionDate.getMonth();
-        const year = projectionDate.getFullYear();
-        const monthKey = `${monthIdx}-${year}`;
+        const projDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        const mIdx = projDate.getMonth();
+        const year = projDate.getFullYear();
+        const monthKey = `${mIdx}-${year}`;
         
-        // Datos automáticos vs manuales
+        // --- DEFINICIÓN DE VARIABLES CLAVE ---
+        const meta = budgetsMap[monthKey] || { fixed: 0, variable: 0, contribution: 0, income: 0 };
+        const real = await getMonthActuals(monthKey);
         const autoFixedValue = data.fixedExpenses
-            .filter(fe => fe.type === 'gastos_personales' && (fe.months || []).includes(monthIdx))
+            .filter(fe => fe.type === 'gastos_personales' && (fe.months || []).includes(mIdx))
             .reduce((s, fe) => s + fe.amount, 0);
 
-        // Lógica de edición por columna
-        const isFixedEdited = runwayAdjustments[`fixed-${monthKey}`] !== undefined;
-        const currentFixed = isFixedEdited ? runwayAdjustments[`fixed-${monthKey}`] : autoFixedValue;
-            
-        const isVariableEdited = runwayAdjustments[`variable-${monthKey}`] !== undefined;
-        const currentVariable = isVariableEdited ? runwayAdjustments[`variable-${monthKey}`] : baseVariable;
+        // 4. Lógica de valores proyectados (Meta - Real)
+        const finalValues = {
+            fixed: runwayAdjustments[`fixed-${monthKey}`] ?? Math.max(0, (meta.fixed || autoFixedValue) - real.fixed),
+            variable: runwayAdjustments[`variable-${monthKey}`] ?? Math.max(0, meta.variable - real.variable),
+            contribution: runwayAdjustments[`contribution-${monthKey}`] ?? Math.max(0, meta.contribution - real.contribution),
+            income: runwayAdjustments[`income-${monthKey}`] ?? Math.max(0, meta.income - real.income)
+        };
 
-        const isContribEdited = runwayAdjustments[`contribution-${monthKey}`] !== undefined;
-        const currentContrib = isContribEdited ? runwayAdjustments[`contribution-${monthKey}`] : baseContrib;
-
-        const isIncomeEdited = runwayAdjustments[`income-${monthKey}`] !== undefined;
-        const currentIncome = isIncomeEdited ? runwayAdjustments[`income-${monthKey}`] : baseIncome;
-
-        // CÁLCULO FINAL: Salidas (Fijo + Variable + Aportación Casa)
-        const totalOut = currentFixed + currentVariable + currentContrib;
-        const monthNet = currentIncome - totalOut;
+        const monthNet = finalValues.income - (finalValues.fixed + finalValues.variable + finalValues.contribution);
         runningCapital += monthNet;
         if (runningCapital > 0) monthsOfLife++;
 
-        // Estilos visuales
-        const incomeBg = currentIncome > baseIncome ? 'background: rgba(16, 185, 129, 0.12);' : (currentIncome < baseIncome && currentIncome > 0 ? 'background: rgba(242, 100, 100, 0.08);' : '');
-        const fixedBg = currentFixed > (autoFixedValue > 0 ? autoFixedValue : 0) ? 'background: rgba(245, 158, 11, 0.1);' : '';
-        const rowWarning = monthNet < 0 ? 'border-left: 4px solid var(--red);' : '';
-
         html += `
-            <tr style="${runningCapital < 0 ? 'opacity: 0.5; background: var(--red-bg);' : ''} ${rowWarning}">
-                <td class="description-cell"><b>${MONTHS[monthIdx]} ${year}</b></td>
-                
-                <!-- Gasto Fijo -->
-                <td style="${fixedBg}">
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <input type="number" step="0.01" class="date-input-mini ${isFixedEdited ? 'input-edited' : ''}" 
-                              style="width: 75px; text-align: right; border:none; background:transparent;" 
-                              value="${currentFixed.toFixed(2)}" onchange="setRunwayAdjustment('fixed', '${monthKey}', this.value)">
-                        ${valueAddons(isFixedEdited)}
-                    </div>
-                </td>
-
-                <!-- Gasto Variable -->
-                <td>
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <input type="number" step="0.01" class="date-input-mini ${isVariableEdited ? 'input-edited' : ''}" 
-                              style="width: 75px; text-align: right; border:none; background:transparent;" 
-                              value="${currentVariable.toFixed(2)}" onchange="setRunwayAdjustment('variable', '${monthKey}', this.value)">
-                        ${valueAddons(isVariableEdited)}
-                    </div>
-                </td>
-
-                <!-- Aportación Casa (NUEVA COLUMNA) -->
-                <td>
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <input type="number" step="0.01" class="date-input-mini ${isContribEdited ? 'input-edited' : ''}" 
-                              style="width: 75px; text-align: right; border:none; background:transparent;" 
-                              value="${currentContrib.toFixed(2)}" onchange="setRunwayAdjustment('contribution', '${monthKey}', this.value)">
-                        ${valueAddons(isContribEdited)}
-                    </div>
-                </td>
-
-                <!-- Ingresos -->
-                <td style="${incomeBg}">
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <input type="number" step="0.01" class="date-input-mini ${isIncomeEdited ? 'input-edited' : ''}" 
-                              style="width: 75px; text-align: right; border:none; background:transparent; ${!isIncomeEdited ? 'color: var(--green); font-weight: 700;' : ''}" 
-                              value="${currentIncome.toFixed(2)}" onchange="setRunwayAdjustment('income', '${monthKey}', this.value)">
-                        ${valueAddons(isIncomeEdited)}
-                    </div>
-                </td>
-
-                <!-- Balance Píldora -->
-                <td style="padding-right: 20px;">
-                    <span style="color: ${monthNet >= 0 ? 'var(--green)' : 'var(--red)'}; 
-                                background: ${monthNet >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(242, 100, 100, 0.1)'}; 
-                                padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 800;
-                                display: inline-block; min-width: 90px; text-align: center;">
-                        ${monthNet >= 0 ? '+' : ''}${formatCurrency(monthNet)}
-                    </span>
-                </td>
-
-                <!-- Capital Restante -->
-                <td style="text-align: right; font-weight: 800; color: ${runningCapital > 0 ? 'var(--green)' : 'var(--red)'}">
-                    ${formatCurrency(runningCapital)}
-                </td>
-            </tr>`;
+          <tr>
+              <td style="width: 100px; padding: 10px;">
+                  <div style="display: flex; gap: 10px; align-items:center; justify-content: center;">
+                      <button onclick="toggleBudgetDrawer('${monthKey}')" 
+                              class="action-btn btn-settings" 
+                              title="Configurar Meta Mensual">
+                          <i class="fas fa-sliders-h"></i>
+                      </button>
+                      
+                      <button onclick="resetMonthToAuto('${monthKey}')" 
+                              class="action-btn btn-reset" 
+                              title="Restablecer valores">
+                          <i class="fas fa-arrow-rotate-left"></i>
+                      </button>
+                  </div>
+              </td>
+              
+              <td class="description-cell">
+                  <div style="display: flex; flex-direction: column;">
+                      <span style="font-weight: 800; font-size: 13px;">${MONTHS[mIdx]}</span>
+                      <span style="font-size: 10px; color: var(--text-tertiary); margin-top: -2px;">${year}</span>
+                  </div>
+              </td>
+              <td style="text-align:right; font-weight:600;">${formatCurrency(finalValues.fixed)}</td>
+              <td style="text-align:right; font-weight:600;">${formatCurrency(finalValues.variable)}</td>
+              <td style="text-align:right; font-weight:600;">${formatCurrency(finalValues.contribution)}</td>
+              <td style="text-align:right; color:var(--green); font-weight:700;">${formatCurrency(finalValues.income)}</td>
+              <td style="text-align:right;">
+                  <span class="badge-${monthNet >= 0 ? 'green' : 'red'}" style="min-width:70px; display:inline-block; text-align:center;">
+                      ${formatCurrency(monthNet)}
+                  </span>
+              </td>
+              <td style="text-align:right; font-weight:800;">${formatCurrency(runningCapital)}</td>
+          </tr>
+          <tr id="drawer-${monthKey}" class="budget-drawer-row" style="display:none;">
+              <td colspan="8">
+                  <div class="drawer-content">
+                      ${renderCategoryBlock('Fijos', 'fixed', meta.fixed || autoFixedValue, real.fixed, monthKey)}
+                      ${renderCategoryBlock('Variables', 'variable', meta.variable, real.variable, monthKey)}
+                      ${renderCategoryBlock('Aportación', 'contribution', meta.contribution, real.contribution, monthKey)}
+                      ${renderCategoryBlock('Ingresos', 'income', meta.income, real.income, monthKey)}
+                  </div>
+              </td>
+          </tr>
+      `;
     }
-
     tableBody.innerHTML = html;
+    updateLifeBar(monthsOfLife);
+    document.getElementById('rd-net-savings').textContent = formatCurrency(runningCapital - currentCapital);
+    document.getElementById('rd-total-months').textContent = monthsOfLife >= 12 ? "12+ meses" : monthsOfLife + " meses";
+}
+
+// Función auxiliar para renderizar los bloques del desplegable
+function renderCategoryBlock(label, key, metaVal, realVal, monthKey) {
+    const diff = metaVal - realVal;
+    const isIncome = key === 'income';
+    const absDiff = Math.abs(diff);
     
-    // 4. ACTUALIZAR KPIS SUPERIORES Y LÍNEA DE VIDA
-    const totalNetSavings = runningCapital - startingCapital;
-    if (document.getElementById('rd-net-savings')) {
-        document.getElementById('rd-net-savings').textContent = formatCurrency(totalNetSavings);
-        document.getElementById('rd-net-savings').style.color = totalNetSavings >= 0 ? 'var(--green)' : 'var(--red)';
+    // 1. ¿Está completado? (Diferencia casi cero)
+    const isDone = absDiff < 0.01;
+    
+    // 2. Lógica de Alerta (Rojo)
+    // Para gastos: Alerta si diff < 0 (gastaste de más)
+    // Para ingresos: Alerta si diff > 0 (aún te falta dinero por cobrar)
+    const hasAlert = isIncome ? (diff > 0) : (diff < 0);
+    
+    // 3. Determinar el texto de estado
+    let statusText = "";
+    if (isDone) {
+        statusText = "Completado";
+    } else if (isIncome) {
+        statusText = diff > 0 ? "Falta cobrar" : "Extra";
+    } else {
+        statusText = diff < 0 ? "Exceso" : "Pendiente";
     }
 
-    const monthsEl = document.getElementById('rd-total-months');
-    monthsEl.textContent = monthsOfLife >= 12 ? "12+ meses" : monthsOfLife + " meses";
-    monthsEl.style.color = monthsOfLife > 6 ? 'var(--green)' : (monthsOfLife > 3 ? 'var(--orange)' : 'var(--red)');
+    // 4. Color final
+    // Si está hecho -> Verde. Si hay alerta -> Rojo. Si no -> Verde.
+    const statusColor = isDone ? 'var(--green)' : (hasAlert ? 'var(--red)' : 'var(--green)');
 
-    // Actualización de la barra visual (Línea de vida)
-    updateLifeBar(monthsOfLife);
+    // Cálculo de la barra de progreso
+    let percentage = metaVal > 0 ? (realVal / metaVal) * 100 : 0;
+    if (percentage > 100) percentage = 100;
+
+    return `
+        <div class="drawer-col">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div class="drawer-label">${label}</div>
+                <i class="fa-solid fa-pen-to-square" style="font-size:9px; color:var(--text-tertiary); opacity:0.4;"></i>
+            </div>
+            
+            <input type="number" 
+                   id="b-${key}-${monthKey}" 
+                   class="input-meta" 
+                   value="${metaVal}" 
+                   onchange="saveMonthBudget('${monthKey}')">
+            
+            <div style="height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; overflow: hidden;">
+                <div style="width: ${percentage}%; background: ${statusColor}; height: 100%; border-radius: 10px; transition: width 0.5s ease;"></div>
+            </div>
+
+            <div style="margin-top:8px;">
+                <div class="drawer-stat">
+                    <span class="drawer-stat-label">Ejecutado</span>
+                    <span class="drawer-stat-value">${formatCurrency(realVal)}</span>
+                </div>
+                
+                <div class="drawer-stat">
+                    <span class="drawer-stat-label" style="color:${statusColor}; font-weight:800;">
+                        ${statusText}
+                    </span>
+                    <span class="drawer-stat-value" style="color:${statusColor}; font-size:14px; font-weight:800;">
+                        ${formatCurrency(absDiff)}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function setManualAdjustment(key, monthKey, value) {
+    runwayAdjustments[`${key}-${monthKey}`] = Math.max(0, value);
+    localStorage.setItem(`runway_sim_${currentUser.id}`, JSON.stringify(runwayAdjustments));
+    renderRunwayDetail();
+    showToast("Valor manual aplicado a la tabla", "success");
 }
 
 // Función auxiliar para no saturar el render principal
@@ -8571,6 +8799,174 @@ async function saveTransferClick() {
   await renderDashboard();
   showToast('Transferencia guardada correctamente', 'success');
 }
+
+// ============================================================================
+// PRESUPUESTOS INI
+// ============================================================================
+
+// Guardar la meta (Presupuesto) de un mes específico en Supabase
+async function saveMonthBudget(monthKey) {
+    const budgets = {
+        user_id: currentUser.id,
+        month_key: monthKey,
+        fixed: parseFloat(document.getElementById(`b-fixed-${monthKey}`).value) || 0,
+        variable: parseFloat(document.getElementById(`b-variable-${monthKey}`).value) || 0,
+        contribution: parseFloat(document.getElementById(`b-contribution-${monthKey}`).value) || 0,
+        income: parseFloat(document.getElementById(`b-income-${monthKey}`).value) || 0
+    };
+
+    const { error } = await supabaseClient.from('budgets').upsert(budgets, { onConflict: 'user_id, month_key' });
+    
+    if (error) showToast("Error al guardar meta", "error");
+    else {
+        showToast("Meta del mes guardada ✓", "success");
+        renderRunwayDetail(); // Recargamos para que la simulación use los nuevos valores
+    }
+}
+
+// Lógica del botón REAL (Mes en curso)
+async function syncRealMonthStatus(monthKey) {
+    const data = await getData();
+    const { data: b } = await supabaseClient.from('budgets').select('*').eq('user_id', currentUser.id).eq('month_key', monthKey).single();
+    
+    if (!b) {
+        showToast("Primero define la meta en el engranaje ⚙️", "info");
+        return;
+    }
+
+    // Lista de IDs de gastos fijos estrictamente personales
+    const personalFixedIds = data.fixedExpenses
+        .filter(fe => fe.type === 'gastos_personales')
+        .map(fe => fe.id);
+
+    const now = new Date();
+    const monthTx = data.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+
+    const actuals = {
+        // FILTRADO ESTRICTO AQUÍ:
+        fixed: monthTx.filter(t => t.fixedExpenseId && personalFixedIds.includes(t.fixedExpenseId))
+                      .reduce((s, t) => s + Math.abs(t.amount), 0),
+        
+        variable: monthTx.filter(t => t.type === 'gastos_personales' && !t.fixedExpenseId)
+                         .reduce((s, t) => s + Math.abs(t.amount), 0),
+        
+        income: monthTx.filter(t => t.type === 'ingresos')
+                       .reduce((s, t) => s + t.amount, 0)
+    };
+
+    const contribDone = data.contributions.find(c => c.month === monthKey)?.my || 0;
+
+    runwayAdjustments[`fixed-${monthKey}`] = Math.max(0, b.fixed - actuals.fixed);
+    runwayAdjustments[`variable-${monthKey}`] = Math.max(0, b.variable - actuals.variable);
+    runwayAdjustments[`contribution-${monthKey}`] = Math.max(0, b.contribution - contribDone);
+    runwayAdjustments[`income-${monthKey}`] = Math.max(0, b.income - actuals.income);
+
+    localStorage.setItem(`runway_sim_${currentUser.id}`, JSON.stringify(runwayAdjustments));
+    renderRunwayDetail();
+    showToast("Sincronizado: solo se cuenta lo personal pendiente", "success");
+}
+
+function toggleBudgetDrawer(monthKey) {
+    const drawer = document.getElementById(`drawer-${monthKey}`);
+    drawer.style.display = drawer.style.display === 'none' ? 'table-row' : 'none';
+}
+
+// A. GUARDAR PRESUPUESTOS EN LA NUBE
+async function saveSupabaseBudget() {
+    if (!currentUser) return;
+    const budgets = {
+        user_id: currentUser.id,
+        fixed: parseFloat(document.getElementById('b-fixed').value) || 0,
+        variable: parseFloat(document.getElementById('b-variable').value) || 0,
+        contribution: parseFloat(document.getElementById('b-contribution').value) || 0,
+        income: parseFloat(document.getElementById('b-income').value) || 0
+    };
+
+    const { error } = await supabaseClient.from('budgets').upsert(budgets, { onConflict: 'user_id' });
+
+    if (error) showToast("Error al guardar presupuesto", "error");
+    else {
+        showToast("Presupuesto actualizado ✓", "success");
+        invalidateCache();
+        renderRunwayDetail();
+    }
+}
+
+// B. SINCRONIZAR MES ACTUAL (Cálculo Inteligente)
+async function syncRealMonthStatus(monthKey) {
+    const data = await getData();
+    const { data: b } = await supabaseClient.from('budgets').select('*').eq('user_id', currentUser.id).single();
+    
+    if (!b) { showToast("Define primero tus presupuestos arriba", "error"); return; }
+
+    const now = new Date();
+    const monthTx = data.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+
+    // Calcular lo ya ejecutado
+    const actuals = {
+        fixed: monthTx.filter(t => t.fixedExpenseId).reduce((s, t) => s + Math.abs(t.amount), 0),
+        variable: monthTx.filter(t => t.type === 'gastos_personales' && !t.fixedExpenseId).reduce((s, t) => s + Math.abs(t.amount), 0),
+        income: monthTx.filter(t => t.type === 'ingresos').reduce((s, t) => s + t.amount, 0)
+    };
+    
+    // Aportación casa desde la tabla contributions
+    const contribDone = data.contributions.find(c => c.month === monthKey)?.my || 0;
+
+    // Guardar en runwayAdjustments el RESTANTE (Presupuesto - Real)
+    runwayAdjustments[`fixed-${monthKey}`] = Math.max(0, b.fixed - actuals.fixed);
+    runwayAdjustments[`variable-${monthKey}`] = Math.max(0, b.variable - actuals.variable);
+    runwayAdjustments[`contribution-${monthKey}`] = Math.max(0, b.contribution - contribDone);
+    runwayAdjustments[`income-${monthKey}`] = Math.max(0, b.income - actuals.income);
+
+    localStorage.setItem(`runway_sim_${currentUser.id}`, JSON.stringify(runwayAdjustments));
+    renderRunwayDetail();
+    showToast("Mes sincronizado: mostrando pendiente", "success");
+}
+
+function resetMonthToAuto(monthKey) {
+    ['fixed', 'variable', 'contribution', 'income'].forEach(k => delete runwayAdjustments[`${k}-${monthKey}`]);
+    localStorage.setItem(`runway_sim_${currentUser.id}`, JSON.stringify(runwayAdjustments));
+    renderRunwayDetail();
+}
+
+async function getMonthActuals(monthKey) {
+    const data = await getData();
+    const [m, y] = monthKey.split('-').map(Number);
+    
+    // Obtener solo los IDs de gastos fijos que son personales
+    const personalFixedIds = data.fixedExpenses
+        .filter(fe => fe.type === 'gastos_personales')
+        .map(fe => fe.id);
+
+    const txs = data.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getMonth() === m && d.getFullYear() === y;
+    });
+
+    return {
+        // AHORA: Solo sumamos si el ID de gasto fijo está en nuestra lista personal
+        fixed: txs.filter(t => t.fixedExpenseId && personalFixedIds.includes(t.fixedExpenseId))
+                  .reduce((s, t) => s + Math.abs(t.amount), 0),
+        
+        variable: txs.filter(t => t.type === 'gastos_personales' && !t.fixedExpenseId)
+                     .reduce((s, t) => s + Math.abs(t.amount), 0),
+        
+        income: txs.filter(t => t.type === 'ingresos')
+                   .reduce((s, t) => s + t.amount, 0),
+        
+        contribution: data.contributions.find(c => c.month === monthKey)?.my || 0
+    };
+}
+
+// ============================================================================
+// PRESUPUESTOS FIN
+// ============================================================================
 
 // ============================================================================
 // CONTRIBUTION MODAL & FUNCTIONS
