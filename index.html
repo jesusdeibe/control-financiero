@@ -21,10 +21,11 @@
 
     :root {
         /* Fondos */
-        --bg-body: #E9EFF5;
-        --bg-surface: #FFFFFF; /* Blanco puro para las tarjetas */
+        --bg-body: #E2E8F0; /* Azul grisáceo profundo para Windows */
+        --bg-surface: #FFFFFF;
 
         /* Textos */
+        --text-main: #1E293B;
         --text-primary: #1A2B4D; /* Un azul muy oscuro para los textos, mejor que el negro puro */
         --text-secondary: #7E8299; /* Gris medio para subtítulos */
         --text-tertiary: #A1A5B7; /* Gris claro para fechas o ejes de gráficos */
@@ -52,8 +53,27 @@
         --border-medium: #D1D5DB;
         --bg-primary: #F3F4F6;
 
+        --shadow-premium: 
+          0 4px 6px -1px rgba(15, 23, 42, 0.1), 
+          0 10px 15px -3px rgba(15, 23, 42, 0.1),
+          0 0 0 1px rgba(33, 69, 137, 0.05); /* Bucle de definición extra */
+
         --shadow-sm: 0 2px 4px rgba(33, 69, 137, 0.08);
         --shadow-md: 0 10px 15px -3px rgba(33, 69, 137, 0.12);
+
+        font-size: 14px;
+    }
+
+    html {
+        /* Fuerza el suavizado nítido en Windows */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        
+        /* Mejora la legibilidad de fuentes geométricas como Outfit */
+        text-rendering: optimizeLegibility !important;
+        
+        /* Un pequeño truco: una sombra casi invisible ayuda a Windows a definir el borde de la letra */
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
     }
 
     /* 1. Estructura General y Fondo */
@@ -64,11 +84,15 @@
       display: flex;
       height: 100vh;
       overflow: hidden;
-      color: var(--text-primary);
+      color: #0F172A;
       font-family: 'Outfit', sans-serif;
+      font-variant-ligatures: none;
+      font-weight: 500;
 
       /* NUEVO GRADIENTE: Más limpio, eliminando el tono crema excesivo */
-      background-color: #F8FAFC; 
+      background-color: var(--bg-body);
+      color: #1E293B; /* Slate 800: Más oscuro que el gris pero menos duro que el negro */
+      letter-spacing: -0.01em; /* Mejora la lectura en fuentes geométricas como Outfit */
       background-image: 
           radial-gradient(at 0% 0%, rgba(33, 69, 137, 0.08) 0px, transparent 50%),   /* Azul marca */
           radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%), /* Verde inversión */
@@ -83,22 +107,82 @@
    NUEVA SIDEBAR ULTRA-LIMPIA (REEMPLAZO)
    =================================================== */
 
-    /* Sidebar: Ajuste de estructura */
+    /* --- BLOQUE ÚNICO Y DEFINITIVO DE LA SIDEBAR --- */
     .sidebar {
-        width: 260px;
+        width: 240px;
         height: calc(100vh - 40px);
-        margin: 20px;
-        background: transparent !important;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.5) !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.03);
+        margin: 15px;
+        
+        /* Integración: Mismo fondo que tus tarjetas (.section) */
+        background: var(--bg-surface) !important; 
+        
+        /* Borde idéntico al de tus secciones para coherencia visual */
+        border: 1px solid #CBD5E1 !important;
         border-radius: 24px !important;
-        padding: 0 12px 24px 12px !important; /* Quitamos padding superior */
+        
+        padding: 20px 10px !important;
         display: flex;
         flex-direction: column;
-        overflow: hidden; /* Evita que la sidebar entera scrollee */
-        box-shadow: 0 10px 40px rgba(0,0,0,0.02) !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        
+        /* Sombra integrada con el estilo de la app */
+        box-shadow: 0 10px 15px -3px rgba(33, 69, 137, 0.05) !important;
+    }
+
+    /* Scrollbar fina para Windows */
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 10px;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 6px;
+        border-radius: 16px;
+        
+        /* Texto en el Slate oscuro de tu app */
+        color: var(--text-main) !important; 
+        text-decoration: none;
+        font-weight: 700; /* Outfit luce mejor con peso 700 */
+        font-size: 14px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Iconos integrados */
+    .sidebar a i {
+        width: 20px;
+        text-align: center;
+        font-size: 18px;
+        color: #64748B; /* Gris acero por defecto */
+        transition: color 0.2s ease;
+    }
+
+    /* Hover: Fondo azul muy suave, texto azul fuerte */
+    .sidebar a:hover {
+        background: #E0E7FF !important;
+        color: #214589 !important;
+    }
+
+    .sidebar a:hover i {
+        color: #214589;
+    }
+
+    /* ESTADO ACTIVO: Integración total con el color de marca */
+    .sidebar a.active {
+        background: #214589 !important; /* Tu azul principal */
+        color: white !important;
+        box-shadow: 0 8px 15px rgba(33, 69, 137, 0.2);
+    }
+
+    .sidebar a.active i {
+        color: white !important;
     }
 
     .sidebar-nav-container {
@@ -122,6 +206,44 @@
             black 92%, 
             transparent 100%
         );
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 4px;
+        border-radius: 12px;
+        color: #94A3B8; /* Gris azulado apagado */
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    /* Hover: El elemento se aclara un poco */
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        color: #F8FAFC;
+    }
+
+    /* Activo: El elemento se ilumina y destaca */
+    .nav-item.active {
+        background: var(--primary); /* Tu azul principal */
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(33, 69, 137, 0.3);
+    }
+
+    .nav-item.active i {
+        color: white;
+    }
+
+    .nav-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 16px;
+        opacity: 0.8;
     }
 
     /* OPCIONAL: Una pequeña flecha animada que solo aparece si quieres algo más explícito */
@@ -298,7 +420,7 @@
     .main-content {
       flex-grow: 1;
       overflow-y: auto;
-      padding: 32px 40px;
+      padding: 15px !important;
       position: relative;
     }
 
@@ -314,8 +436,8 @@
     .page-title {
       font-family: 'Outfit', sans-serif;
       font-size: 32px;
+      color: #0F172A; /* Slate 900 para títulos: Máximo contraste */
       font-weight: 800;
-      color: #214589; /* Tu azul marino */
       letter-spacing: -0.03em; /* Ajuste moderno de kerning */
       margin-bottom: 4px;
     }
@@ -360,7 +482,7 @@
       background: #FFFFFF;
       border: 1px solid #E2E8F0;
       border-radius: 20px;
-      padding: 24px;
+      padding: 15px !important;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -380,11 +502,11 @@
 
     /* Etiquetas (Ej: "Ingresos", "Gastos") */
     .kpi-label {
-      font-size: 12px;
+      color: #64748B; /* Slate 500 para etiquetas secundarias */
       font-weight: 700;
-      color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -392,7 +514,7 @@
 
     /* Valores monetarios */
     .kpi-value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -1px;
       font-variant-numeric: tabular-nums; /* Números alineados */
@@ -424,14 +546,15 @@
     /* Efecto Cristal (Glassmorphism) para tarjetas y secciones */
     .kpi-card, .section {
     background: rgba(255, 255, 255, 0.7) !important; /* Fondo semitransparente */
+    background-color: var(--bg-surface) !important;
     backdrop-filter: blur(12px) !important;          /* El desenfoque clave */
     -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Borde brillante */
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07) !important;
+    box-shadow: var(--shadow-premium) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #CBD5E1 !important; 
     border-radius: 16px !important;
     padding: 24px;
     margin-bottom: 24px;
-    transition: all 0.3s ease !important;
     }
 
     .kpi-card:hover, .section:hover {
@@ -602,6 +725,8 @@
       overflow-y: visible !important; /* Prohibimos el scroll vertical interno */
       height: auto !important;
       max-height: none !important;
+      border-collapse: separate;
+      border-spacing: 0 12px; /* Más espacio entre filas para Windows */
     }
 
     /* Tablas Estilo SaaS */
@@ -3302,17 +3427,6 @@ body.privacy-mode #dashboard-runway-value {
         background-color: var(--bg-body) !important;
     }
 
-    /* 1. Quitamos la "burbuja" al menú lateral para que se funda con el fondo */
-    .sidebar {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 24px;
-        /* Si tu sidebar tiene un margin o border-radius previo, esto lo anula: */
-        margin: 0 !important;
-        border-radius: 0 !important;
-    }
-
     /* 2. El contenedor derecho (abarca la cabecera y la caja blanca) */
     .right-wrapper {
         flex: 1;
@@ -4357,8 +4471,8 @@ body.privacy-mode #dashboard-runway-value {
 /* En el proyector, las celdas de la tabla ahora resaltarán más */
 .table-container tr td {
     background: var(--bg-surface) !important;
-    border-top: 1px solid #E2E8F0 !important;
-    border-bottom: 1px solid #E2E8F0 !important;
+    border-top: 1px solid #D1DDEB !important;
+    border-bottom: 1px solid #D1DDEB !important;
 }
 
 /* Redondear esquinas de las filas */
@@ -4379,7 +4493,8 @@ body.privacy-mode #dashboard-runway-value {
 
 /* Diseño del Desplegable (Drawer) */
 .budget-drawer-row td {
-    background: #f8fafc !important; /* Un gris azulado muy suave */
+    background: #D1D9E6 !important; /* Azul acero claro */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
     border-radius: 0 0 12px 12px !important;
     padding: 0 !important; /* El padding lo dará el contenido interno */
     border-top: none !important;
@@ -4404,7 +4519,7 @@ body.privacy-mode #dashboard-runway-value {
     padding: 16px;
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--primary-light);
+    border: 1px solid #94A3B8 !important;
 }
 
 /* Micro-barra de progreso */
@@ -4479,6 +4594,154 @@ body.privacy-mode #dashboard-runway-value {
     background-color: var(--bg-surface) !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important; /* Borde casi invisible pero que define el límite */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+.sidebar, .section, .kpi-card, .view {
+    /* Esto "despierta" a la tarjeta gráfica para que dibuje con precisión */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+}
+
+canvas {
+    /* Evita que el navegador aplique suavizado de imagen al estirar el gráfico */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated; /* Solo si lo anterior no es suficiente */
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 5px;
+    margin-bottom: 15px; /* Margen reducido para mayor compacidad */
+}
+
+.brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 36px; /* Ligeramente más pequeño */
+    height: 36px;
+    background: #214589;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(33, 69, 137, 0.15);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #214589 0%, #6366F1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Más espacio para que respire */
+}
+
+/* Una barra vertical fina con el degradado de la marca */
+.brand-divider {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(to bottom, #214589, #6366F1);
+    border-radius: 2px;
+    opacity: 0.3; /* Que sea sutil, que no grite */
+}
+
+.greeting-emoji {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.app-title {
+    font-size: 26px; 
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.04em;
+    margin: 0;
+}
+
+.app-subtitle {
+    margin-left: 0 !important; /* Ahora que no hay icono, volvemos al margen 0 */
+    color: #64748B;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.user-highlight {
+    color: #214589;
+    font-weight: 700;
+}
+
+.header-date-pill {
+    background: white;
+    border: 1px solid #E2E8F0;
+    padding: 6px 12px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #64748B;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.header-date-pill i {
+    color: #214589;
+    font-size: 14px;
+}
+
+/* Badge de Estatus */
+.status-badge {
+    background: #E0E7FF;
+    color: #214589;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+}
+
+/* Subtítulo */
+.app-subtitle {
+    color: #64748B;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* Tarjeta de Fecha (Derecha) */
+.date-card {
+    background: white;
+    padding: 10px 18px;
+    border-radius: 14px;
+    border: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #475569;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.date-card i {
+    color: #214589;
+    font-size: 16px;
 }
 
   </style>
@@ -4605,11 +4868,21 @@ body.privacy-mode #dashboard-runway-value {
 
         <div id="dashboard-view" class="view active">
           <header class="header">
-            <div class="dashboard-header-row" style="width: 100%;">
-              <div>
-                <h1 class="page-title" style="margin:0;">Sunday Money Club</h1>
-                <p class="page-subtitle" style="margin-top: 4px;">Tu resumen financiero</p>
-              </div>
+            <div class="app-header">
+                <div class="header-left">
+                    <div class="brand-wrapper">
+                        <h1 class="app-title">Sunday <span class="text-gradient">Money Club</span></h1>
+                        <div class="brand-divider"></div>
+                        <span id="greeting-emoji" class="greeting-emoji">☀️</span>
+                    </div>
+                    <p class="app-subtitle">Bienvenido, <span id="user-greeting-name" class="user-highlight">...</span>. Así va tu <span id="current-day-name">...</span>.</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-date-pill">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span id="header-date"></span>
+                    </div>
+                </div>
             </div>
           </header>
     
@@ -5313,6 +5586,23 @@ body.privacy-mode #dashboard-runway-value {
         <div style="font-size: 28px; font-weight: 900;" id="pa-runway-value">0 meses</div>
         <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">Meses de libertad financiera</div>
       </div>
+    </div>
+
+    <div class="section" style="margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h2 class="section-title" style="margin-bottom: 4px;">Evolución de Gastos</h2>
+                <p style="font-size: 12px; color: var(--text-tertiary);">Análisis mensual por categorías principales</p>
+            </div>
+            <select id="spending-months-range" onchange="updateSpendingChart()" 
+                    style="padding: 6px 12px; border-radius: 8px; border: 1px solid #CBD5E1; font-family: 'Outfit'; font-size: 12px; background: white; color: var(--text-main);">
+                <option value="6">Últimos 6 meses</option>
+                <option value="12" selected>Último año</option>
+            </select>
+        </div>
+        <div style="height: 350px; width: 100%; position: relative;">
+            <canvas id="spendingEvolutionChart"></canvas>
+        </div>
     </div>
 
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
@@ -6886,6 +7176,7 @@ body.privacy-mode #dashboard-runway-value {
             }]
         },
         options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -6947,6 +7238,7 @@ body.privacy-mode #dashboard-runway-value {
       }]
     },
     options: {
+      devicePixelRatio: window.devicePixelRatio || 1,
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
@@ -7011,6 +7303,7 @@ function renderDistributionChart(normal, investments, shared) {
             }]
         },
         options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
             responsive: true,
             maintainAspectRatio: false,
             cutout: '75%', // Anillo más fino
@@ -7371,6 +7664,7 @@ function renderIndividualSparkline(holdingId, history) {
             }]
         },
         options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -8046,7 +8340,10 @@ async function showPersonalExpensesBreakdown() {
         if (viewName === 'search') renderSearchView();
         if (viewName === 'wishlist') renderWishlist();
         if (viewName === 'travels') renderTravelPlans();
-        if (viewName === 'personal-analysis') renderPersonalAnalysis();
+        if (viewName === 'personal-analysis') {
+          renderPersonalAnalysis();
+          renderSpendingEvolutionChart();
+        }
         
         // El Proyector ahora se carga aquí SIN volver a llamar a switchView
         if (viewName === 'runway-detail') renderRunwayDetail();
@@ -8162,8 +8459,9 @@ async function showPersonalExpensesBreakdown() {
     // 5. LANZAR GRÁFICO
     try {
         await renderPersonalGrowthChart();
+        await renderSpendingEvolutionChart(); // <-- AÑADE ESTO
     } catch (e) {
-        console.error("Error al renderizar el gráfico personal:", e);
+        console.error("Error al renderizar los gráficos:", e);
     }
 }
 
@@ -8462,6 +8760,7 @@ async function renderPersonalGrowthChart() {
             }]
         },
         options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
@@ -10794,6 +11093,7 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
         }))
     },
     options: {
+        devicePixelRatio: window.devicePixelRatio || 1,
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -10945,6 +11245,7 @@ document.getElementById('fixed-expense-modal')?.addEventListener('click', (e) =>
             }]
         },
         options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -13123,7 +13424,7 @@ async function renderSharedAnalysisChart() {
                 { label: 'Externas', data: externalValues, borderColor: '#10B981', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { size: 10, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+        options: { devicePixelRatio: window.devicePixelRatio || 1, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { size: 10, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
     });
 
     // ---------------------------------------------------------
@@ -13429,6 +13730,7 @@ async function openTravelAnalysis(travelId) {
                 }]
             },
             options: {
+                devicePixelRatio: window.devicePixelRatio || 1,
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '75%',
@@ -13440,7 +13742,7 @@ async function openTravelAnalysis(travelId) {
         travelAnalysisChart = new Chart(canvas.getContext('2d'), {
             type: 'doughnut',
             data: { labels: ['Sin gastos'], datasets: [{ data: [1], backgroundColor: ['#E4E6EF'], borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+            options: { devicePixelRatio: window.devicePixelRatio || 1, responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
         });
     }
 }
@@ -14401,6 +14703,157 @@ function renderMobileNavigation(activeView = 'dashboard') {
 }
 
 
+let spendingEvolutionChartInstance = null;
+
+async function renderSpendingEvolutionChart() {
+    const canvas = document.getElementById('spendingEvolutionChart');
+    if (!canvas) return;
+    
+    // CONFIGURACIÓN GLOBAL DE FUENTE
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.color = '#64748B'; // Color Slate 500 para etiquetas generales
+
+    const data = await getData();
+    const transactions = data.transactions || [];
+    const monthsToShow = parseInt(document.getElementById('spending-months-range').value) || 12;
+
+    const labels = [];
+    const monthKeys = [];
+    const now = new Date();
+    for (let i = monthsToShow - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        labels.push(MONTHS[d.getMonth()].substring(0,3).toUpperCase());
+        monthKeys.push(`${d.getMonth()}-${d.getFullYear()}`);
+    }
+
+    const categoryData = {}; 
+    transactions.filter(t => t.type === 'gastos_personales').forEach(t => {
+        const tDate = new Date(t.date);
+        const tKey = `${tDate.getMonth()}-${tDate.getFullYear()}`;
+        const monthIdx = monthKeys.indexOf(tKey);
+        
+        if (monthIdx !== -1) {
+            const cat = t.category || 'Otros';
+            if (!categoryData[cat]) {
+                categoryData[cat] = new Array(monthsToShow).fill(0);
+            }
+            categoryData[cat][monthIdx] += Math.abs(parseFloat(t.amount || 0));
+        }
+    });
+
+    const sortedCategories = Object.keys(categoryData)
+        .sort((a, b) => categoryData[b].reduce((s, v) => s + v, 0) - categoryData[a].reduce((s, v) => s + v, 0))
+        .slice(0, 5);
+
+    const colors = ['#214589', '#6366F1', '#8B5CF6', '#EC4899', '#F59E0B'];
+
+    const datasets = sortedCategories.map((cat, i) => ({
+        label: cat,
+        data: categoryData[cat],
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length] + '10', 
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 2
+    }));
+
+    if (spendingEvolutionChartInstance) spendingEvolutionChartInstance.destroy();
+
+    spendingEvolutionChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            devicePixelRatio: window.devicePixelRatio || 1,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        usePointStyle: true, 
+                        padding: 20,
+                        font: { 
+                            family: "'Outfit', sans-serif", 
+                            size: 12, 
+                            weight: '700' // Negrita para la leyenda
+                        },
+                        color: '#1E293B'
+                    } 
+                },
+                tooltip: { 
+                    backgroundColor: '#1E293B',
+                    titleFont: { family: "'Outfit', sans-serif", size: 14, weight: '800' },
+                    bodyFont: { family: "'Outfit', sans-serif", size: 13 },
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: true
+                }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#E2E8F0', drawBorder: false }, 
+                    ticks: { 
+                        font: { family: "'Outfit', sans-serif", size: 11, weight: '600' },
+                        color: '#94A3B8',
+                        callback: v => formatCurrency(v) 
+                    } 
+                },
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { 
+                        font: { family: "'Outfit', sans-serif", size: 10, weight: '800' },
+                        color: '#94A3B8'
+                    } 
+                }
+            }
+        }
+    });
+}
+
+// Función para el selector de meses
+function updateSpendingChart() {
+    renderSpendingEvolutionChart();
+}
+
+function updateHeaderInfo() {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    // 1. Emoji dinámico según la hora
+    let emoji = '☀️'; // Por defecto sol
+    if (hour >= 6 && hour < 12) emoji = '☕'; // Mañana
+    if (hour >= 12 && hour < 20) emoji = '☀️'; // Tarde
+    if (hour >= 20 || hour < 6) emoji = '🌙'; // Noche
+    
+    const emojiEl = document.getElementById('greeting-emoji');
+    if (emojiEl) emojiEl.innerText = emoji;
+
+    // 2. Fecha completa (Mes dinámico incluido)
+    const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+    let fullDate = now.toLocaleDateString('es-ES', dateOptions);
+    fullDate = fullDate.charAt(0).toUpperCase() + fullDate.slice(1);
+    document.getElementById('header-date').innerText = fullDate;
+
+    // 3. Día de la semana en el saludo
+    const daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const dayName = daysOfWeek[now.getDay()];
+    if (document.getElementById('current-day-name')) {
+        document.getElementById('current-day-name').innerText = dayName;
+    }
+
+    // 4. Nombre de usuario
+    const nameEl = document.getElementById('user-greeting-name');
+    if (nameEl && typeof currentUser !== 'undefined' && currentUser) {
+        const rawName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+        const firstName = rawName.split(' ')[0];
+        nameEl.innerText = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    }
+}
+
 // ============================================================================
 // INICIO DE LA APLICACIÓN
 // ============================================================================
@@ -14652,6 +15105,8 @@ function getPublicPrioColors(prio) {
     } else {
       switchView(startView);
     }
+
+    updateHeaderInfo();
   }
 
   initializeApp();
