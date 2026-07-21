@@ -5933,6 +5933,9 @@ canvas {
                 <option value="12" selected>Último año</option>
             </select>
         </div>
+        <div id="health-chart-category-filters" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding: 5px 0;">
+            </div>
+
         <div style="height: 350px; width: 100%; position: relative;">
             <canvas id="spendingEvolutionChart"></canvas>
         </div>
@@ -6100,6 +6103,10 @@ canvas {
             <div class="section-header">
                 <h3 class="section-title">📈 Evolución Temporal</h3>
             </div>
+            
+            <div id="shared-chart-category-filters" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding: 5px 0;">
+                </div>
+
             <div style="height: 300px;">
                 <canvas id="sharedEvolutionChart"></canvas>
             </div>
@@ -13647,10 +13654,17 @@ function toggleExtraordinaryExpenses() {
     renderSharedAnalysisChart();
 }
 
+// Inicialmente en null para que la primera vez cargue todas las de vuestra base de datos.
+let selectedSharedChartCategories = null; 
+
 async function renderSharedAnalysisChart() {
     const data = await getData();
     const canvas = document.getElementById('sharedEvolutionChart');
     if (!canvas) return;
+
+    // CONFIGURACIÓN DE FUENTE
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.color = '#64748B';
 
     // 1. ACTUALIZAR NAVEGADOR COMPACTO
     const monthDisplay = document.getElementById('shared-current-month-display');
@@ -13662,52 +13676,116 @@ async function renderSharedAnalysisChart() {
     if (ignoredEl) ignoredEl.textContent = EXTRA_CATEGORIES.join(', ');
 
     const labels = [];
-    const values = []; 
-    const jesusValues = []; 
-    const silviaValues = []; 
-    const externalValues = []; 
+    const monthKeys = [];
     const now = new Date();
-    const categoryTotals = {};
     
-    // 2. PROCESAR ÚLTIMOS 6 MESES
-    for (let i = 5; i >= 0; i--) {
+    // Cambiamos a los últimos 6 meses para vuestra gráfica temporal
+    const monthsToShow = 6;
+    for (let i = monthsToShow - 1; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const m = d.getMonth();
-        const y = d.getFullYear();
-        labels.push(MONTHS[m].substring(0, 3).toUpperCase());
-
-        const monthTxs = data.transactions.filter(t => {
-            const tDate = new Date(t.date);
-            const matchesDate = tDate.getMonth() === m && tDate.getFullYear() === y;
-            const isShared = t.type === 'gastos_compartidos';
-            
-            if (!matchesDate || !isShared) return false;
-            if (excludeExtraordinary && EXTRA_CATEGORIES.includes(t.category)) return false;
-            
-            return true;
-        });
-
-        const total = monthTxs.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-        values.push(total);
-
-        if (m === currentMonth && y === currentYear) {
-            monthTxs.forEach(t => {
-                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + Math.abs(t.amount);
-            });
-        }
-
-        const monthKey = `${m}-${y}`;
-        const contrib = data.contributions.find(c => c.month === monthKey);
-        jesusValues.push(contrib ? parseFloat(contrib.my || 0) : 0);
-        silviaValues.push(contrib ? parseFloat(contrib.partner || 0) : 0);
-        externalValues.push(contrib ? parseFloat(contrib.external || 0) : 0);
+        labels.push(MONTHS[d.getMonth()].substring(0, 3).toUpperCase());
+        monthKeys.push(`${d.getMonth()}-${d.getFullYear()}`);
     }
 
-    // 3. ACTUALIZAR KPIs
-    const activeValues = values.filter(v => v > 0);
-    const avg = activeValues.length > 0 
-        ? activeValues.reduce((a, b) => a + b, 0) / activeValues.length 
-        : 0;
+    // Estructuras de datos para agrupar costes y calcular medias
+    const categoryData = {};
+    const monthlyTotalValues = new Array(monthsToShow).fill(0);
+    const categoryTotalsThisMonth = {}; // Para el TOP de gastos en el KPI de abajo
+
+    // 2. PROCESAR TRANSACCIONES POR CATEGORÍA Y MES
+    data.transactions.forEach(t => {
+        if (t.type !== 'gastos_compartidos') return;
+        
+        // Respetamos vuestro filtro de Modo Rutina (Evita viajes o extraordinarios si está activo)
+        if (excludeExtraordinary && EXTRA_CATEGORIES.includes(t.category)) return;
+
+        const tDate = new Date(t.date);
+        const tKey = `${tDate.getMonth()}-${tDate.getFullYear()}`;
+        const monthIdx = monthKeys.indexOf(tKey);
+
+        if (monthIdx !== -1) {
+            const cat = t.category || 'Otros';
+            const amount = Math.abs(parseFloat(t.amount || 0));
+
+            // Acumular para las líneas temporales
+            if (!categoryData[cat]) {
+                categoryData[cat] = new Array(monthsToShow).fill(0);
+            }
+            categoryData[cat][monthIdx] += amount;
+            monthlyTotalValues[monthIdx] += amount;
+
+            // Acumular solo para el TOP del mes que estáis consultando en el visor
+            if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear) {
+                categoryTotalsThisMonth[cat] = (categoryTotalsThisMonth[cat] || 0) + amount;
+            }
+        }
+    });
+
+    // Clasificar todas las categorías ordenadas por volumen total
+    const allCategories = Object.keys(categoryData).sort((a, b) => {
+        return categoryData[b].reduce((s, v) => s + v, 0) - categoryData[a].reduce((s, v) => s + v, 0);
+    });
+
+    // Si es la primera vez que se monta la vista, marcamos todas como visibles
+    if (selectedSharedChartCategories === null) {
+        selectedSharedChartCategories = [...allCategories];
+    }
+
+    // --- NUEVO: Inyectar píldoras de filtrado dinámico en el HTML ---
+    const filtersContainer = document.getElementById('shared-chart-category-filters');
+    if (filtersContainer) {
+        const areAllChecked = allCategories.length === selectedSharedChartCategories.length;
+        
+        let htmlButtons = `
+            <button type="button" onclick="toggleAllSharedCategories(${JSON.stringify(allCategories).replace(/"/g, '&quot;')})" style="
+                padding: 6px 12px; 
+                border-radius: 20px; 
+                border: 1px solid ${areAllChecked ? '#1E293B' : '#CBD5E1'}; 
+                background: ${areAllChecked ? '#F1F5F9' : '#FFFFFF'}; 
+                color: #1E293B; 
+                font-size: 11px; 
+                font-weight: 800; 
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s ease;
+                margin-right: 8px;
+            ">
+                <i class="fa-solid ${areAllChecked ? 'fa-eye-slash' : 'fa-eye'}" style="font-size: 10px;"></i>
+                ${areAllChecked ? 'Desmarcar todas' : 'Marcar todas'}
+            </button>
+        `;
+
+        htmlButtons += allCategories.map(cat => {
+            const isChecked = selectedSharedChartCategories.includes(cat);
+            return `
+                <button type="button" onclick="toggleSharedChartCategory('${cat}')" style="
+                    padding: 6px 12px; 
+                    border-radius: 20px; 
+                    border: 1px solid ${isChecked ? '#214589' : '#E2E8F0'}; 
+                    background: ${isChecked ? '#E0E7FF' : '#FFFFFF'}; 
+                    color: ${isChecked ? '#214589' : '#64748B'}; 
+                    font-size: 11px; 
+                    font-weight: 700; 
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.2s ease;
+                ">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${isChecked ? '#214589' : '#94A3B8'}"></span>
+                    ${cat}
+                </button>
+            `;
+        }).join('');
+
+        filtersContainer.innerHTML = htmlButtons;
+    }
+
+    // 3. ACTUALIZAR KPIs BASADOS EN EL TOTAL REAL (Independiente del filtro visual de líneas)
+    const activeValues = monthlyTotalValues.filter(v => v > 0);
+    const avg = activeValues.length > 0 ? activeValues.reduce((a, b) => a + b, 0) / activeValues.length : 0;
 
     document.getElementById('shared-avg-value').textContent = formatCurrency(avg);
     const monthsCountEl = document.getElementById('shared-months-count');
@@ -13716,7 +13794,7 @@ async function renderSharedAnalysisChart() {
     const descText = document.getElementById('routine-desc-text');
     if (descText) descText.textContent = excludeExtraordinary ? "Excluyendo gastos extraordinarios" : "Incluyendo todos los gastos";
 
-    // 4. BARRA DE SINTONÍA
+    // 4. BARRA DE REPARTO SILVIA Y JESÚS (Mantenemos intacta tu lógica)
     const monthKey = `${currentMonth}-${currentYear}`;
     const currentContrib = data.contributions.find(c => c.month === monthKey);
     const balanceTextEl = document.getElementById('shared-balance-text');
@@ -13739,46 +13817,78 @@ async function renderSharedAnalysisChart() {
         if (noteEl) noteEl.textContent = "No hay ingresos comunes este mes.";
     }
 
-    // 5. LISTA DE CATEGORÍAS
+    // 5. RENDERIZAR LISTA TOP CATEGORÍAS DE ABAJO
     const catContainer = document.getElementById('shared-category-list');
-    const sortedCats = Object.entries(categoryTotals).sort((a,b) => b[1] - a[1]);
+    const sortedCats = Object.entries(categoryTotalsThisMonth).sort((a,b) => b[1] - a[1]);
     catContainer.innerHTML = sortedCats.map(([name, val]) => `<div onclick="showSharedCategoryDetails('${name}')" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; border-radius: 8px;"><span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">${name}</span><span style="font-size: 13px; font-weight: 800; color: var(--primary);">${formatCurrency(val)}</span></div>`).join('') || '<div style="text-align:center; color:var(--text-tertiary); padding:20px;">Sin gastos este mes</div>';
 
-    // 6. GRÁFICA MULTI-LÍNEA
+    // 6. FILTRADO PARA GENERACIÓN DE DATASETS EN LA GRÁFICA MULTI-LÍNEA
+    const activeCategories = allCategories.filter(cat => selectedSharedChartCategories.includes(cat));
+    const colors = ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#214589', '#EF4444', '#06B6D4'];
+
+    const datasets = activeCategories.map((cat, i) => ({
+        label: cat,
+        data: categoryData[cat],
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length] + '10',
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 2
+    }));
+
     if (sharedChartInstance) sharedChartInstance.destroy();
+    
     sharedChartInstance = new Chart(canvas.getContext('2d'), {
         type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                { label: 'Gastos', data: values, borderColor: '#214589', backgroundColor: 'rgba(33, 69, 137, 0.05)', borderWidth: 4, tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#fff' },
-                { label: 'Jesús', data: jesusValues, borderColor: '#3B82F6', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 },
-                { label: 'Silvia', data: silviaValues, borderColor: '#F59E0B', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 },
-                { label: 'Externas', data: externalValues, borderColor: '#10B981', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, pointRadius: 2 }
-            ]
-        },
-        options: { devicePixelRatio: window.devicePixelRatio || 1, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { size: 10, weight: '600' } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+        data: { labels: labels, datasets: datasets },
+        options: { 
+            devicePixelRatio: window.devicePixelRatio || 1, 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { 
+                    display: true, 
+                    position: 'bottom', 
+                    labels: { 
+                        usePointStyle: true, 
+                        boxWidth: 6, 
+                        padding: 15,
+                        font: { family: "'Outfit', sans-serif", size: 11, weight: '700' },
+                        color: '#1E293B'
+                    } 
+                }, 
+                tooltip: { mode: 'index', intersect: false } 
+            }, 
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    grid: { borderDash: [5, 5], color: 'rgba(0,0,0,0.05)' },
+                    ticks: { font: { family: "'Outfit', sans-serif", size: 11, weight: '600' }, color: '#94A3B8' }
+                }, 
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { family: "'Outfit', sans-serif", size: 10, weight: '800' }, color: '#94A3B8' }
+                } 
+            } 
+        }
     });
 
     // ---------------------------------------------------------
-    // 7. PROYECTOR TOTAL (Independiente del Modo Rutina)
+    // 7. PROYECTOR TOTAL (Mantenemos intacto vuestro proyector de viajes lineal)
     // ---------------------------------------------------------
     const projectionValEl = document.getElementById('shared-projection-value');
     const projectionDiffEl = document.getElementById('projection-diff-label');
-    const projectionCard = document.getElementById('projection-card');
-    const dot = document.getElementById('projection-status-dot');
-    
     const realDate = new Date();
     const isCurrentMonth = (currentMonth === realDate.getMonth() && currentYear === realDate.getFullYear());
 
     if (isCurrentMonth) {
         const day = realDate.getDate();
         const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-        // Categorías que NO se proyectan linealmente (se pagan una vez)
         const nonRepeatingCats = ['Alquiler', 'Hipoteca', 'Suministros', 'Internet', 'Seguros', ...EXTRA_CATEGORIES];
 
-        // IMPORTANTE: Aquí cogemos TODAS las transacciones, ignorando el "Modo Rutina"
         const currentMonthTxs = data.transactions.filter(t => {
             const d = new Date(t.date);
             return d.getMonth() === currentMonth && d.getFullYear() === currentYear && t.type === 'gastos_compartidos';
@@ -13789,7 +13899,6 @@ async function renderSharedAnalysisChart() {
 
         currentMonthTxs.forEach(t => {
             const amount = Math.abs(t.amount);
-            // Ya no hacemos el "if (excludeExtraordinary) return", proyectamos TODO.
             if (nonRepeatingCats.includes(t.category)) {
                 fixedAlreadySpent += amount;
             } else {
@@ -13797,45 +13906,35 @@ async function renderSharedAnalysisChart() {
             }
         });
 
-        // --- LÓGICA DE VIAJES PLANIFICADOS ---
         let pendingTravelBudget = 0;
-        let activeTravelNames = []; // Para informar al usuario
+        let activeTravelNames = [];
 
-        // Pedimos los viajes a Supabase
         const { data: travelPlans } = await supabaseClient.from('travel_plans').select('*').eq('is_shared', true);
         
         if (travelPlans) {
             travelPlans.forEach(plan => {
                 if (!plan.start_date) return;
                 const startDate = new Date(plan.start_date);
-                
-                // Si el viaje empieza en el mes que estamos viendo
                 if (startDate.getMonth() === currentMonth && startDate.getFullYear() === currentYear) {
-                    
-                    // Calculamos cuánto habéis gastado YA de este viaje concreto este mes
                     const alreadySpentOnThisTravel = currentMonthTxs
                         .filter(t => t.travel_id === plan.id)
                         .reduce((sum, t) => sum + Math.abs(t.amount), 0);
                     
                     const remaining = Math.max(0, plan.total_budget - alreadySpentOnThisTravel);
-                    
                     if (remaining > 0) {
                         pendingTravelBudget += remaining;
-                        activeTravelNames.push(plan.name); // Guardamos el nombre del viaje
+                        activeTravelNames.push(plan.name);
                     }
                 }
             });
         }
 
-        // FÓRMULA: Fijo + Variable Proyectada + Resto del presupuesto del viaje
         const variableDailyAvg = variableTotal / day;
         const projectedVariable = variableDailyAvg * totalDays;
         const finalProjection = fixedAlreadySpent + projectedVariable + pendingTravelBudget;
 
-        // ACTUALIZAR INTERFAZ
         projectionValEl.textContent = formatCurrency(finalProjection);
         
-        // Informamos de qué viajes se están teniendo en cuenta
         if (activeTravelNames.length > 0) {
             projectionDiffEl.innerHTML = `<span style="color:var(--primary); font-size:10px;">✈️ Incluye presupuesto de: <b>${activeTravelNames.join(', ')}</b></span>`;
         } else {
@@ -13853,10 +13952,36 @@ async function renderSharedAnalysisChart() {
         document.getElementById('total-days-num').textContent = totalDays;
 
     } else {
-        // Lógica mes pasado...
-        projectionValEl.textContent = formatCurrency(values[5]);
+        const lastMonthTotal = data.transactions
+            .filter(t => t.type === 'gastos_compartidos' && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+        projectionValEl.textContent = formatCurrency(lastMonthTotal);
         projectionDiffEl.textContent = "Mes finalizado";
     }
+}
+
+// 8. LOGICA INTERACTIVA DE LAS PÍLDORAS
+function toggleAllSharedCategories(allCategories) {
+    if (selectedSharedChartCategories.length === allCategories.length) {
+        selectedSharedChartCategories = [allCategories[0]]; 
+    } else {
+        selectedSharedChartCategories = [...allCategories];
+    }
+    renderSharedAnalysisChart();
+}
+
+function toggleSharedChartCategory(category) {
+    const index = selectedSharedChartCategories.indexOf(category);
+    if (index > -1) {
+        if (selectedSharedChartCategories.length > 1) {
+            selectedSharedChartCategories.splice(index, 1);
+        } else {
+            return;
+        }
+    } else {
+        selectedSharedChartCategories.push(category);
+    }
+    renderSharedAnalysisChart();
 }
 
 // Función para cambiar de mes directamente desde la vista compartida
@@ -15037,6 +15162,7 @@ function renderMobileNavigation(activeView = 'dashboard') {
 
 
 let spendingEvolutionChartInstance = null;
+let selectedSpendingChartCategories = null; 
 
 async function renderSpendingEvolutionChart() {
     const canvas = document.getElementById('spendingEvolutionChart');
@@ -15044,7 +15170,7 @@ async function renderSpendingEvolutionChart() {
     
     // CONFIGURACIÓN GLOBAL DE FUENTE
     Chart.defaults.font.family = "'Outfit', sans-serif";
-    Chart.defaults.color = '#64748B'; // Color Slate 500 para etiquetas generales
+    Chart.defaults.color = '#64748B';
 
     const data = await getData();
     const transactions = data.transactions || [];
@@ -15059,6 +15185,7 @@ async function renderSpendingEvolutionChart() {
         monthKeys.push(`${d.getMonth()}-${d.getFullYear()}`);
     }
 
+    // Extraer y procesar todas las categorías con transacciones
     const categoryData = {}; 
     transactions.filter(t => t.type === 'gastos_personales').forEach(t => {
         const tDate = new Date(t.date);
@@ -15074,13 +15201,77 @@ async function renderSpendingEvolutionChart() {
         }
     });
 
-    const sortedCategories = Object.keys(categoryData)
-        .sort((a, b) => categoryData[b].reduce((s, v) => s + v, 0) - categoryData[a].reduce((s, v) => s + v, 0))
-        .slice(0, 5);
+    // Todas las categorías ordenadas por volumen de gasto
+    const allCategories = Object.keys(categoryData).sort((a, b) => {
+        return categoryData[b].reduce((s, v) => s + v, 0) - categoryData[a].reduce((s, v) => s + v, 0);
+    });
 
-    const colors = ['#214589', '#6366F1', '#8B5CF6', '#EC4899', '#F59E0B'];
+    // Si es la primera vez, marcamos todas por defecto
+    if (selectedSpendingChartCategories === null) {
+        selectedSpendingChartCategories = [...allCategories];
+    }
 
-    const datasets = sortedCategories.map((cat, i) => ({
+    // --- Renderizar botones/píldoras de filtrado en el HTML ---
+    const filtersContainer = document.getElementById('health-chart-category-filters');
+    if (filtersContainer) {
+        // Determinar el estado del botón maestro "Todos"
+        const areAllChecked = allCategories.length === selectedSpendingChartCategories.length;
+        
+        // 1. Crear el botón de "Marcar/Desmarcar Todos" con un diseño distinguido (borde gris oscuro)
+        let htmlButtons = `
+            <button type="button" onclick="toggleAllSpendingCategories(${JSON.stringify(allCategories).replace(/"/g, '&quot;')})" style="
+                padding: 6px 12px; 
+                border-radius: 20px; 
+                border: 1px solid ${areAllChecked ? '#1E293B' : '#CBD5E1'}; 
+                background: ${areAllChecked ? '#F1F5F9' : '#FFFFFF'}; 
+                color: '#1E293B'; 
+                font-size: 11px; 
+                font-weight: 800; 
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s ease;
+                margin-right: 8px; /* Separación extra */
+            ">
+                <i class="fa-solid ${areAllChecked ? 'fa-eye-slash' : 'fa-eye'}" style="font-size: 10px;"></i>
+                ${areAllChecked ? 'Desmarcar todas' : 'Marcar todas'}
+            </button>
+        `;
+
+        // 2. Concatenar el resto de píldoras individuales de categorías
+        htmlButtons += allCategories.map(cat => {
+            const isChecked = selectedSpendingChartCategories.includes(cat);
+            return `
+                <button type="button" onclick="toggleSpendingChartCategory('${cat}')" style="
+                    padding: 6px 12px; 
+                    border-radius: 20px; 
+                    border: 1px solid ${isChecked ? '#214589' : '#E2E8F0'}; 
+                    background: ${isChecked ? '#E0E7FF' : '#FFFFFF'}; 
+                    color: ${isChecked ? '#214589' : '#64748B'}; 
+                    font-size: 11px; 
+                    font-weight: 700; 
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.2s ease;
+                ">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${isChecked ? '#214589' : '#94A3B8'}"></span>
+                    ${cat}
+                </button>
+            `;
+        }).join('');
+
+        filtersContainer.innerHTML = htmlButtons;
+    }
+
+    // FILTRADO: Seleccionamos solo las categorías marcadas por el usuario
+    const activeCategories = allCategories.filter(cat => selectedSpendingChartCategories.includes(cat));
+
+    const colors = ['#214589', '#6366F1', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#EF4444', '#06B6D4'];
+
+    const datasets = activeCategories.map((cat, i) => ({
         label: cat,
         data: categoryData[cat],
         borderColor: colors[i % colors.length],
@@ -15108,11 +15299,7 @@ async function renderSpendingEvolutionChart() {
                     labels: { 
                         usePointStyle: true, 
                         padding: 20,
-                        font: { 
-                            family: "'Outfit', sans-serif", 
-                            size: 12, 
-                            weight: '700' // Negrita para la leyenda
-                        },
+                        font: { family: "'Outfit', sans-serif", size: 12, weight: '700' },
                         color: '#1E293B'
                     } 
                 },
@@ -15147,7 +15334,33 @@ async function renderSpendingEvolutionChart() {
     });
 }
 
-// Función para el selector de meses
+// NUEVA FUNCIÓN: Maneja la acción global del botón maestro
+function toggleAllSpendingCategories(allCategories) {
+    // Si están todas seleccionadas, desmarcamos de golpe dejando solo la primera activa para no romper Chart.js
+    if (selectedSpendingChartCategories.length === allCategories.length) {
+        selectedSpendingChartCategories = [allCategories[0]]; 
+    } else {
+        // Si faltaba alguna o estaban todas apagadas, las activamos todas
+        selectedSpendingChartCategories = [...allCategories];
+    }
+    renderSpendingEvolutionChart();
+}
+
+function toggleSpendingChartCategory(category) {
+    const index = selectedSpendingChartCategories.indexOf(category);
+    
+    if (index > -1) {
+        if (selectedSpendingChartCategories.length > 1) {
+            selectedSpendingChartCategories.splice(index, 1);
+        } else {
+            return; 
+        }
+    } else {
+        selectedSpendingChartCategories.push(category);
+    }
+    renderSpendingEvolutionChart();
+}
+
 function updateSpendingChart() {
     renderSpendingEvolutionChart();
 }
